@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rpkclust"
+version = "0.1.0"
+description = "Region-Partitioned Keywords Inference for Binary Protocol Reverse"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "numpy",
+    "scipy",
+    "scikit-learn",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+    "scapy",
+]
+
+[project.scripts]
+rpkclust = "rpkclust.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["rpkclust*"]

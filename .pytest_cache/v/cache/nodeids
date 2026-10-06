@@ -1,0 +1,21 @@
+[
+  "tests/test_boundary.py::test_boundary_detection_synthetic",
+  "tests/test_boundary.py::test_fig1_boundary_check",
+  "tests/test_candidates.py::test_for_candidate_generation",
+  "tests/test_candidates.py::test_nfor_tlv_candidate_generation",
+  "tests/test_detectors.py::test_checksum_detector",
+  "tests/test_detectors.py::test_constant_detector",
+  "tests/test_detectors.py::test_length_detector",
+  "tests/test_detectors.py::test_sequence_detector",
+  "tests/test_detectors.py::test_sparse_detector",
+  "tests/test_detectors.py::test_timestamp_detector",
+  "tests/test_fig1_pipeline.py::test_fig1_pipeline_reproduction",
+  "tests/test_model_config.py::test_candidate_extraction",
+  "tests/test_model_config.py::test_config_json_roundtrip",
+  "tests/test_stage1_constraints.py::test_compute_eer_separated",
+  "tests/test_stage1_constraints.py::test_evaluate_stage1_ranking",
+  "tests/test_stage1_constraints.py::test_star_posterior_monotonic",
+  "tests/test_stage2_constraints.py::test_paper_bit_use_example",
+  "tests/test_stage2_constraints.py::test_position_constraint",
+  "tests/test_stage2_constraints.py::test_two_stage_combination"
+]

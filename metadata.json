@@ -1,0 +1,6 @@
+{
+  "name": "RPKClust - Binary Protocol Reverse Engineering",
+  "description": "Region-Partitioned Keywords Inference for Binary Protocol Reverse Engineering: FOR-NFOR boundary detection, candidate generation, and two-stage probability inference.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

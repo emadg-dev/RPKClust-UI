@@ -1,0 +1,12 @@
+Metadata-Version: 2.4
+Name: rpkclust
+Version: 0.1.0
+Summary: Region-Partitioned Keywords Inference for Binary Protocol Reverse
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+Requires-Dist: numpy
+Requires-Dist: scipy
+Requires-Dist: scikit-learn
+Provides-Extra: test
+Requires-Dist: pytest; extra == "test"
+Requires-Dist: scapy; extra == "test"
