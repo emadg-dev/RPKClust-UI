@@ -51,11 +51,11 @@ class Config:
     boundary_per_direction: bool = False
     boundary_require_contiguous: bool = False
     boundary_min_msgs: int = 20
-    # R-05: Include Float and Length detectors in boundary scan (paper uses 6 rules only)
+    # R-05: Include Float and Length detectors in boundary scan (only 6 rules by default)
     boundary_include_extra_rules: bool = False
 
     # Stage 1 Clustering constraints
-    stage1_top_k: int = 5  # R-19: default between 3 and 5 per paper Table 3
+    stage1_top_k: int = 5  # R-19: default between 3 and 5
     sim_sample_size: int = 200
     sim_sample_pairs: int = 20000
     pair_min_ratio: float = 0.3

@@ -3,7 +3,7 @@ from rpkclust.config import Config
 from rpkclust.pipeline import run_pipeline
 
 def test_fig1_pipeline_reproduction():
-    # 8 messages from Figure 1
+    # 8 messages from the toy trace
     # m1: Read, m2: Response, m3: Read, m4: Response,
     # m5: Write, m6: Response, m7: Write, m8: Response
     fig1_hex = """

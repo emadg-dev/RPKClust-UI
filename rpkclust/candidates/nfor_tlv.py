@@ -68,7 +68,7 @@ def generate_nfor_candidates(
     if not nfor_data:
         return [], {"tlv_candidates_count": 0}
 
-    # R-08: Support fixed (t_len, l_len) params as in the paper (default).
+    # R-08: Support fixed (t_len, l_len) params (default).
     # Grid search is only performed when config.tlv_auto_params=True.
     if config.tlv_auto_params:
         t_len_list = list(config.tlv_t_lens)

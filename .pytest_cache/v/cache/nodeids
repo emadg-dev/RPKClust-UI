@@ -18,6 +18,7 @@
   "tests/test_stage1_constraints.py::test_compute_eer_separated",
   "tests/test_stage1_constraints.py::test_evaluate_stage1_ranking",
   "tests/test_stage1_constraints.py::test_star_posterior_monotonic",
+  "tests/test_stage2_constraints.py::test_bit_use_example",
   "tests/test_stage2_constraints.py::test_paper_bit_use_example",
   "tests/test_stage2_constraints.py::test_position_constraint",
   "tests/test_stage2_constraints.py::test_two_stage_combination"

@@ -25,7 +25,7 @@ BOUNDARY_RULES: List[Detector] = [
     ChecksumDetector(),
 ]
 
-# Extra rules not in the paper's boundary algorithm but used for FOR exclusion (R-05)
+# Extra rules not in the boundary algorithm but used for FOR exclusion (R-05)
 EXTRA_RULES: List[Detector] = [
     FloatDetector(),
     LengthDetector(),
@@ -36,7 +36,7 @@ DEFAULT_RULES: List[Detector] = BOUNDARY_RULES + EXTRA_RULES
 def get_detectors(config: Optional[Config] = None) -> List[Detector]:
     """
     Return ordered list of detectors for boundary scanning.
-    R-05: By default, only the paper's 6 rules are used for boundary detection.
+    R-05: By default, only 6 rules are used for boundary detection.
     Float and Length are included only when config.boundary_include_extra_rules=True.
     """
     if config is None:

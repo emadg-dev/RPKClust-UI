@@ -230,7 +230,7 @@ All core data models are defined in `rpkclust/model.py`. Message-level structure
 
 **Checksum algorithms** (1 byte: xor8, sum8, crc8 with poly 0x07; 2 bytes: crc16-modbus 0xA001, crc16-ccitt 0x1021, crc16-dnp 0xA6BC; 4 bytes: zlib crc32).
 
-**`get_detectors(config)`**: Returns `BOUNDARY_RULES` (6 paper rules) by default. When `config.boundary_include_extra_rules = True`, also includes Float and Length detectors.
+**`get_detectors(config)`**: Returns `BOUNDARY_RULES` (6 default rules) by default. When `config.boundary_include_extra_rules = True`, also includes Float and Length detectors.
 
 **`all_hits(messages, config, max_offset, pairs)`**: Alternative to `find_boundary()` that collects all hits (not just first-match). Not used by the pipeline itself.
 
@@ -265,7 +265,7 @@ Calls `generate_for_candidates()` and `generate_nfor_candidates()`, merges and d
 
 4. **Candidate generation**: For each valid TLV found, creates `Candidate(region="NFOR", offset=first_offset, length=v_len, kind="tlv", tlv_type=t_tag, endian, t_len, l_len)` with all four fields stored.
 
-**R-08**: Defaults to fixed parameters `t_len=1, l_len=1, endian="big"` (matching the paper). Grid search over `(1,2) × (1,2) × (big,little)` is enabled via `config.tlv_auto_params = True`, with `tlv_min_coverage` (0.6) and `tlv_min_presence` (0.8) filters applying in that mode.
+**R-08**: Defaults to fixed parameters `t_len=1, l_len=1, endian="big"`. Grid search over `(1,2) × (1,2) × (big,little)` is enabled via `config.tlv_auto_params = True`, with `tlv_min_coverage` (0.6) and `tlv_min_present` (0.8) filters applying in that mode.
 
 ---
 
@@ -281,7 +281,7 @@ Calls `generate_for_candidates()` and `generate_nfor_candidates()`, merges and d
 | Forward factor `f_fwd(K → x)` | Reliability of K influencing x (p_arrow) |
 | Backward factor `f_bwd(x → K)` | Reliability of x indicating K (p_back) |
 
-**Fixed constants** (R-11: documented from NetPlier, paper gives no numbers):
+**Fixed constants** (R-11: documented from NetPlier reference captures):
 ```
 p_arrow = {"sim": 0.8, "coupling": 0.9, "struct": 0.9, "dim": 0.9}
 p_back  = {"sim": 0.8, "coupling": 0.8, "struct": 0.8, "dim": 0.7}
@@ -423,7 +423,6 @@ Spawns as a subprocess via Vite middleware (`vite.config.ts`). Reads JSON from s
 |---|---|---|
 | `get_sources` | — | `{"catalog": SOURCES}` |
 | `benchmark_all` | `source_id` | Per-dataset benchmark results across all datasets in a source |
-| `scaling_benchmark` | `source_id`, `protocol`, `dataset_id` | Scaling points at message counts `[100, 500, 1000]` (R-20) |
 | `run_dataset` | `source_id`, `protocol`, `dataset_id`, `pcap_path`, `max_messages` | Full `Result` JSON with sample messages, boundary, candidates, keywords |
 | `run_custom` | `text` | Full `Result` JSON from hex-lines input |
 | `simulate_error` | `message` | Deliberately crashes for debugging |
@@ -436,7 +435,7 @@ Intercepts `POST /api/run`, pipes request body to stdin of the Python subprocess
 
 Single-file app with tab-based navigation. Uses `fetch('/api/run', {method: 'POST', ...})` for all backend communication. TypeScript interfaces mirror the Python dataclass field names. Key data flow:
 
-1. On mount: calls `get_sources` (loads catalog), `benchmark_all` (loads all benchmarks), `scaling_benchmark` (loads scaling data).
+1. On mount: calls `get_sources` (loads catalog), `benchmark_all` (loads all benchmarks).
 2. When a dataset is selected: calls `run_dataset` with the selected source/dataset.
 3. When hex input is submitted: calls `run_custom`.
 4. Results populate the tab views: Boundary, Candidates, Keywords (with ranking tables), Clusters, Diagnostics (timing), Samples.
@@ -515,11 +514,12 @@ All hyperparameters live in `rpkclust/config.py` (`Config` dataclass). The full 
 
 ### `rpkclust/catalog.py`
 
-Static registry of protocol datasets for the single source:
+Static registry of protocol datasets across 2 sources:
 
 | Source | Datasets | Protocols |
 |---|---|---|
 | `netplier` | 7 | modbus, dnp3, dhcp, tftp, ntp, smb, smb2 |
+| `icsreal` | 7 | modbus, dnp3, dhcp, tftp, ntp, smb, smb2 |
 
 **`get_catalog()`**: Returns a copy of `SOURCES` with `exists` (bool) and `file_size_kb` (float) added per dataset.
 
@@ -532,7 +532,7 @@ Protocol-specific ground-truth extraction (`extract_ground_truth_label`) and ben
 **`run_benchmark_on_pcap`**:
 1. Loads PCAP trace via `load_pcap()`.
 2. Protocol-specific cleaning:
-   - **modbus**: Truncates to Modbus TCP length field (`data[4:6]` + 6 bytes max).
+    - **modbus**: Truncates to Modbus TCP length field with `signed=False`.
    - **smb/smb2**: Filters to SMB magic (`\xffSMB` / `\xfeSMB`) packets.
 3. Extracts true labels, remaps message IDs, trims to `max_messages`.
 4. Runs `run_pipeline()`, computes metrics, returns evaluation dict.
@@ -571,12 +571,12 @@ catalog.py               → (os only)
 
 | Test File | Tests | Coverage |
 |---|---|---|
-| `test_fig1_pipeline.py` | 1 | End-to-end Figure 1 reproduction (8-message trace → B≥13, correct clustering) |
-| `test_boundary.py` | 2 | Synthetic boundary detection + Figure 1 hex |
+| `test_fig1_pipeline.py` | 1 | End-to-end toy trace reproduction (8-message trace → B≥13, correct clustering) |
+| `test_boundary.py` | 2 | Synthetic boundary detection + toy hex |
 | `test_detectors.py` | 6 | Constant, Sequence, Timestamp, Sparse, Checksum, Length detectors |
 | `test_candidates.py` | 2 | FOR candidate generation (excludes constants, includes sparse) + NFOR TLV detection |
 | `test_stage1_constraints.py` | 3 | EER computation, star posterior monotonicity, Stage 1 ranking |
 | `test_stage2_constraints.py` | 3 | Bit-use MSB test, position constraint formula, two-stage combination |
-| `test_model_config.py` | 2 | Config JSON roundtrip, candidate extraction |
+| `test_model_config.py` | 5 | Config JSON roundtrip, defaults, new fields, candidate extraction (FOR + NFOR pair) |
 
-Run all tests: `python -m pytest tests/ -v` (19 tests, ~2-3 seconds).
+Run all tests: `python -m pytest tests/ -v` (22 tests, ~2-3 seconds).

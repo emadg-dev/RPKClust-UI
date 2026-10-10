@@ -55,7 +55,7 @@ def combine_two_stage(
     prob_clip: Optional[Tuple[float, float]] = None
 ) -> float:
     """
-    Equation (14)-(15) from paper:
+    Equation (14)-(15):
     M = p_bit * p_offset * p_f
     N = (1 - p_bit) * (1 - p_offset) * (1 - p_f)
     P(K = 1 | p_bit, p_offset) = M / (M + N)

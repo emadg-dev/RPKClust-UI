@@ -16,7 +16,7 @@ RPKClust infers keyword fields from binary protocol messages through a multi-sta
 4. **Message Clustering** — groups protocol messages by inferred keyword values.
 5. **Evaluation** — computes Homogeneity, Completeness, and V-measure against ground truth.
 
-The UI provides an interactive dashboard for exploring benchmarks across 4 data sources (27+ datasets) with hyperparameter tuning controls.
+The UI provides an interactive dashboard for exploring benchmarks across 2 data sources (14 datasets) covering 7 supported protocols, with hyperparameter tuning controls.
 
 ## Tech Stack
 
@@ -115,7 +115,7 @@ echo '{"cmd":"get_sources"}' | python -m rpkclust.api_runner
 pytest tests/
 ```
 
-7 test files covering boundary detection, candidate generation, all 8 semantic detectors, end-to-end pipeline, config serialization, and both inference stages.
+22 tests across 7 test files covering boundary detection, candidate generation, all 8 semantic detectors, end-to-end pipeline, config serialization, and both inference stages.
 
 ## Environment Variables
 
@@ -131,4 +131,4 @@ See `.env.example` for the template.
 
 - [ASSUMPTIONS.md](ASSUMPTIONS.md) — Mathematical assumptions and defaults
 - [BENCHMARKS.md](BENCHMARKS.md) — Multi-source evaluation results and dataset catalog
-- [docs/DECISIONS.md](docs/DECISIONS.md) — Design decisions for underspecified paper parameters
+- [docs/DECISIONS.md](docs/DECISIONS.md) — Design decisions for underspecified parameters

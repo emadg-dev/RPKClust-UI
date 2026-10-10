@@ -3,13 +3,13 @@ from rpkclust.config import Config
 from rpkclust.constraints.stage2 import compute_bit_use_prob, compute_position_prob, evaluate_stage2
 from rpkclust.constraints.posterior import combine_two_stage
 
-def test_paper_bit_use_example():
+def test_bit_use_example():
     # Paper Section 3.6 example:
     # 00100100 (0x24 = 36), 00000010 (0x02 = 2), 00010000 (0x10 = 16)
     values = [bytes([0b00100100]), bytes([0b00000010]), bytes([0b00010000])]
     p_bit, details = compute_bit_use_prob(values)
 
-    # In paper: MSB is 5
+    # MSB is 5
     assert details["msb"] == 5
     assert len(details["q_k"]) == 6  # k = 0, 1, 2, 3, 4, 5
     # Verify p_bit is positive and healthy

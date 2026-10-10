@@ -244,7 +244,7 @@ def evaluate_stage1(
         })
 
     # R-10: Stage 1 posterior is each candidate's prior (Eq. 14).
-    # Normalization across candidates is NOT in the paper — off by default.
+    # Normalization across candidates is NOT the default — off by default.
     if config.stage1_normalize:
         low_norm, high_norm = config.norm_range
 

@@ -91,7 +91,7 @@ npm run typecheck  # TypeScript type checking (tsc --noEmit)
 | `rpkclust/api_runner.py` | Bridge between frontend and backend |
 | `src/App.tsx` | Entire frontend application |
 | `vite.config.ts` | Build config + API middleware plugin |
-| `tests/test_fig1_pipeline.py` | End-to-end test reproducing paper Figure 1 |
+| `tests/test_fig1_pipeline.py` | End-to-end test reproducing the toy trace |
 
 ## Vite API Middleware
 

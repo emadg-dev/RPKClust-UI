@@ -22,7 +22,7 @@ def test_boundary_detection_synthetic():
 
 def test_fig1_boundary_check():
     cfg = Config()
-    # Paper Figure 1 hex data
+    # Toy trace hex data
     hex_lines = [
         "05 64 0b c4 44 33 33 44 ac d1 c6 c5 01 3c 00 00 93 24",
         "05 64 0a 44 33 44 44 33 6e 25 e0 c5 81 00 00 02 ee",

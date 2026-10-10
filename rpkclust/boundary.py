@@ -1,5 +1,5 @@
 """
-FOR-NFOR Boundary Detection (Algorithm 1 in RPKClust paper).
+FOR-NFOR Boundary Detection (Algorithm 1).
 Identifies the maximal boundary B between Fixed-Offset Region (FOR)
 and Non-Fixed-Offset Region (NFOR).
 """
@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 def expand_boundary(boundary: BoundaryResult, messages: List[Message]) -> BoundaryResult:
     """
-    Hook for boundary dynamic expansion (referenced in Figure 6 of paper).
+    Hook for boundary dynamic expansion (not implemented in v1).
     Returns boundary unchanged in v1 (Decision D-03).
     """
     return boundary

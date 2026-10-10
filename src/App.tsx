@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   Layers,
   Cpu,
@@ -21,7 +21,6 @@ import {
   Sliders,
   ChevronRight,
   Sparkles,
-  TrendingUp,
   Clock,
   RotateCcw,
   SlidersHorizontal,
@@ -173,15 +172,6 @@ interface ProtocolDetails {
   sample_messages?: SampleMessage[];
 }
 
-interface ScalingPoint {
-  size: number;
-  rpkclust_sec: number;
-  netplier_sec: number;
-  boundary_B: number;
-  homogeneity: number;
-  v_measure: number;
-}
-
 interface Hyperparameters {
   fo_lengths_for_candidates: number[];
   sparse_ratio: number;
@@ -217,7 +207,7 @@ const DEFAULT_SOURCES: Record<string, SourceMeta> = {
     url: 'https://github.com/yapengye/NetPlier/tree/master/data',
     badge: 'Official Benchmark',
     color: 'indigo',
-    description: 'The official benchmark dataset from the NetPlier repository, cited and evaluated throughout the RPKClust paper.',
+                description: 'The official benchmark dataset from the NetPlier repository.',
     datasets: [
       { id: 'modbus', name: 'Modbus TCP', protocol: 'modbus', file: 'data/netplier/modbus_100.pcap', category: 'SCADA / Industrial', packets: 100, header_len: 8, keyword_field: 'Function Code (offset 7, 1B)', true_keyword: { offset: 7, length: 1, region: 'FOR', name: 'Function Code' }, expected_B: 8, description: 'Standard Modbus TCP request/response frames querying holding registers and coils.' },
       { id: 'dnp3', name: 'DNP3 SCADA', protocol: 'dnp3', file: 'data/netplier/dnp3_100.pcap', category: 'Electric Utility SCADA', packets: 114, header_len: 13, keyword_field: 'Application Function Code (offset 12, 1B)', true_keyword: { offset: 12, length: 1, region: 'FOR', name: 'Application Function Code' }, expected_B: 13, description: 'Distributed Network Protocol 3 telemetry and control between master and outstation RTUs.' },
@@ -250,7 +240,7 @@ const DEFAULT_SOURCES: Record<string, SourceMeta> = {
 };
 
 const BASELINE_COMPARISONS = [
-  { method: 'RPKClust (Ours)', msa: 'None (Alignment-Free)', time: '0.2s - 1.9s', avgV: '87.4%', forAware: 'Yes (FOR/NFOR Partitioned)' },
+  { method: 'RPKClust (Ours)', msa: 'None (Alignment-Free)', time: '0.2s - 1.9s', avgV: '', forAware: 'Yes (FOR/NFOR Partitioned)' },
   { method: 'NetPlier (NDSS 21)', msa: 'Global (MAFFT)', time: '12.4s - 180s', avgV: '82.1%', forAware: 'No (Uniform Processing)' },
   { method: 'AutoFormat (08)', msa: 'Pairwise Needleman', time: '30.0s - 140s', avgV: '68.2%', forAware: 'No' },
 ];
@@ -276,8 +266,6 @@ export default function App() {
   const [benchLoading, setBenchLoading] = useState<boolean>(false);
   const [benchmarks, setBenchmarks] = useState<BenchmarkResult[]>([]);
   const [protoDetails, setProtoDetails] = useState<ProtocolDetails | null>(null);
-  const [scalingPoints, setScalingPoints] = useState<ScalingPoint[]>([]);
-  const [scalingLoading, setScalingLoading] = useState<boolean>(false);
   const [customText, setCustomText] = useState<string>(FIG1_HEX);
   const [customDetails, setCustomDetails] = useState<ProtocolDetails | null>(null);
   const [selectedMessage, setSelectedMessage] = useState<number>(0);
@@ -409,7 +397,6 @@ export default function App() {
   useEffect(() => {
     fetchSources();
     runAllBenchmarks('all');
-    fetchScalingData('netplier', 'modbus');
   }, []);
 
   // When selectedSource changes, ensure selectedDataset belongs to that source
@@ -428,7 +415,6 @@ export default function App() {
   // When selectedDataset changes, load that dataset
   useEffect(() => {
     loadDataset(selectedSource, selectedDataset);
-    fetchScalingData(selectedSource, selectedDataset);
   }, [selectedDataset]);
 
   const serializeParams = () => {
@@ -485,23 +471,6 @@ export default function App() {
     }
   };
 
-  const fetchScalingData = async (sourceId: string, datasetId: string) => {
-    setScalingLoading(true);
-    try {
-      const { data } = await executeApiCall({
-        cmd: 'scaling_benchmark',
-        source_id: sourceId,
-        dataset_id: datasetId,
-        config: serializeParams(),
-      }, `scaling_${datasetId}`);
-      if (data?.status === 'ok') {
-        setScalingPoints(data.points);
-      }
-    } finally {
-      setScalingLoading(false);
-    }
-  };
-
   const runCustomTrace = async () => {
     setLoading(true);
     try {
@@ -543,6 +512,14 @@ export default function App() {
     if (benchmarkFilter === 'all') return true;
     return b.source_id === benchmarkFilter;
   });
+
+  // Compute RPKClust average V-Measure from netplier benchmark results
+  const rpkAvgV = useMemo(() => {
+    const netplerResults = benchmarks.filter((b) => !b.error && b.v_measure !== undefined);
+    if (netplerResults.length === 0) return null;
+    const avg = netplerResults.reduce((sum, b) => sum + (b.v_measure || 0), 0) / netplerResults.length;
+    return `${(avg * 100).toFixed(1)}%`;
+  }, [benchmarks]);
 
   // Stderr Drawer Computed States & Formatting
   const errorCount = stderrLogs.filter((l) => l.status === 'error').length;
@@ -705,7 +682,7 @@ export default function App() {
               }`}
             >
               <Table className="w-4 h-4" />
-              Paper Results
+              Results
             </button>
             <button
               onClick={() => setActiveTab('charts')}
@@ -714,7 +691,7 @@ export default function App() {
               }`}
             >
               <BarChart3 className="w-4 h-4" />
-              Paper Charts
+              Charts
             </button>
             <button
               onClick={() => setActiveTab('inspector')}
@@ -785,7 +762,7 @@ export default function App() {
                   className="px-3 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium flex items-center gap-1.5 transition"
                 >
                   <RotateCcw className="w-3.5 h-3.5" />
-                  Reset to Paper Defaults
+                  Reset to Defaults
                 </button>
                 <button
                   onClick={() => {
@@ -849,7 +826,7 @@ export default function App() {
                     onChange={(e) => setParams({ ...params, sparse_ratio: parseFloat(e.target.value) })}
                     className="w-full accent-indigo-500"
                   />
-                  <span className="text-[10px] text-slate-500">Default: 0.02 (Eq. 4 in paper)</span>
+                  <span className="text-[10px] text-slate-500">Default: 0.02 (Eq. 4)</span>
                 </div>
               </div>
 
@@ -1050,7 +1027,7 @@ export default function App() {
           </div>
         </div>
 
-        {/* TAB 1: Paper Results (Tables 2, 3, 4 & Baselines) */}
+        {/* TAB 1: Results (Tables 2, 3, 4 & Baselines) */}
         {activeTab === 'results' && (
           <div className="space-y-6">
             {/* Table 2: Boundary Detection Evaluation Table */}
@@ -1258,7 +1235,7 @@ export default function App() {
                 Cross-Method Comparison (RPKClust vs NetPlier vs AutoFormat)
               </h3>
               <p className="text-xs text-slate-400">
-                Summary of algorithmic design differences and execution efficiency as described in Section 4 of the paper.
+                Summary of algorithmic design differences and execution efficiency as described in Section 4.
               </p>
 
               <div className="overflow-x-auto">
@@ -1278,7 +1255,7 @@ export default function App() {
                         <td className="px-4 py-3 text-cyan-300">{row.method}</td>
                         <td className="px-4 py-3">{row.msa}</td>
                         <td className="px-4 py-3 text-emerald-400 font-semibold">{row.time}</td>
-                        <td className="px-4 py-3 text-amber-300 font-semibold">{row.avgV}</td>
+                        <td className="px-4 py-3 text-amber-300 font-semibold">{i === 0 ? (rpkAvgV ?? row.avgV) : row.avgV}</td>
                         <td className="px-4 py-3">{row.forAware}</td>
                       </tr>
                     ))}
@@ -1289,7 +1266,7 @@ export default function App() {
           </div>
         )}
 
-        {/* TAB 2: Visual Charts from the Paper */}
+        {/* TAB 2: Visual Charts */}
         {activeTab === 'charts' && (
           <div className="space-y-6">
             {/* Chart 1: Clustering Metrics Comparison Bar Chart */}
@@ -1362,103 +1339,6 @@ export default function App() {
                     );
                   })}
                 </svg>
-              </div>
-            </div>
-
-            {/* Chart 2: Scalability O(N) vs NetPlier O(N^2) MSA Runtime */}
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="font-bold text-white text-base flex items-center gap-2">
-                    <TrendingUp className="w-5 h-5 text-cyan-400" />
-                    Figure 8 Replication: Execution Time vs Trace Size (N Packets)
-                  </h3>
-                  <p className="text-xs text-slate-400 mt-0.5">
-                    Empirical verification of Alignment-Free linear scaling $O(N)$ against NetPlier multiple sequence alignment $O(N^2 \cdot L^2)$.
-                  </p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-slate-400">Current Dataset:</span>
-                  <span className="text-xs font-mono font-bold text-cyan-300 uppercase">
-                    {currentDatasetMeta?.name}
-                  </span>
-                </div>
-              </div>
-
-              {/* Scalability Chart Line Visualization */}
-              <div className="bg-slate-950 p-6 rounded-xl border border-slate-800">
-                <svg viewBox="0 0 800 240" className="w-full h-56 overflow-visible">
-                  {[0, 2, 5, 10, 15].map((sVal) => {
-                    const y = 200 - (sVal / 15) * 160;
-                    return (
-                      <g key={sVal}>
-                        <line x1="50" y1={y} x2="780" y2={y} stroke="#1e293b" strokeDasharray="3 3" />
-                        <text x="40" y={y + 4} fill="#64748b" fontSize="10" textAnchor="end" fontFamily="monospace">
-                          {sVal}s
-                        </text>
-                      </g>
-                    );
-                  })}
-
-                  {/* NetPlier Curve */}
-                  {scalingPoints.length > 1 && (
-                    <polyline
-                      fill="none"
-                      stroke="#f43f5e"
-                      strokeWidth="3"
-                      points={scalingPoints
-                        .map((pt) => {
-                          const x = 70 + ((pt.size - 15) / 85) * 680;
-                          const y = 200 - (Math.min(15, pt.netplier_sec) / 15) * 160;
-                          return `${x},${y}`;
-                        })
-                        .join(' ')}
-                    />
-                  )}
-
-                  {/* RPKClust Curve */}
-                  {scalingPoints.length > 1 && (
-                    <polyline
-                      fill="none"
-                      stroke="#10b981"
-                      strokeWidth="3"
-                      points={scalingPoints
-                        .map((pt) => {
-                          const x = 70 + ((pt.size - 15) / 85) * 680;
-                          const y = 200 - (Math.min(15, pt.rpkclust_sec) / 15) * 160;
-                          return `${x},${y}`;
-                        })
-                        .join(' ')}
-                    />
-                  )}
-
-                  {scalingPoints.map((pt) => {
-                    const x = 70 + ((pt.size - 15) / 85) * 680;
-                    const yRpk = 200 - (Math.min(15, pt.rpkclust_sec) / 15) * 160;
-                    const yNet = 200 - (Math.min(15, pt.netplier_sec) / 15) * 160;
-
-                    return (
-                      <g key={pt.size}>
-                        <circle cx={x} cy={yNet} r="4" fill="#f43f5e" />
-                        <circle cx={x} cy={yRpk} r="4" fill="#10b981" />
-                        <text x={x} y="220" fill="#94a3b8" fontSize="10" textAnchor="middle" fontFamily="monospace">
-                          N={pt.size}
-                        </text>
-                      </g>
-                    );
-                  })}
-                </svg>
-
-                <div className="flex items-center justify-center gap-6 mt-2 text-xs font-mono">
-                  <span className="flex items-center gap-1.5 text-emerald-400">
-                    <span className="w-3 h-3 rounded-full bg-emerald-500" />
-                    <span>RPKClust (Alignment-Free O(N))</span>
-                  </span>
-                  <span className="flex items-center gap-1.5 text-rose-400">
-                    <span className="w-3 h-3 rounded-full bg-rose-500" />
-                    <span>NetPlier (MSA O(N^2))</span>
-                  </span>
-                </div>
               </div>
             </div>
           </div>
@@ -1823,7 +1703,7 @@ export default function App() {
           </div>
         )}
 
-        {/* TAB 5: Motivating Figure 1 Toy Trace & Custom Hex Input */}
+        {/* TAB 5: Toy Trace & Custom Hex Input */}
         {activeTab === 'custom' && (
           <div className="space-y-6">
             <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
@@ -1831,10 +1711,10 @@ export default function App() {
                 <div>
                   <h3 className="font-bold text-white text-base flex items-center gap-2">
                     <FileCode className="w-5 h-5 text-indigo-400" />
-                    Motivating Figure 1 Toy Trace & Custom Hex Input
+                    Motivating Toy Trace & Custom Hex Input
                   </h3>
                   <p className="text-xs text-slate-400 mt-0.5">
-                    Paste raw hex lines or test with the motivating Figure 1 toy trace from the paper.
+                    Paste raw hex lines or test with the motivating toy trace.
                   </p>
                 </div>
                 <button

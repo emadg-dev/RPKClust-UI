@@ -18,7 +18,7 @@ def _pure_homogeneity_completeness_v_measure(
 ) -> Tuple[float, float, float]:
     """
     Pure Python calculation of Homogeneity, Completeness, and V-measure
-    (Rosenberg & Hirschberg, EMNLP 2007; Equations 16-20 in RPKClust paper).
+    (Rosenberg & Hirschberg, EMNLP 2007; Equations 16-20).
     """
     n = len(labels_true)
     if n == 0:
