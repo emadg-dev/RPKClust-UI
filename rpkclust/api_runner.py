@@ -190,9 +190,33 @@ def process_request(data: dict) -> dict:
         else:
             res = run_benchmark_on_pcap(pcap_path, proto, config=config, max_messages=max_msgs)
             trace = load_pcap(pcap_path, config)
+
         if max_msgs and len(trace.messages) > max_msgs:
-            from rpkclust.model import Trace
-            trace = Trace(messages=trace.messages[:max_msgs], pairs=trace.pairs, capture_range=trace.capture_range)
+            from rpkclust.model import Trace as TraceModel
+            trace = TraceModel(messages=trace.messages[:max_msgs], pairs=trace.pairs, capture_range=trace.capture_range)
+
+        if proto == "modbus":
+            from rpkclust.model import Message as MsgModel, Trace as TraceModel
+            cleaned_msgs: List[MsgModel] = []
+            for m in trace.messages:
+                data = m.data
+                if len(data) >= 6:
+                    length = int.from_bytes(data[4:6], byteorder="big", signed=False)
+                    if len(data) > length + 6:
+                        data = data[:length + 6]
+                cleaned_msgs.append(MsgModel(
+                    id=m.id,
+                    data=data,
+                    ts=m.ts,
+                    src=m.src,
+                    dst=m.dst,
+                    sport=m.sport,
+                    dport=m.dport,
+                    direction=m.direction,
+                    session_id=m.session_id,
+                    label=m.label,
+                ))
+            trace = TraceModel(messages=cleaned_msgs, pairs=trace.pairs, capture_range=trace.capture_range)
 
         pipeline_res = run_pipeline(trace, config)
 

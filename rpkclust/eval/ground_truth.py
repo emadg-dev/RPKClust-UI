@@ -76,7 +76,7 @@ def run_benchmark_on_pcap(
         data = m.data
         if p == "modbus":
             if len(data) >= 6:
-                length = int.from_bytes(data[4:6], byteorder="big", signed=True)
+                length = int.from_bytes(data[4:6], byteorder="big", signed=False)
                 if len(data) > length + 6:
                     data = data[:length + 6]
         elif p == "smb":

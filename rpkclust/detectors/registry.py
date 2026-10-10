@@ -49,7 +49,8 @@ def all_hits(
     messages: List[Message],
     config: Optional[Config] = None,
     max_offset: Optional[int] = None,
-    pairs: Optional[List[Pair]] = None
+    pairs: Optional[List[Pair]] = None,
+    detectors: Optional[List[Detector]] = None
 ) -> List[Hit]:
     """
     Scan all message fragments across offsets and evaluate all semantic rules.
@@ -63,6 +64,8 @@ def all_hits(
 
     if pairs is None:
         pairs = []
+        
+    detectors = detectors if detectors is not None else get_detectors(config)
 
     min_len = min(len(m.data) for m in messages)
     limit = min_len if max_offset is None else min(min_len, max_offset)

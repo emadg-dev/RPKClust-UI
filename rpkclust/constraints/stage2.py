@@ -16,36 +16,27 @@ def compute_bit_use_prob(
     dmax_mode: str = "max_over_m",
     prob_clip: Optional[Tuple[float, float]] = None
 ) -> Tuple[float, Dict[str, Any]]:
-    """
-    Compute Bit-use constraint probability p_bit according to Equations (7)-(10).
-    R-14: dmax_mode controls D_max computation:
-      - "max_over_m" (default): maximum over all bit positions m (current V2 approach)
-      - "m_equals_msb": m = MSB (alternative reading of the paper)
-    R-12: prob_clip controls clamping (default None = no clamp, only numeric guard).
-    """
     if not values:
         return 0.50, {"msb": -1, "D": 0.0, "D_max": 0.0}
 
-    distinct_bytes = list(set(values))
-    int_vals = [int.from_bytes(v, byteorder=endian) for v in distinct_bytes if v]
-    if not int_vals:
+    # D-B3: Q(k) is computed over ALL message values (multiset), not distinct values.
+    int_vals = [int.from_bytes(v, byteorder=endian) for v in values]
+
+    # D-B1: zero has no active bit; exclude it from both numerator and denominator.
+    nonzero = [v for v in int_vals if v > 0]
+    if not nonzero:
         return 0.50, {"msb": -1, "D": 0.0, "D_max": 0.0}
 
-    msb_list = [(v.bit_length() - 1) for v in int_vals if v > 0]
-    if not msb_list:
-        return 0.50, {"msb": -1, "D": 0.0, "D_max": 0.0}
-
+    msb_list = [v.bit_length() - 1 for v in nonzero]
     max_msb = max(msb_list)
-    total_valid = len(int_vals)
+    total_valid = len(msb_list)          # == len(nonzero)
 
     q_k = []
     p_k = []
-
     for k in range(max_msb + 1):
-        q_val = sum(1 for m in msb_list if m >= k) / total_valid
-        p_val = 1.0 - math.exp2(-(max_msb + 1 - k))
-        q_k.append(q_val)
-        p_k.append(p_val)
+        q_k.append(sum(1 for m in msb_list if m >= k) / total_valid)
+        p_k.append(1.0 - math.exp2(-(max_msb + 1 - k)))
+
 
     d_sq = sum((q - p) ** 2 for q, p in zip(q_k, p_k))
     D = math.sqrt(d_sq)

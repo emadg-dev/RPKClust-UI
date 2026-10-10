@@ -46,11 +46,21 @@ def run_pipeline(
 
     # 2. Candidate Generation (Algorithm 2 & Algorithm 3)
     t_cand_start = time.perf_counter()
+    # candidates, cand_diagnostics = generate_candidates(
+    #     messages=messages,
+    #     boundary=boundary,
+    #     config=config
+    # )
+    from rpkclust.detectors.registry import all_hits, EXTRA_RULES
+
+    extra = all_hits(messages, config, max_offset=boundary.B,
+                    pairs=pairs, detectors=EXTRA_RULES)
+    cand_boundary = BoundaryResult(
+        B=boundary.B, hits=boundary.hits + extra,
+        min_len=boundary.min_len, direction=boundary.direction)
+
     candidates, cand_diagnostics = generate_candidates(
-        messages=messages,
-        boundary=boundary,
-        config=config
-    )
+        messages=messages, boundary=cand_boundary, config=config)
     t_cand = time.perf_counter() - t_cand_start
 
     # 3. Two-Stage Probability Inference (per direction)
