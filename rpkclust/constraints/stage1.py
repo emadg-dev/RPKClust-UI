@@ -243,21 +243,28 @@ def evaluate_stage1(
             "clusters": clusters
         })
 
-    # Min-max normalization for p_m, p_r, p_s into [0.10, 0.95]
-    low_norm, high_norm = config.norm_range
+    # R-10: Stage 1 posterior is each candidate's prior (Eq. 14).
+    # Normalization across candidates is NOT in the paper — off by default.
+    if config.stage1_normalize:
+        low_norm, high_norm = config.norm_range
 
-    def normalize(vals: List[float]) -> List[float]:
-        min_v = min(vals) if vals else 0.0
-        max_v = max(vals) if vals else 1.0
-        if max_v > min_v:
-            return [low_norm + ((v - min_v) / (max_v - min_v)) * (high_norm - low_norm) for v in vals]
-        return [0.50 for _ in vals]
+        def normalize(vals: List[float]) -> List[float]:
+            min_v = min(vals) if vals else 0.0
+            max_v = max(vals) if vals else 1.0
+            if max_v > min_v:
+                return [low_norm + ((v - min_v) / (max_v - min_v)) * (high_norm - low_norm) for v in vals]
+            return [0.50 for _ in vals]
 
-    norm_m = normalize([d["raw_m"] for d in raw_candidates_data])
-    norm_r = normalize([d["raw_r"] for d in raw_candidates_data])
-    norm_s = normalize([d["raw_s"] for d in raw_candidates_data])
+        norm_m = normalize([d["raw_m"] for d in raw_candidates_data])
+        norm_r = normalize([d["raw_r"] for d in raw_candidates_data])
+        norm_s = normalize([d["raw_s"] for d in raw_candidates_data])
+    else:
+        norm_m = [d["raw_m"] for d in raw_candidates_data]
+        norm_r = [d["raw_r"] for d in raw_candidates_data]
+        norm_s = [d["raw_s"] for d in raw_candidates_data]
 
     scored: List[ScoredCandidate] = []
+    # R-11: p_arrow and p_back are NetPlier-originated constants, documented in DECISIONS (D-09)
     p_arrow = {"sim": 0.8, "coupling": 0.9, "struct": 0.9, "dim": 0.9}
     p_back = {"sim": 0.8, "coupling": 0.8, "struct": 0.8, "dim": 0.7}
 
@@ -275,7 +282,8 @@ def evaluate_stage1(
             "dim": p_d,
         }
 
-        p_f = compute_star_posterior(p_obs, p_arrow, p_back)
+        # R-12: pass prob_clip from config (default None = no clamp, only numeric guard)
+        p_f = compute_star_posterior(p_obs, p_arrow, p_back, prob_clip=config.prob_clip)
 
         scored.append(ScoredCandidate(
             candidate=cand,

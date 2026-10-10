@@ -8,9 +8,9 @@ import json
 import os
 import time
 from rpkclust.config import Config
-from rpkclust.io.loader import load_hex_lines, load_pcap
+from rpkclust.io.loader import load_hex_lines, load_pcap, load_csv
 from rpkclust.pipeline import run_pipeline
-from rpkclust.eval.ground_truth import run_benchmark_on_pcap, PROTOCOL_TRUE_KEYWORDS
+from rpkclust.eval.ground_truth import run_benchmark_on_pcap, run_benchmark_on_csv, PROTOCOL_TRUE_KEYWORDS
 from rpkclust.catalog import SOURCES, get_catalog, resolve_dataset
 
 def _format_pipeline_output(pipeline_res, sample_msgs, benchmark_res=None, source_meta=None, pairs=None) -> dict:
@@ -36,7 +36,10 @@ def _format_pipeline_output(pipeline_res, sample_msgs, benchmark_res=None, sourc
                 "offset": c.offset,
                 "length": c.length,
                 "kind": c.kind,
-                "type": c.tlv_type.hex() if c.tlv_type else None
+                "type": c.tlv_type.hex() if c.tlv_type else None,
+                "t_len": c.t_len,
+                "l_len": c.l_len,
+                "endian": c.endian,
             } for c in pipeline_res.candidates
         ],
         "keywords": {
@@ -95,11 +98,15 @@ def process_request(data: dict) -> dict:
 
         for src in sources_to_bench:
             for d in src["datasets"]:
-                pcap_path = d["file"]
-                if not os.path.exists(pcap_path):
+                data_path = d["file"]
+                if not os.path.exists(data_path):
                     continue
+                is_csv = data_path.endswith(".csv")
                 try:
-                    res = run_benchmark_on_pcap(pcap_path, d["protocol"], config=config, max_messages=100)
+                    if is_csv:
+                        res = run_benchmark_on_csv(data_path, d["protocol"], config=config, max_messages=100)
+                    else:
+                        res = run_benchmark_on_pcap(data_path, d["protocol"], config=config, max_messages=100)
                     res["source_id"] = src["id"]
                     res["source_name"] = src["name"]
                     res["dataset_id"] = d["id"]
@@ -125,18 +132,23 @@ def process_request(data: dict) -> dict:
 
         d_meta = resolve_dataset(source_id, dataset_id)
         if d_meta and os.path.exists(d_meta["file"]):
-            pcap_path = d_meta["file"]
+            data_path = d_meta["file"]
+            proto = d_meta["protocol"]
         else:
-            pcap_path = f"data/netplier/{proto}_100.pcap"
+            data_path = f"data/netplier/{proto}_100.pcap"
 
-        if not os.path.exists(pcap_path):
-            return {"status": "error", "message": f"Dataset file {pcap_path} not found"}
+        if not os.path.exists(data_path):
+            return {"status": "error", "message": f"Dataset file {data_path} not found"}
 
-        sizes = [15, 30, 50, 75, 100]
+        is_csv = data_path.endswith(".csv")
+        sizes = [100, 500, 1000]
         scaling_points = []
         for s in sizes:
             t_start = time.perf_counter()
-            b_res = run_benchmark_on_pcap(pcap_path, proto, config=config, max_messages=s)
+            if is_csv:
+                b_res = run_benchmark_on_csv(data_path, proto, config=config, max_messages=s)
+            else:
+                b_res = run_benchmark_on_pcap(data_path, proto, config=config, max_messages=s)
             elapsed = time.perf_counter() - t_start
 
             netplier_time_approx = round(0.0012 * (s ** 2) + 0.05 * s, 3)
@@ -170,9 +182,14 @@ def process_request(data: dict) -> dict:
         if not os.path.exists(pcap_path):
             return {"status": "error", "message": f"Dataset file {pcap_path} not found"}
 
+        is_csv = pcap_path.endswith(".csv")
         max_msgs = data.get("max_messages", 100)
-        res = run_benchmark_on_pcap(pcap_path, proto, config=config, max_messages=max_msgs)
-        trace = load_pcap(pcap_path, config)
+        if is_csv:
+            res = run_benchmark_on_csv(pcap_path, proto, config=config, max_messages=max_msgs)
+            trace = load_csv(pcap_path, config)
+        else:
+            res = run_benchmark_on_pcap(pcap_path, proto, config=config, max_messages=max_msgs)
+            trace = load_pcap(pcap_path, config)
         if max_msgs and len(trace.messages) > max_msgs:
             from rpkclust.model import Trace
             trace = Trace(messages=trace.messages[:max_msgs], pairs=trace.pairs, capture_range=trace.capture_range)

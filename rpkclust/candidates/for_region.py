@@ -73,17 +73,20 @@ def generate_for_candidates(
             # Line 8: Modulo alignment check s == 0 (mod L)
             if s % L == 0:
                 # Line 9: Continuity check
-                if L == 1 or is_continuous(S, s, L):
-                    # Check cardinality pre-filters
-                    values = [m.data[s:s + L] for m in target_msgs if len(m.data) >= s + L]
-                    if len(values) == num_msgs:
-                        distinct_cnt = len(set(values))
-                        # Drop constant candidate (1 unique value)
-                        if distinct_cnt <= 1:
-                            continue
-                        # Drop if distinct ratio > 0.5 (dimension pre-filter)
-                        if num_msgs >= 10 and (distinct_cnt / num_msgs > 0.5):
-                            continue
+                    if L == 1 or is_continuous(S, s, L):
+                        # Check basic cardinality (drop constants — already caught by detectors)
+                        values = [m.data[s:s + L] for m in target_msgs if len(m.data) >= s + L]
+                        if len(values) == num_msgs:
+                            distinct_cnt = len(set(values))
+                            # Drop constant candidate (1 unique value)
+                            if distinct_cnt <= 1:
+                                continue
+                            # R-07: cardinality pre-filter off by default;
+                            # only apply if config.candidate_max_distinct_ratio is set
+                            max_ratio = config.candidate_max_distinct_ratio
+                            if max_ratio is not None and num_msgs >= 10:
+                                if distinct_cnt / num_msgs > max_ratio:
+                                    continue
 
                         cand = Candidate(
                             region="FOR",

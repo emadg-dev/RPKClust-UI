@@ -23,6 +23,7 @@ class Pair:
     req_id: int
     resp_id: int
     session_id: int
+    dt: float = 0.0
 
 @dataclass(frozen=True)
 class Trace:
@@ -44,48 +45,55 @@ DetectionResult = Hit
 class Candidate:
     region: str              # "FOR" | "NFOR"
     offset: int              # FOR: fixed offset; NFOR: first observed offset
-    length: int              # Window length or V length
+    length: int              # Window length (FOR) or V length (NFOR)
     kind: str = "window"     # "window" | "tlv"
     direction: str = "both"  # "both" | "c2s" | "s2c"
     tlv_type: Optional[bytes] = None
     endian: str = "big"
+    t_len: int = 1           # TLV Type field length (NFOR only)
+    l_len: int = 1           # TLV Length field length (NFOR only)
 
     def extract(self, m: Message) -> Optional[bytes]:
-        """Extract field bytes from message according to candidate specification."""
+        """
+        Extract field bytes from message according to candidate specification.
+
+        For NFOR TLV candidates, returns the combined Type+Value (T-V) bytes
+        as the keyword field (Sec. 3.5: "use T-V as the combined keyword field
+        candidates").
+        """
         if self.region == "FOR":
             end = self.offset + self.length
             if len(m.data) >= end:
                 return m.data[self.offset:end]
             return None
         elif self.region == "NFOR":
-            # For TLV candidate, find the TLV matching self.tlv_type
             if self.tlv_type is None:
-                # Fallback to offset extraction if simple window in NFOR
                 end = self.offset + self.length
                 if len(m.data) >= end:
                     return m.data[self.offset:end]
                 return None
 
-            t_len = len(self.tlv_type)
-            l_len = 1 if self.length <= 255 else 2
-            # Scan message payload for matching type
+            # Use stored t_len and l_len (no guessing)
+            t_len = self.t_len
+            l_len = self.l_len
             off = 0
             while off + t_len + l_len <= len(m.data):
                 tag = m.data[off:off + t_len]
                 if tag == self.tlv_type:
-                    val_len = int.from_bytes(m.data[off + t_len:off + t_len + l_len], byteorder=self.endian)
+                    val_len = int.from_bytes(
+                        m.data[off + t_len:off + t_len + l_len], byteorder=self.endian
+                    )
                     val_start = off + t_len + l_len
                     val_end = val_start + val_len
                     if val_end <= len(m.data):
-                        # Returns the Value bytes
-                        return m.data[val_start:val_end]
-                # Advance 1 byte if not matched
+                        # R-01: return combined T-V (type_bytes + value_bytes), not T-L-V
+                        return m.data[off:off + t_len] + m.data[val_start:val_end]
                 off += 1
             return None
         return None
 
     def key(self) -> Tuple:
-        return (self.region, self.offset, self.length, self.kind, self.tlv_type)
+        return (self.region, self.offset, self.length, self.kind, self.tlv_type, self.t_len, self.l_len)
 
 @dataclass
 class BoundaryResult:

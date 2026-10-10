@@ -68,14 +68,24 @@ def generate_nfor_candidates(
     if not nfor_data:
         return [], {"tlv_candidates_count": 0}
 
+    # R-08: Support fixed (t_len, l_len) params as in the paper (default).
+    # Grid search is only performed when config.tlv_auto_params=True.
+    if config.tlv_auto_params:
+        t_len_list = list(config.tlv_t_lens)
+        l_len_list = list(config.tlv_l_lens)
+        endian_list = list(config.tlv_endians)
+    else:
+        t_len_list = [config.tlv_t_len]
+        l_len_list = [config.tlv_l_len]
+        endian_list = [config.tlv_endian]
+
     best_config = None
     best_coverage = 0.0
-    detected_tlvs_by_msg: List[List[Tuple[bytes, bytes, int]]] = []  # list of (T, V, abs_offset)
+    detected_tlvs_by_msg: List[List[Tuple[bytes, bytes, int]]] = []
 
-    # Grid search over TLV configurations
-    for t_len in config.tlv_t_lens:
-        for l_len in config.tlv_l_lens:
-            for endian in config.tlv_endians:
+    for t_len in t_len_list:
+        for l_len in l_len_list:
+            for endian in endian_list:
                 parsed_count = 0
                 temp_parsed: List[List[Tuple[bytes, bytes, int]]] = []
 
@@ -91,7 +101,6 @@ def generate_nfor_candidates(
                             val_bytes = nfor[off + t_len + l_len:off + t_len + l_len + val_len]
                             abs_offset = boundary_b + off + t_len + l_len
                             msg_tlvs.append((type_tag, val_bytes, abs_offset))
-                            # Advance by full TLV structure
                             off += t_len + l_len + val_len
                         else:
                             off += 1
@@ -101,20 +110,24 @@ def generate_nfor_candidates(
                     temp_parsed.append(msg_tlvs)
 
                 coverage = parsed_count / len(target_msgs)
-                if coverage > best_coverage and coverage >= config.tlv_min_coverage:
-                    best_coverage = coverage
+                if config.tlv_auto_params:
+                    if coverage > best_coverage and coverage >= config.tlv_min_coverage:
+                        best_coverage = coverage
+                        best_config = (t_len, l_len, endian)
+                        detected_tlvs_by_msg = temp_parsed
+                else:
                     best_config = (t_len, l_len, endian)
+                    best_coverage = coverage
                     detected_tlvs_by_msg = temp_parsed
 
-    if not best_config or best_coverage < config.tlv_min_coverage:
+    if not best_config or (config.tlv_auto_params and best_coverage < config.tlv_min_coverage):
         return [], {"best_config": None, "coverage": best_coverage}
 
     t_len, l_len, endian = best_config
 
     # Group detected TLVs by type tag T across messages
-    type_occurrences: Dict[bytes, List[Tuple[bytes, int]]] = {}  # T -> list of (V, abs_offset)
+    type_occurrences: Dict[bytes, List[Tuple[bytes, int]]] = {}
     for msg_tlvs in detected_tlvs_by_msg:
-        # Check presence of each type in this message
         seen_in_msg = set()
         for t_tag, v_val, abs_off in msg_tlvs:
             if t_tag not in seen_in_msg:
@@ -139,6 +152,8 @@ def generate_nfor_candidates(
                     direction=direction,
                     tlv_type=t_tag,
                     endian=endian,
+                    t_len=t_len,
+                    l_len=l_len,
                 )
                 candidates.append(cand)
 

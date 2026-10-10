@@ -10,59 +10,69 @@ from rpkclust.model import Message, Candidate, ScoredCandidate, KeywordResult, S
 from rpkclust.config import Config
 from rpkclust.constraints.posterior import combine_two_stage
 
-def compute_bit_use_prob(values: List[bytes], endian: str = "big") -> Tuple[float, Dict[str, Any]]:
+def compute_bit_use_prob(
+    values: List[bytes],
+    endian: str = "big",
+    dmax_mode: str = "max_over_m",
+    prob_clip: Optional[Tuple[float, float]] = None
+) -> Tuple[float, Dict[str, Any]]:
     """
     Compute Bit-use constraint probability p_bit according to Equations (7)-(10).
-    Uses MSB distribution of values compared against theoretical exponential distribution P(k).
+    R-14: dmax_mode controls D_max computation:
+      - "max_over_m" (default): maximum over all bit positions m (current V2 approach)
+      - "m_equals_msb": m = MSB (alternative reading of the paper)
+    R-12: prob_clip controls clamping (default None = no clamp, only numeric guard).
     """
     if not values:
         return 0.50, {"msb": -1, "D": 0.0, "D_max": 0.0}
 
-    # Convert non-empty byte values to distinct integer value space (valid value space)
     distinct_bytes = list(set(values))
     int_vals = [int.from_bytes(v, byteorder=endian) for v in distinct_bytes if v]
     if not int_vals:
         return 0.50, {"msb": -1, "D": 0.0, "D_max": 0.0}
 
-    # Compute MSB for each non-zero value
     msb_list = [(v.bit_length() - 1) for v in int_vals if v > 0]
     if not msb_list:
-        # All zeros
         return 0.50, {"msb": -1, "D": 0.0, "D_max": 0.0}
 
     max_msb = max(msb_list)
     total_valid = len(int_vals)
 
-    # Q(k) for k in [0, max_msb]: fraction of values where MSB >= k
     q_k = []
     p_k = []
 
     for k in range(max_msb + 1):
         q_val = sum(1 for m in msb_list if m >= k) / total_valid
-        # Theoretical distribution: P(k) = 1 - 1 / (2^(MSB + 1 - k))
-        p_val = 1.0 - (1.0 / (2 ** (max_msb + 1 - k)))
+        p_val = 1.0 - math.exp2(-(max_msb + 1 - k))
         q_k.append(q_val)
         p_k.append(p_val)
 
-    # Euclidean distance D = sqrt(sum (Q(k) - P(k))^2)
     d_sq = sum((q - p) ** 2 for q, p in zip(q_k, p_k))
     D = math.sqrt(d_sq)
 
-    # Maximum discrepancy D_max: empirical Q concentrated at single bit position m
     d_max = 0.0
-    for m in range(max_msb + 1):
-        # Q_m(k) = 1 for k <= m, 0 for k > m
+    if dmax_mode == "m_equals_msb":
+        # Alternative reading: m = MSB, single D_max value
+        m = max_msb
         d_m_sq = sum((1.0 - p_k[k]) ** 2 for k in range(m + 1)) + sum(p_k[k] ** 2 for k in range(m + 1, max_msb + 1))
-        d_m = math.sqrt(d_m_sq)
-        if d_m > d_max:
-            d_max = d_m
+        d_max = math.sqrt(d_m_sq)
+    else:
+        # Default: max over all possible m
+        for m in range(max_msb + 1):
+            d_m_sq = sum((1.0 - p_k[k]) ** 2 for k in range(m + 1)) + sum(p_k[k] ** 2 for k in range(m + 1, max_msb + 1))
+            d_m = math.sqrt(d_m_sq)
+            if d_m > d_max:
+                d_max = d_m
 
     if d_max > 0:
         p_bit = 1.0 - (D / d_max)
     else:
         p_bit = 1.0
 
-    p_bit_clamped = max(0.01, min(0.99, p_bit))
+    if prob_clip is not None:
+        p_bit = max(prob_clip[0], min(prob_clip[1], p_bit))
+    else:
+        p_bit = max(1e-12, min(1.0 - 1e-12, p_bit))
 
     details = {
         "msb": max_msb,
@@ -73,21 +83,33 @@ def compute_bit_use_prob(values: List[bytes], endian: str = "big") -> Tuple[floa
         "p_bit_raw": p_bit
     }
 
-    return p_bit_clamped, details
+    return p_bit, details
 
 
-def compute_position_prob(candidate: Candidate, config: Config) -> float:
+def compute_position_prob(
+    candidate: Candidate,
+    config: Config,
+    prob_clip: Optional[Tuple[float, float]] = None
+) -> float:
     """
     Compute Position constraint probability p_offset (Equation 11):
+    R-14: Position constraint depends on candidate type and offset.
     - If cand in FOR: max(0.95 - 0.01 * offset, 0.70)
     - If cand in NFOR: 0.60
+    R-12: prob_clip controls clamping (default None = no clamp, only numeric guard).
     """
     if candidate.region == "FOR":
         base, slope, floor_val = config.pos_for
         p_off = max(base - slope * candidate.offset, floor_val)
-        return max(0.01, min(0.99, p_off))
     else:
-        return config.pos_nfor
+        p_off = config.pos_nfor
+
+    if prob_clip is not None:
+        p_off = max(prob_clip[0], min(prob_clip[1], p_off))
+    else:
+        p_off = max(1e-12, min(1.0 - 1e-12, p_off))
+
+    return p_off
 
 
 def evaluate_stage2(
@@ -133,10 +155,11 @@ def evaluate_stage2(
         values = [cand.extract(m) for m in target_msgs]
         valid_values = [v for v in values if v is not None]
 
-        p_bit, bit_details = compute_bit_use_prob(valid_values, endian=config.bituse_endian)
-        p_offset = compute_position_prob(cand, config)
+        p_bit, bit_details = compute_bit_use_prob(valid_values, endian=config.bituse_endian, dmax_mode=config.dmax_mode, prob_clip=config.prob_clip)
+        p_offset = compute_position_prob(cand, config, prob_clip=config.prob_clip)
 
-        posterior = combine_two_stage(p_f=p_f, p_bit=p_bit, p_offset=p_offset)
+        # R-12: pass prob_clip from config (default None = no clamp, only numeric guard)
+        posterior = combine_two_stage(p_f=p_f, p_bit=p_bit, p_offset=p_offset, prob_clip=config.prob_clip)
 
         candidates_evaluated.append({
             "candidate": cand,

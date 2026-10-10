@@ -9,7 +9,7 @@ import os
 import json
 import csv
 from rpkclust.config import Config
-from rpkclust.io.loader import load_hex_lines, load_pcap
+from rpkclust.io.loader import load_hex_lines, load_pcap, load_csv
 from rpkclust.pipeline import run_pipeline
 from rpkclust.metrics import compute_metrics
 
@@ -46,6 +46,8 @@ def main():
         # Load input
         if args.input.endswith((".pcap", ".pcapng", ".cap")):
             trace = load_pcap(args.input, cfg)
+        elif args.input.endswith(".csv"):
+            trace = load_csv(args.input, cfg)
         else:
             trace = load_hex_lines(args.input, cfg)
 
@@ -92,6 +94,8 @@ def main():
         cfg = Config()
         if args.input.endswith((".pcap", ".pcapng", ".cap")):
             trace = load_pcap(args.input, cfg)
+        elif args.input.endswith(".csv"):
+            trace = load_csv(args.input, cfg)
         else:
             trace = load_hex_lines(args.input, cfg)
 

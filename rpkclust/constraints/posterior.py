@@ -3,12 +3,13 @@ Closed-form probabilistic factor graph marginalization for Stage 1 and Stage 2.
 """
 
 import math
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Optional
 
 def compute_star_posterior(
     p_obs: Dict[str, float],
     p_arrow: Dict[str, float],
-    p_back: Dict[str, float]
+    p_back: Dict[str, float],
+    prob_clip: Optional[Tuple[float, float]] = None
 ) -> float:
     """
     Exact closed-form marginalization of the star factor graph centered on latent keyword variable K in {0, 1}.
@@ -17,6 +18,9 @@ def compute_star_posterior(
       f_fwd(k, x) = p_arrow if (not k or x) else (1 - p_arrow)
       f_bwd(k, x) = p_back if (k or not x) else (1 - p_back)
     Computes log-odds sum and returns P(K = 1).
+
+    R-12: Hard clamps cause rank ties. By default, only a 1e-12 numeric guard
+    is applied. Set prob_clip=(lo, hi) to restore clamping.
     """
     log_odds = 0.0
 
@@ -24,18 +28,8 @@ def compute_star_posterior(
         arr = p_arrow.get(name, 0.9)
         bck = p_back.get(name, 0.8)
 
-        # Clamp observation prior to avoid 0 or 1
-        p_val = max(0.01, min(0.99, p_val))
-
-        # g_x(k) = sum_{x in {0, 1}} f_obs(x) * f_fwd(k, x) * f_bwd(k, x)
-        # For x = 1:
-        #   f_obs(1) = p_val
-        #   f_fwd(1, 1) = arr;       f_bwd(1, 1) = bck
-        #   f_fwd(0, 1) = arr;       f_bwd(0, 1) = 1 - bck
-        # For x = 0:
-        #   f_obs(0) = 1 - p_val
-        #   f_fwd(1, 0) = 1 - arr;   f_bwd(1, 0) = bck
-        #   f_fwd(0, 0) = arr;       f_bwd(0, 0) = bck
+        # R-12: numeric guard only (no hard clamp by default)
+        p_val = max(1e-12, min(1.0 - 1e-12, p_val))
 
         g_1 = p_val * arr * bck + (1.0 - p_val) * (1.0 - arr) * bck
         g_0 = p_val * arr * (1.0 - bck) + (1.0 - p_val) * arr * bck
@@ -43,31 +37,40 @@ def compute_star_posterior(
         if g_1 > 0 and g_0 > 0:
             log_odds += math.log(g_1) - math.log(g_0)
 
-    # Sigmoid function for posterior
-    # p_f = 1 / (1 + exp(-log_odds))
     try:
         p_f = 1.0 / (1.0 + math.exp(-log_odds))
     except OverflowError:
         p_f = 1.0 if log_odds > 0 else 0.0
 
-    return max(0.01, min(0.99, p_f))
+    if prob_clip is not None:
+        p_f = max(prob_clip[0], min(prob_clip[1], p_f))
+
+    return p_f
 
 
 def combine_two_stage(
     p_f: float,
     p_bit: float,
-    p_offset: float
+    p_offset: float,
+    prob_clip: Optional[Tuple[float, float]] = None
 ) -> float:
     """
     Equation (14)-(15) from paper:
     M = p_bit * p_offset * p_f
     N = (1 - p_bit) * (1 - p_offset) * (1 - p_f)
     P(K = 1 | p_bit, p_offset) = M / (M + N)
+
+    R-12: By default, only a 1e-12 numeric guard is applied (no hard clamp).
+    Set prob_clip=(lo, hi) to restore clamping.
     """
-    # Clamp to [0.001, 0.999] to prevent 0 / 0
-    pf_c = max(0.001, min(0.999, p_f))
-    pb_c = max(0.001, min(0.999, p_bit))
-    po_c = max(0.001, min(0.999, p_offset))
+    pf_c = max(1e-12, min(1.0 - 1e-12, p_f))
+    pb_c = max(1e-12, min(1.0 - 1e-12, p_bit))
+    po_c = max(1e-12, min(1.0 - 1e-12, p_offset))
+
+    if prob_clip is not None:
+        pf_c = max(prob_clip[0], min(prob_clip[1], pf_c))
+        pb_c = max(prob_clip[0], min(prob_clip[1], pb_c))
+        po_c = max(prob_clip[0], min(prob_clip[1], po_c))
 
     M = pb_c * po_c * pf_c
     N = (1.0 - pb_c) * (1.0 - po_c) * (1.0 - pf_c)
@@ -75,4 +78,9 @@ def combine_two_stage(
     if M + N == 0:
         return 0.5
 
-    return M / (M + N)
+    result = M / (M + N)
+
+    if prob_clip is not None:
+        result = max(prob_clip[0], min(prob_clip[1], result))
+
+    return result

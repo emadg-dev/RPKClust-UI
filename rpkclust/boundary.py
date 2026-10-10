@@ -29,7 +29,9 @@ def find_boundary(
     """
     Algorithm 1: FOR-NFOR Boundary Detection.
     Scans every byte offset 0 .. min_len - 1 using explicit semantic detectors.
-    Computes maximal boundary B = max(hit_offsets) + 1.
+    R-13: B is exclusive — the first NFOR byte. Computed as
+    B = max(hit.offset + hit.length) over all hits, equivalently
+    B = max(hit_end_offset + 1) where hit_end_offset = offset + length - 1.
     """
     if not messages:
         return BoundaryResult(B=0, hits=[], min_len=0, direction=direction)

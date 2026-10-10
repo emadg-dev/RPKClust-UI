@@ -8,7 +8,7 @@ from rpkclust.model import Hit
 
 class ConstantDetector:
     name: str = "constant"
-    lengths = (1,)  # Algorithm 1 tests byte-by-byte for constant
+    lengths = (8, 4, 2, 1)  # R-06: paper says "byte slices of any length"
 
     def check(self, slices: List[bytes], ctx: Context) -> Optional[Hit]:
         if not slices:

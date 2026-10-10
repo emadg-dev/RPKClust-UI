@@ -15,20 +15,35 @@ from rpkclust.detectors.length_rule import LengthDetector
 from rpkclust.model import Message, Hit, Pair
 from rpkclust.config import Config
 
-DEFAULT_RULES = [
+# R-05b: Paper order (Sec. 3.3): Constant -> Sequence -> Timestamp -> Sparse -> Address -> Checksum
+BOUNDARY_RULES: List[Detector] = [
     ConstantDetector(),
     SequenceDetector(),
     TimestampDetector(),
-    FloatDetector(),
-    LengthDetector(),
-    ChecksumDetector(),
-    AddressDetector(),
     SparseDetector(),
+    AddressDetector(),
+    ChecksumDetector(),
 ]
 
+# Extra rules not in the paper's boundary algorithm but used for FOR exclusion (R-05)
+EXTRA_RULES: List[Detector] = [
+    FloatDetector(),
+    LengthDetector(),
+]
+
+DEFAULT_RULES: List[Detector] = BOUNDARY_RULES + EXTRA_RULES
+
 def get_detectors(config: Optional[Config] = None) -> List[Detector]:
-    """Return ordered list of detectors according to configuration."""
-    return DEFAULT_RULES
+    """
+    Return ordered list of detectors for boundary scanning.
+    R-05: By default, only the paper's 6 rules are used for boundary detection.
+    Float and Length are included only when config.boundary_include_extra_rules=True.
+    """
+    if config is None:
+        config = Config()
+    if config.boundary_include_extra_rules:
+        return DEFAULT_RULES
+    return BOUNDARY_RULES
 
 def all_hits(
     messages: List[Message],

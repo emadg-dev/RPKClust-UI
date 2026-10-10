@@ -1,9 +1,12 @@
 """
-Data loading module for RPKClust. Supports PCAP/PCAPNG files and hex-lines.
+Data loading module for RPKClust. Supports PCAP/PCAPNG files, hex-lines, and CNN-pre CSV.
 """
 
 import os
 import re
+import csv as _csv
+import struct
+import socket
 from typing import List, Tuple, Optional
 from rpkclust.model import Message, Trace
 from rpkclust.config import Config
@@ -108,8 +111,76 @@ def load_hex_lines(file_or_content: str, config: Optional[Config] = None) -> Tra
     return Trace(messages=messages, pairs=pairs, capture_range=(t_start, t_end))
 
 
-import struct
-import socket
+def load_csv(csv_path: str, config: Optional[Config] = None) -> Trace:
+    """
+    Load messages from a CNN-pre format CSV file.
+    Expected columns: direction, type, hex, Full
+    - direction: "0" = client-to-server (c2s), "1" = server-to-client (s2c)
+    - type: protocol-specific type tag
+    - hex: hex-encoded payload bytes
+    - Full: binary bit-string representation (unused)
+
+    Synthetic endpoints are assigned based on direction. Request-response pairs
+    are inferred from direction alternation.
+    """
+    if config is None:
+        config = Config()
+
+    messages: List[Message] = []
+    cur_time = 1000.0
+
+    with open(csv_path, "r", encoding="utf-8", errors="ignore", newline="") as f:
+        reader = _csv.DictReader(f)
+        for idx, row in enumerate(reader):
+            direction_raw = row.get("direction", "0").strip()
+            hex_str = row.get("hex", "").strip()
+            type_tag = row.get("type", "").strip()
+
+            if not hex_str:
+                continue
+
+            hex_str = re.sub(r"[^0-9a-fA-F]", "", hex_str)
+            if len(hex_str) % 2 != 0:
+                hex_str = hex_str[:-1]
+
+            payload = bytes.fromhex(hex_str)
+            is_client = direction_raw == "0"
+            ts = cur_time + idx * 0.001
+
+            if is_client:
+                src = "10.0.0.1"
+                dst = "10.0.0.2"
+                sport = 10000
+                dport = 502
+                direction = "c2s"
+            else:
+                src = "10.0.0.2"
+                dst = "10.0.0.1"
+                sport = 502
+                dport = 10000
+                direction = "s2c"
+
+            msg = Message(
+                id=idx,
+                data=payload,
+                ts=ts,
+                src=src,
+                dst=dst,
+                sport=sport,
+                dport=dport,
+                direction=direction,
+                session_id=0,
+                label=type_tag if type_tag else None,
+            )
+            messages.append(msg)
+
+    messages = assign_sessions_and_directions(messages, config)
+    pairs = pair_messages(messages)
+    t_start = min((m.ts for m in messages), default=0.0)
+    t_end = max((m.ts for m in messages), default=0.0)
+
+    return Trace(messages=messages, pairs=pairs, capture_range=(t_start, t_end))
+
 
 def parse_pcap_packets(pcap_path: str):
     """
@@ -215,7 +286,7 @@ def parse_pcap_packets(pcap_path: str):
 
 
 def _parse_raw_eth_ip(raw_pkt: bytes, link_type: int = 1):
-    """Parse link layer (including 802.1Q VLAN), IPv4, and TCP/UDP/ICMP header to extract payload and endpoints."""
+    """Parse link layer (including 802.1Q VLAN), IPv4, and TCP/UDP header to extract payload and endpoints."""
     ip_data = None
     if len(raw_pkt) >= 14:
         eth_type = struct.unpack(">H", raw_pkt[12:14])[0]
@@ -251,8 +322,6 @@ def _parse_raw_eth_ip(raw_pkt: bytes, link_type: int = 1):
             sport, dport, ulen = struct.unpack(">HHH", trans_data[0:6])
             payload = trans_data[8:ulen] if ulen <= len(trans_data) else trans_data[8:]
             return src, dst, sport, dport, payload
-        elif proto == 1 and len(trans_data) >= 4:  # ICMP
-            return src, dst, 0, 0, trans_data
 
     return None
 

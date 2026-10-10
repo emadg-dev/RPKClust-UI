@@ -122,7 +122,7 @@ def pair_messages(messages: List[Message]) -> List[Pair]:
                 pending_req = m
             elif m.direction == "s2c":
                 if pending_req is not None:
-                    pairs.append(Pair(req_id=pending_req.id, resp_id=m.id, session_id=sess_id))
+                    pairs.append(Pair(req_id=pending_req.id, resp_id=m.id, session_id=sess_id, dt=m.ts - pending_req.ts))
                     pending_req = None
 
     return pairs

@@ -2,7 +2,95 @@ import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 import {defineConfig, Plugin} from 'vite';
-import {spawn} from 'child_process';
+import {spawn, ChildProcess} from 'child_process';
+
+const PYTHON_COMMANDS: string[] = process.env.PYTHON_CMD
+  ? [process.env.PYTHON_CMD]
+  : process.platform === 'win32'
+    ? ['py', 'python']
+    : ['python3'];
+
+function spawnPython(res: any, body: string): void {
+  let cmdIndex = 0;
+
+  const trySpawn = (cmd: string): void => {
+    const py: ChildProcess = spawn(cmd, ['-m', 'rpkclust.api_runner']);
+    let stdout = '';
+    let stderr = '';
+
+    const onError = (err: Error & {code?: string}): void => {
+      if (err.code === 'ENOENT' && cmdIndex < PYTHON_COMMANDS.length - 1) {
+        cmdIndex++;
+        trySpawn(PYTHON_COMMANDS[cmdIndex]);
+      } else {
+        res.setHeader('Content-Type', 'application/json');
+        res.statusCode = 500;
+        res.end(JSON.stringify({
+          status: 'error',
+          message: `Could not find Python executable. Tried: ${PYTHON_COMMANDS.join(', ')}. Set PYTHON_CMD env var to specify the Python executable path.`,
+          stderr: err.message,
+        }));
+      }
+    };
+
+    py.on('error', onError);
+
+    if (py.stdout) {
+      py.stdout.on('data', data => {
+        stdout += data;
+      });
+    }
+    if (py.stderr) {
+      py.stderr.on('data', data => {
+        stderr += data;
+      });
+    }
+
+    py.on('close', code => {
+      res.setHeader('Content-Type', 'application/json');
+      if (code !== 0) {
+        res.statusCode = 500;
+        let responseObj: any = {
+          status: 'error',
+          stderr: stderr || 'Process terminated with non-zero exit code ' + code,
+          message: 'Python execution failed (exit code ' + code + ')',
+        };
+        try {
+          if (stdout && stdout.trim().length > 0) {
+            const parsed = JSON.parse(stdout);
+            responseObj = { ...parsed, stderr: stderr || parsed.stderr || parsed.trace };
+          }
+        } catch (_) {}
+        res.end(JSON.stringify(responseObj));
+      } else {
+        try {
+          const parsed = JSON.parse(stdout);
+          if (stderr && stderr.trim().length > 0) {
+            parsed.stderr = stderr;
+          }
+          res.statusCode = parsed.status === 'error' ? 400 : 200;
+          res.end(JSON.stringify(parsed));
+        } catch (e) {
+          res.statusCode = 500;
+          res.end(
+            JSON.stringify({
+              status: 'error',
+              stderr: stderr + (stdout ? '\n' + stdout : ''),
+              message: 'Invalid JSON response from Python runner',
+            })
+          );
+        }
+      }
+    });
+
+    if (py.stdin) {
+      py.stdin.write(body);
+      py.stdin.end();
+    }
+  };
+
+  trySpawn(PYTHON_COMMANDS[0]);
+}
 
 function apiPlugin(): Plugin {
   return {
@@ -21,56 +109,7 @@ function apiPlugin(): Plugin {
         });
 
         req.on('end', () => {
-          const py = spawn('python3', ['-m', 'rpkclust.api_runner']);
-          let stdout = '';
-          let stderr = '';
-
-          py.stdout.on('data', data => {
-            stdout += data;
-          });
-          py.stderr.on('data', data => {
-            stderr += data;
-          });
-
-          py.on('close', code => {
-            res.setHeader('Content-Type', 'application/json');
-            if (code !== 0) {
-              res.statusCode = 500;
-              let responseObj: any = {
-                status: 'error',
-                stderr: stderr || 'Process terminated with non-zero exit code ' + code,
-                message: 'Python execution failed (exit code ' + code + ')',
-              };
-              try {
-                if (stdout && stdout.trim().length > 0) {
-                  const parsed = JSON.parse(stdout);
-                  responseObj = { ...parsed, stderr: stderr || parsed.stderr || parsed.trace };
-                }
-              } catch (_) {}
-              res.end(JSON.stringify(responseObj));
-            } else {
-              try {
-                const parsed = JSON.parse(stdout);
-                if (stderr && stderr.trim().length > 0) {
-                  parsed.stderr = stderr;
-                }
-                res.statusCode = parsed.status === 'error' ? 400 : 200;
-                res.end(JSON.stringify(parsed));
-              } catch (e) {
-                res.statusCode = 500;
-                res.end(
-                  JSON.stringify({
-                    status: 'error',
-                    stderr: stderr + (stdout ? '\n' + stdout : ''),
-                    message: 'Invalid JSON response from Python runner',
-                  })
-                );
-              }
-            }
-          });
-
-          py.stdin.write(body);
-          py.stdin.end();
+          spawnPython(res, body);
         });
       });
     },

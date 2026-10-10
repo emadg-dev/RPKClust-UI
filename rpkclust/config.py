@@ -12,7 +12,16 @@ class Config:
     # FOR candidate generation window sizes
     fo_lengths_for_candidates: Tuple[int, ...] = (1, 2, 4)
 
+    # FOR cardinality pre-filter (R-07: None disables by default)
+    candidate_max_distinct_ratio: Optional[float] = None
+
     # NFOR TLV parameters
+    # When tlv_auto_params=False (default), use fixed tlv_t_len / tlv_l_len / tlv_endian
+    # When True, grid search over tlv_t_lens / tlv_l_lens / tlv_endians
+    tlv_auto_params: bool = False
+    tlv_t_len: int = 1
+    tlv_l_len: int = 1
+    tlv_endian: str = "big"
     tlv_t_lens: Tuple[int, ...] = (1, 2)
     tlv_l_lens: Tuple[int, ...] = (1, 2)
     tlv_endians: Tuple[str, ...] = ("big", "little")
@@ -33,6 +42,7 @@ class Config:
     float_min_distinct: int = 5
     enable_float: bool = True
     enable_length: bool = True
+    # Rules excluded from FOR candidates (R-05: Length excluded from boundary, kept in FOR exclusion)
     for_exclude_rules: List[str] = field(default_factory=lambda: [
         "constant", "sequence", "timestamp", "float", "length", "checksum", "address"
     ])
@@ -41,24 +51,32 @@ class Config:
     boundary_per_direction: bool = False
     boundary_require_contiguous: bool = False
     boundary_min_msgs: int = 20
+    # R-05: Include Float and Length detectors in boundary scan (paper uses 6 rules only)
+    boundary_include_extra_rules: bool = False
 
     # Stage 1 Clustering constraints
-    stage1_top_k: int = 5
+    stage1_top_k: int = 5  # R-19: default between 3 and 5 per paper Table 3
     sim_sample_size: int = 200
     sim_sample_pairs: int = 20000
-    p_imp: Dict[str, Tuple[float, Optional[float]]] = field(default_factory=lambda: {
-        "sim": (0.8, None),
-        "other": (0.9, None),
-    })
     pair_min_ratio: float = 0.3
     struct_mode: str = "length"  # "length" or "mafft"
     predicate_mode: str = "per_cluster"  # "per_cluster" or "mean"
+    # R-10: Min-max normalization of p_m, p_r, p_s across candidates
+    stage1_normalize: bool = False
     norm_range: Tuple[float, float] = (0.1, 0.95)
 
     # Stage 2 Self-constraints
     pos_for: Tuple[float, float, float] = (0.95, 0.01, 0.70)  # base, slope, floor
     pos_nfor: float = 0.60
     bituse_endian: str = "big"
+    # R-14: Mode for D_max computation in bit-use constraint
+    dmax_mode: str = "max_over_m"  # "max_over_m" | "m_equals_msb"
+
+    # R-12: Probability clip range (None = no clamp, only 1e-12 numeric guard)
+    prob_clip: Optional[Tuple[float, float]] = None
+
+    # R-18: Clustering label mode
+    cluster_label_mode: str = "per_direction"  # "per_direction" or "global"
 
     # Execution & Reproducibility
     seed: int = 0
