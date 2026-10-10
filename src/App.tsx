@@ -228,6 +228,25 @@ const DEFAULT_SOURCES: Record<string, SourceMeta> = {
       { id: 'smb2', name: 'SMBv2', protocol: 'smb2', file: 'data/netplier/smb2_100.pcap', category: 'Storage / File Sharing', packets: 100, header_len: 64, keyword_field: 'SMB2 Command (offset 16, 2B)', true_keyword: { offset: 16, length: 2, region: 'FOR', name: 'SMB2 Command' }, expected_B: 70, description: 'SMBv2 multi-credit protocol commands including Create, Close, Read, Write, and Ioctl.' },
     ],
   },
+  icsreal: {
+    id: 'icsreal',
+    name: 'Real ICS Traffic',
+    short_name: 'ICS Real',
+    citation: 'ICS-Security-Tools',
+    url: 'https://github.com/ICS-Security-Tools',
+    badge: 'Real ICS',
+    color: 'sky',
+    description: 'Real ICS protocol captures from the ICS-Security-Tools repository and other public traffic sources, covering all 7 supported protocols with larger, more diverse message volumes.',
+    datasets: [
+      { id: 'modbus', name: 'Modbus TCP (Real)', protocol: 'modbus', file: 'data/icsreal/modbus.pcap', category: 'SCADA / Industrial', packets: 4901, header_len: 8, keyword_field: 'Function Code (offset 7, 1B)', true_keyword: { offset: 7, length: 1, region: 'FOR', name: 'Function Code' }, expected_B: 8, description: 'Real Modbus TCP traffic with diverse function codes from ICS-Security-Tools.' },
+      { id: 'dnp3', name: 'DNP3 SCADA (Real)', protocol: 'dnp3', file: 'data/icsreal/dnp3.pcap', category: 'Electric Utility SCADA', packets: 198, header_len: 13, keyword_field: 'Application Function Code (offset 12, 1B)', true_keyword: { offset: 12, length: 1, region: 'FOR', name: 'Application Function Code' }, expected_B: 13, description: 'Real DNP3 telemetry and control traffic between master and outstation RTUs.' },
+      { id: 'dhcp', name: 'DHCP (Real)', protocol: 'dhcp', file: 'data/icsreal/dhcp.pcap', category: 'Network Infrastructure', packets: 100, header_len: 240, keyword_field: 'Message Type Option 53 (offset 242, 1B)', true_keyword: { offset: 242, length: 1, region: 'FOR', name: 'DHCP Option 53 (Msg Type)' }, expected_B: 245, description: 'Real DHCP discover/offer/request/ack exchanges.' },
+      { id: 'tftp', name: 'TFTP (Real)', protocol: 'tftp', file: 'data/icsreal/tftp.pcap', category: 'File Transfer', packets: 100, header_len: 2, keyword_field: 'Opcode (offset 0, 2B)', true_keyword: { offset: 0, length: 2, region: 'FOR', name: 'Opcode' }, expected_B: 2, description: 'Real TFTP RRQ, WRQ, DATA, ACK, and ERROR message packets.' },
+      { id: 'ntp', name: 'NTP Time Sync (Real)', protocol: 'ntp', file: 'data/icsreal/ntp.pcap', category: 'Time Synchronization', packets: 100, header_len: 48, keyword_field: 'Mode (offset 0, bits 5-7)', true_keyword: { offset: 0, length: 1, bits: [5, 7], name: 'Mode (bits 5-7)' }, expected_B: 48, description: 'Real NTP packets with client, server, and symmetric active synchronization modes.' },
+      { id: 'smb', name: 'SMBv1 (Real)', protocol: 'smb', file: 'data/icsreal/smb.pcap', category: 'Storage / File Sharing', packets: 100, header_len: 32, keyword_field: 'SMB Command (offset 8, 1B)', true_keyword: { offset: 8, length: 1, region: 'FOR', name: 'SMB Command' }, expected_B: 39, description: 'Real SMBv1 commands (Negotiate, Session Setup, Tree Connect, Trans2).' },
+      { id: 'smb2', name: 'SMBv2 (Real)', protocol: 'smb2', file: 'data/icsreal/smb2.pcap', category: 'Storage / File Sharing', packets: 100, header_len: 64, keyword_field: 'SMB2 Command (offset 16, 2B)', true_keyword: { offset: 16, length: 2, region: 'FOR', name: 'SMB2 Command' }, expected_B: 70, description: 'Real SMBv2 multi-credit protocol commands including Create, Close, Read, Write, and Ioctl.' },
+    ],
+  },
 };
 
 const BASELINE_COMPARISONS = [
@@ -634,7 +653,7 @@ export default function App() {
               <div className="absolute right-0 mt-2 w-80 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2">
                 <div className="px-3 py-2 bg-slate-950/80 border-b border-slate-800 text-[11px] font-semibold text-slate-400 uppercase tracking-wider flex justify-between items-center">
                   <span>Select PCAP Archive / Source</span>
-                  <span className="text-cyan-400 font-mono">4 Sources Available</span>
+                  <span className="text-cyan-400 font-mono">{Object.keys(sourcesCatalog).length} Sources Available</span>
                 </div>
                 <div className="p-1.5 space-y-1">
                   {Object.values(sourcesCatalog).map((src) => {

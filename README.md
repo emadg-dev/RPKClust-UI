@@ -51,8 +51,9 @@ The UI provides an interactive dashboard for exploring benchmarks across 4 data 
 │   ├── cli.py                  # CLI commands
 │   └── api_runner.py           # JSON stdin/stdout API for frontend
 ├── tests/                      # Pytest test suite
-├── data/                       # PCAP datasets (1 source)
-│   └── netplier/               #   7 NetPlier benchmark PCAPs
+├── data/                       # PCAP datasets (2 sources)
+│   ├── netplier/              #   7 NetPlier benchmark PCAPs
+│   └── icsreal/               #   7 Real ICS traffic PCAPs
 ├── docs/
 │   └── DECISIONS.md            # Design decisions (D-01 through D-B3)
 ├── ASSUMPTIONS.md              # Mathematical assumptions & defaults

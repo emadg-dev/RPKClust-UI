@@ -14,3 +14,6 @@ dist/
 # IDE
 .idea/
 .vscode/
+
+# Data (downloads/tools not part of project)
+data/ics_tools/
