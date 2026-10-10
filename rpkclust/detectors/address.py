@@ -4,7 +4,7 @@ Formula: req[o:o+w] == resp[o+w:o+2w] and req[o+w:o+2w] == resp[o:o+w], with cro
 """
 
 from typing import List, Optional
-import numpy as np
+import math
 from rpkclust.detectors.base import Context
 from rpkclust.model import Hit
 
@@ -57,10 +57,16 @@ class AddressDetector:
 
         if swaps_valid and len(req_vals_1) >= 3:
             # Check negative correlation or diversity
-            std1 = np.std(req_vals_1)
-            std2 = np.std(req_vals_2)
+            n = len(req_vals_1)
+            mean1 = sum(req_vals_1) / n
+            mean2 = sum(req_vals_2) / n
+            var1 = sum((x - mean1) ** 2 for x in req_vals_1) / n
+            var2 = sum((y - mean2) ** 2 for y in req_vals_2) / n
+            std1 = math.sqrt(var1)
+            std2 = math.sqrt(var2)
             if std1 > 0 and std2 > 0:
-                corr = np.corrcoef(req_vals_1, req_vals_2)[0, 1]
+                cov = sum((x - mean1) * (y - mean2) for x, y in zip(req_vals_1, req_vals_2)) / n
+                corr = cov / (std1 * std2)
                 if corr <= ctx.config.address_corr_threshold:
                     return Hit(
                         rule=self.name,

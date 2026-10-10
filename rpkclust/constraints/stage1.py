@@ -6,7 +6,6 @@ Evaluates Message Similarity, Remote Coupling, Structural Consistency, and Dimen
 from typing import List, Dict, Tuple, Optional, Any
 import difflib
 import random
-import numpy as np
 from rpkclust.model import Message, Candidate, Pair, ScoredCandidate, Stage1Result
 from rpkclust.config import Config
 from rpkclust.constraints.posterior import compute_star_posterior
@@ -55,18 +54,22 @@ def compute_eer(inner_scores: List[float], inter_scores: List[float]) -> float:
     if not inner_scores or not inter_scores:
         return 0.90  # High error if degenerate
 
-    thresholds = np.linspace(0.0, 1.0, 101)
-    inner_arr = np.array(inner_scores)
-    inter_arr = np.array(inter_scores)
+    thresholds = [i / 100.0 for i in range(101)]
+    n_inter = len(inter_scores)
+    n_inner = len(inner_scores)
 
-    # FMR: fraction of inter-cluster pairs above threshold
-    # FNMR: fraction of inner-cluster pairs below threshold
-    fmr = np.array([np.mean(inter_arr >= t) for t in thresholds])
-    fnmr = np.array([np.mean(inner_arr < t) for t in thresholds])
+    best_diff = float("inf")
+    best_eer = 0.90
 
-    diff = np.abs(fmr - fnmr)
-    min_idx = np.argmin(diff)
-    return float((fmr[min_idx] + fnmr[min_idx]) / 2.0)
+    for t in thresholds:
+        fmr = sum(1 for s in inter_scores if s >= t) / n_inter
+        fnmr = sum(1 for s in inner_scores if s < t) / n_inner
+        diff = abs(fmr - fnmr)
+        if diff < best_diff:
+            best_diff = diff
+            best_eer = (fmr + fnmr) / 2.0
+
+    return float(best_eer)
 
 
 def evaluate_stage1(
@@ -97,13 +100,13 @@ def evaluate_stage1(
     sample_msgs = [target_msgs[i] for i in sample_indices]
     idx_map = {orig_i: s_i for s_i, orig_i in enumerate(sample_indices)}
 
-    sim_matrix = np.zeros((len(sample_msgs), len(sample_msgs)), dtype=np.float32)
+    sim_matrix = [[0.0] * len(sample_msgs) for _ in range(len(sample_msgs))]
     for i in range(len(sample_msgs)):
-        sim_matrix[i, i] = 1.0
+        sim_matrix[i][i] = 1.0
         for j in range(i + 1, len(sample_msgs)):
             s = compute_pairwise_similarity(sample_msgs[i], sample_msgs[j], boundary_b)
-            sim_matrix[i, j] = s
-            sim_matrix[j, i] = s
+            sim_matrix[i][j] = s
+            sim_matrix[j][i] = s
 
     # Message pairs lookup
     opposite_msgs = [m for m in messages if m.direction != direction]
@@ -147,7 +150,7 @@ def evaluate_stage1(
             for s_j in range(s_i + 1, len(sample_msgs)):
                 msg_j = sample_msgs[s_j]
                 val_j = cand.extract(msg_j)
-                score = float(sim_matrix[s_i, s_j])
+                score = float(sim_matrix[s_i][s_j])
                 if val_i == val_j and val_i is not None:
                     inner_pairs.append(score)
                 else:
@@ -185,7 +188,7 @@ def evaluate_stage1(
                             r2 = all_msg_by_id.get(sub_sample[j_p])
                             if r1 and r2:
                                 pair_sims.append(compute_pairwise_similarity(r1, r2, boundary_b))
-                    c_pr = float(np.mean(pair_sims)) if pair_sims else 0.10
+                    c_pr = float(sum(pair_sims) / len(pair_sims)) if pair_sims else 0.10
 
                 weighted_pr_sum += (len(c_partners) / paired_count) * c_pr
                 total_paired += len(c_partners)
@@ -204,10 +207,12 @@ def evaluate_stage1(
             if len(c_lens) <= 1:
                 c_ps = 0.10  # Singletons provide no evidence of length coherence
             else:
-                median_l = float(np.median(c_lens))
+                sorted_l = sorted(c_lens)
+                n_l = len(sorted_l)
+                median_l = float(sorted_l[n_l // 2] if n_l % 2 == 1 else (sorted_l[n_l // 2 - 1] + sorted_l[n_l // 2]) / 2.0)
                 max_l = float(max(c_lens))
                 if max_l > 0:
-                    gap_proxy = float(np.mean([abs(l - median_l) for l in c_lens])) / max_l
+                    gap_proxy = float(sum(abs(l - median_l) for l in c_lens) / len(c_lens)) / max_l
                     c_ps = max(0.0, 1.0 - gap_proxy)
                 else:
                     c_ps = 1.0

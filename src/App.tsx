@@ -28,12 +28,36 @@ import {
   Eye,
   Check,
   ChevronDown,
+  ChevronUp,
   ExternalLink,
   FolderArchive,
   Globe,
   Radio,
-  Server
+  Server,
+  Terminal,
+  AlertTriangle,
+  Trash2,
+  Copy,
+  Maximize2,
+  Minimize2,
+  Bug,
+  AlertCircle,
+  GitCompare
 } from 'lucide-react';
+import { PairwiseInspector, SampleMessage } from './components/PairwiseInspector';
+
+export interface StderrLogEntry {
+  id: string;
+  timestamp: string;
+  command: string;
+  target?: string;
+  source_id?: string;
+  status: 'ok' | 'error' | 'warning';
+  httpCode?: number;
+  durationMs?: number;
+  message?: string;
+  stderr: string;
+}
 
 interface DatasetMeta {
   id: string;
@@ -145,13 +169,8 @@ interface ProtocolDetails {
     ranking: RankedCandidate[];
   }>;
   diagnostics?: any;
-  sample_messages?: Array<{
-    id: number;
-    direction: string;
-    hex: string;
-    length: number;
-    cluster: string;
-  }>;
+  pairs?: Array<{ req_id: number; resp_id: number; dt: number }>;
+  sample_messages?: SampleMessage[];
 }
 
 interface ScalingPoint {
@@ -284,7 +303,7 @@ const FIG1_HEX = `05 64 0b c4 44 33 33 44 ac d1 c6 c5 01 3c 00 00 93 24 Read
 05 64 0b 44 33 44 44 33 7c ae c6 c6 81 00 00 00 36 71 Response`;
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'results' | 'charts' | 'inspector' | 'stage2' | 'custom'>('results');
+  const [activeTab, setActiveTab] = useState<'results' | 'charts' | 'inspector' | 'stage2' | 'custom' | 'pairwise'>('results');
   const [sourcesCatalog, setSourcesCatalog] = useState<Record<string, SourceMeta>>(DEFAULT_SOURCES);
   const [selectedSource, setSelectedSource] = useState<string>('netplier');
   const [selectedDataset, setSelectedDataset] = useState<string>('modbus');
@@ -302,6 +321,127 @@ export default function App() {
   const [selectedMessage, setSelectedMessage] = useState<number>(0);
   const [params, setParams] = useState<Hyperparameters>(DEFAULT_PARAMS);
   const [showKnobs, setShowKnobs] = useState<boolean>(false);
+
+  // Stderr & Debug Console Drawer State
+  const [stderrDrawerOpen, setStderrDrawerOpen] = useState<boolean>(false);
+  const [autoExpandOnError, setAutoExpandOnError] = useState<boolean>(true);
+  const [drawerHeight, setDrawerHeight] = useState<'compact' | 'medium' | 'large'>('medium');
+  const [stderrLogs, setStderrLogs] = useState<StderrLogEntry[]>([]);
+  const [activeLogTab, setActiveLogTab] = useState<'all' | 'errors' | 'raw'>('all');
+  const [stderrFilterSearch, setStderrFilterSearch] = useState<string>('');
+  const [copiedStderr, setCopiedStderr] = useState<boolean>(false);
+  const [lastApiStatus, setLastApiStatus] = useState<{
+    command: string;
+    target?: string;
+    durationMs: number;
+    ok: boolean;
+    hasStderr: boolean;
+  } | null>(null);
+
+  // Centralized API call runner that intercepts stderr and errors
+  const executeApiCall = async (payload: any, label?: string) => {
+    const tStart = performance.now();
+    const cmd = payload.cmd || 'run';
+    const target = payload.dataset_id || payload.protocol || payload.source_id || label;
+    const timeStr = new Date().toLocaleTimeString();
+
+    try {
+      const res = await fetch('/api/run', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      const durationMs = Math.round(performance.now() - tStart);
+      const data = await res.json();
+      const hasError = !res.ok || data.status === 'error';
+      const stderrContent = (data.stderr || data.trace || (data.status === 'error' ? data.message : '') || '').trim();
+
+      setLastApiStatus({
+        command: cmd,
+        target,
+        durationMs,
+        ok: !hasError,
+        hasStderr: stderrContent.length > 0,
+      });
+
+      if (stderrContent || hasError) {
+        const newLog: StderrLogEntry = {
+          id: `${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+          timestamp: timeStr,
+          command: cmd,
+          target,
+          source_id: payload.source_id,
+          status: hasError ? 'error' : 'warning',
+          httpCode: res.status,
+          durationMs,
+          message: data.message || (hasError ? 'Execution failed' : 'Execution completed with stderr diagnostics'),
+          stderr: stderrContent || `Command ${cmd} returned HTTP ${res.status}`,
+        };
+
+        setStderrLogs((prev) => [newLog, ...prev]);
+
+        if (hasError && autoExpandOnError) {
+          setStderrDrawerOpen(true);
+        }
+      }
+
+      return { ok: !hasError, data };
+    } catch (err: any) {
+      const durationMs = Math.round(performance.now() - tStart);
+      const errMsg = err?.message || 'Network communication failure or dev server process exit';
+
+      setLastApiStatus({
+        command: cmd,
+        target,
+        durationMs,
+        ok: false,
+        hasStderr: true,
+      });
+
+      const newLog: StderrLogEntry = {
+        id: `${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+        timestamp: timeStr,
+        command: cmd,
+        target,
+        source_id: payload.source_id,
+        status: 'error',
+        httpCode: 0,
+        durationMs,
+        message: 'Network error or process crash',
+        stderr: `Failed to communicate with /api/run:\n${errMsg}`,
+      };
+
+      setStderrLogs((prev) => [newLog, ...prev]);
+
+      if (autoExpandOnError) {
+        setStderrDrawerOpen(true);
+      }
+
+      return { ok: false, data: { status: 'error', message: errMsg, stderr: errMsg } };
+    }
+  };
+
+  const simulateError = async () => {
+    await executeApiCall(
+      {
+        cmd: 'simulate_error',
+        message: 'Simulated pipeline failure in rpkclust.pipeline.run_pipeline: [Errno 2] Ground-truth mismatch during candidate generation at offset 12',
+      },
+      'debug_test'
+    );
+  };
+
+  const clearStderrLogs = () => {
+    setStderrLogs([]);
+  };
+
+  const copyAllStderr = () => {
+    const text = stderrLogs.map((l) => `[${l.timestamp}] [${l.command} - ${l.target || 'default'}] [HTTP ${l.httpCode || 0}]\n${l.stderr}`).join('\n\n---\n\n');
+    navigator.clipboard.writeText(text);
+    setCopiedStderr(true);
+    setTimeout(() => setCopiedStderr(false), 2000);
+  };
 
   // Load catalog and initial data
   useEffect(() => {
@@ -343,39 +483,23 @@ export default function App() {
   };
 
   const fetchSources = async () => {
-    try {
-      const res = await fetch('/api/run', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ cmd: 'get_sources' }),
-      });
-      const data = await res.json();
-      if (data.status === 'ok' && data.catalog) {
-        setSourcesCatalog(data.catalog);
-      }
-    } catch (e) {
-      console.error('Error fetching sources catalog:', e);
+    const { data } = await executeApiCall({ cmd: 'get_sources' }, 'sources_catalog');
+    if (data?.status === 'ok' && data.catalog) {
+      setSourcesCatalog(data.catalog);
     }
   };
 
   const runAllBenchmarks = async (filterSource: string = benchmarkFilter) => {
     setBenchLoading(true);
     try {
-      const res = await fetch('/api/run', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          cmd: 'benchmark_all',
-          source_id: filterSource,
-          config: serializeParams(),
-        }),
-      });
-      const data = await res.json();
-      if (data.status === 'ok') {
+      const { data } = await executeApiCall({
+        cmd: 'benchmark_all',
+        source_id: filterSource,
+        config: serializeParams(),
+      }, `bench_${filterSource}`);
+      if (data?.status === 'ok') {
         setBenchmarks(data.benchmarks);
       }
-    } catch (e) {
-      console.error(e);
     } finally {
       setBenchLoading(false);
     }
@@ -384,23 +508,16 @@ export default function App() {
   const loadDataset = async (sourceId: string, datasetId: string) => {
     setLoading(true);
     try {
-      const res = await fetch('/api/run', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          cmd: 'run_dataset',
-          source_id: sourceId,
-          dataset_id: datasetId,
-          config: serializeParams(),
-        }),
-      });
-      const data = await res.json();
-      if (data.status === 'ok') {
+      const { data } = await executeApiCall({
+        cmd: 'run_dataset',
+        source_id: sourceId,
+        dataset_id: datasetId,
+        config: serializeParams(),
+      }, `${sourceId}/${datasetId}`);
+      if (data?.status === 'ok') {
         setProtoDetails(data);
         setSelectedMessage(0);
       }
-    } catch (e) {
-      console.error(e);
     } finally {
       setLoading(false);
     }
@@ -409,22 +526,15 @@ export default function App() {
   const fetchScalingData = async (sourceId: string, datasetId: string) => {
     setScalingLoading(true);
     try {
-      const res = await fetch('/api/run', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          cmd: 'scaling_benchmark',
-          source_id: sourceId,
-          dataset_id: datasetId,
-          config: serializeParams(),
-        }),
-      });
-      const data = await res.json();
-      if (data.status === 'ok') {
+      const { data } = await executeApiCall({
+        cmd: 'scaling_benchmark',
+        source_id: sourceId,
+        dataset_id: datasetId,
+        config: serializeParams(),
+      }, `scaling_${datasetId}`);
+      if (data?.status === 'ok') {
         setScalingPoints(data.points);
       }
-    } catch (e) {
-      console.error(e);
     } finally {
       setScalingLoading(false);
     }
@@ -433,18 +543,15 @@ export default function App() {
   const runCustomTrace = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/run', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ cmd: 'run_custom', text: customText, config: serializeParams() }),
-      });
-      const data = await res.json();
-      if (data.status === 'ok') {
+      const { data } = await executeApiCall({
+        cmd: 'run_custom',
+        text: customText,
+        config: serializeParams(),
+      }, 'custom_trace');
+      if (data?.status === 'ok') {
         setCustomDetails(data);
         setSelectedMessage(0);
       }
-    } catch (e) {
-      console.error(e);
     } finally {
       setLoading(false);
     }
@@ -474,6 +581,66 @@ export default function App() {
     if (benchmarkFilter === 'all') return true;
     return b.source_id === benchmarkFilter;
   });
+
+  // Stderr Drawer Computed States & Formatting
+  const errorCount = stderrLogs.filter((l) => l.status === 'error').length;
+  const warningCount = stderrLogs.filter((l) => l.status === 'warning').length;
+
+  const filteredLogs = stderrLogs.filter((l) => {
+    if (activeLogTab === 'errors' && l.status !== 'error') return false;
+    if (stderrFilterSearch.trim()) {
+      const q = stderrFilterSearch.toLowerCase();
+      return (
+        l.command.toLowerCase().includes(q) ||
+        (l.target && l.target.toLowerCase().includes(q)) ||
+        l.stderr.toLowerCase().includes(q)
+      );
+    }
+    return true;
+  });
+
+  const rawCombinedStderr = stderrLogs
+    .map((l) => `=== [${l.timestamp}] ${l.command} (${l.target || 'target'}) HTTP ${l.httpCode || 0} ===\n${l.stderr}`)
+    .join('\n\n');
+
+  const renderFormattedStderr = (text: string) => {
+    const lines = text.split('\n');
+    return lines.map((line, idx) => {
+      if (line.startsWith('Traceback (most recent call last):')) {
+        return (
+          <div key={idx} className="text-rose-400 font-bold bg-rose-950/40 px-1 rounded my-0.5">
+            {line}
+          </div>
+        );
+      }
+      if (line.trim().startsWith('File ') && line.includes('line ')) {
+        return (
+          <div key={idx} className="text-slate-400 pl-2">
+            {line}
+          </div>
+        );
+      }
+      if (line.match(/^[A-Za-z]+Error:|^[A-Za-z]+Exception:/)) {
+        return (
+          <div key={idx} className="text-rose-300 font-bold bg-rose-950/50 border-l-2 border-rose-500 pl-2 py-0.5 my-1">
+            {line}
+          </div>
+        );
+      }
+      if (line.includes('[rpkclust.api_runner ERROR]')) {
+        return (
+          <div key={idx} className="text-amber-400 font-semibold bg-amber-950/30 px-1 my-0.5">
+            {line}
+          </div>
+        );
+      }
+      return (
+        <div key={idx} className="text-slate-300">
+          {line}
+        </div>
+      );
+    });
+  };
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans">
@@ -595,6 +762,15 @@ export default function App() {
             >
               <Layers className="w-4 h-4" />
               Region Inspector
+            </button>
+            <button
+              onClick={() => setActiveTab('pairwise')}
+              className={`px-3 py-1.5 rounded-md flex items-center gap-1.5 font-medium transition ${
+                activeTab === 'pairwise' ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              <GitCompare className="w-4 h-4" />
+              Pairwise Inspector
             </button>
             <button
               onClick={() => setActiveTab('stage2')}
@@ -819,7 +995,7 @@ export default function App() {
       )}
 
       {/* Main Content Body */}
-      <main className="flex-1 p-6 max-w-7xl w-full mx-auto space-y-6">
+      <main className="flex-1 p-6 max-w-7xl w-full mx-auto space-y-6 pb-28">
         {/* Source & Dataset Provenance Banner */}
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl relative overflow-hidden">
           <div className="absolute top-0 right-0 -mt-6 -mr-6 w-32 h-32 bg-indigo-500/5 rounded-full blur-2xl pointer-events-none" />
@@ -1742,7 +1918,323 @@ export default function App() {
             </div>
           </div>
         )}
+
+        {/* TAB 6: Pairwise Message Pipeline Inspector & Sequence Aligner */}
+        {activeTab === 'pairwise' && (
+          <PairwiseInspector
+            messages={currentDetails?.sample_messages ?? []}
+            boundaryB={boundaryB}
+            keywords={currentDetails?.keywords}
+            hits={currentDetails?.boundary?.hits ?? []}
+            datasetName={currentDatasetMeta?.name}
+            protocolName={currentDatasetMeta?.protocol}
+          />
+        )}
       </main>
+
+      {/* Collapsible Bottom Panel Drawer: Python API Runner Console & Stderr */}
+      <aside
+        className="fixed bottom-0 left-0 right-0 z-40 bg-slate-900 border-t border-slate-800 shadow-[0_-10px_35px_rgba(0,0,0,0.6)] flex flex-col transition-all duration-200"
+        aria-label="Python API Runner Stderr Console"
+      >
+        {/* Drawer Header / Dock Bar */}
+        <div
+          onClick={() => setStderrDrawerOpen(!stderrDrawerOpen)}
+          className="h-11 px-4 bg-slate-900/95 hover:bg-slate-800/80 cursor-pointer flex items-center justify-between border-b border-slate-800/80 select-none transition"
+        >
+          {/* Left: Terminal Icon, Title & Live Status Badges */}
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <div
+                className={`w-6 h-6 rounded flex items-center justify-center ${
+                  errorCount > 0
+                    ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30'
+                    : warningCount > 0
+                    ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                    : 'bg-slate-800 text-cyan-400 border border-slate-700'
+                }`}
+              >
+                <Terminal className="w-3.5 h-3.5" />
+              </div>
+              <span className="font-bold text-xs text-white tracking-wide flex items-center gap-2">
+                Python API Runner Console & Stderr
+              </span>
+            </div>
+
+            {/* Live Status Indicator Badges */}
+            <div className="flex items-center gap-2 text-[11px] font-mono">
+              {errorCount > 0 ? (
+                <span className="px-2 py-0.5 rounded font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30 flex items-center gap-1.5 animate-pulse">
+                  <span className="w-2 h-2 rounded-full bg-rose-400" />
+                  {errorCount} Error{errorCount > 1 ? 's' : ''}
+                </span>
+              ) : warningCount > 0 ? (
+                <span className="px-2 py-0.5 rounded font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-amber-400" />
+                  {warningCount} Warning{warningCount > 1 ? 's' : ''}
+                </span>
+              ) : (
+                <span className="px-2 py-0.5 rounded font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
+                  <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                  Clean Stderr
+                </span>
+              )}
+
+              {lastApiStatus && (
+                <span className="hidden sm:inline-flex text-slate-400 items-center gap-1">
+                  • Last: <strong className="text-slate-200">{lastApiStatus.command}</strong>
+                  {lastApiStatus.target ? ` (${lastApiStatus.target})` : ''} • {lastApiStatus.durationMs}ms
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Right Controls: Quick Actions */}
+          <div className="flex items-center gap-2 text-xs" onClick={(e) => e.stopPropagation()}>
+            {/* Auto-expand toggle */}
+            <label className="hidden md:flex items-center gap-1.5 text-[11px] text-slate-400 hover:text-slate-200 cursor-pointer mr-2">
+              <input
+                type="checkbox"
+                checked={autoExpandOnError}
+                onChange={(e) => setAutoExpandOnError(e.target.checked)}
+                className="rounded border-slate-700 bg-slate-800 text-indigo-500 focus:ring-0 w-3.5 h-3.5"
+              />
+              <span>Auto-expand on error</span>
+            </label>
+
+            {/* Test Error Simulator button */}
+            <button
+              onClick={simulateError}
+              title="Trigger a simulated Python exception to test the stderr drawer"
+              className="px-2.5 py-1 rounded bg-rose-950/40 hover:bg-rose-900/60 border border-rose-800/60 text-rose-300 text-[11px] font-semibold flex items-center gap-1 transition"
+            >
+              <Bug className="w-3 h-3 text-rose-400" />
+              <span>Simulate Error</span>
+            </button>
+
+            {/* Copy button */}
+            {stderrLogs.length > 0 && (
+              <button
+                onClick={copyAllStderr}
+                className="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-[11px] font-medium flex items-center gap-1 transition"
+                title="Copy all stderr logs to clipboard"
+              >
+                {copiedStderr ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                <span>{copiedStderr ? 'Copied' : 'Copy Stderr'}</span>
+              </button>
+            )}
+
+            {/* Clear logs button */}
+            {stderrLogs.length > 0 && (
+              <button
+                onClick={clearStderrLogs}
+                className="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-slate-200 transition"
+                title="Clear stderr logs"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+              </button>
+            )}
+
+            {/* Height preset buttons (only visible when drawer is open) */}
+            {stderrDrawerOpen && (
+              <div className="hidden sm:flex items-center gap-1 border-l border-slate-800 pl-2">
+                <button
+                  onClick={() => setDrawerHeight('compact')}
+                  className={`px-1.5 py-0.5 rounded text-[10px] font-mono ${
+                    drawerHeight === 'compact' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                  title="Compact drawer height (200px)"
+                >
+                  S
+                </button>
+                <button
+                  onClick={() => setDrawerHeight('medium')}
+                  className={`px-1.5 py-0.5 rounded text-[10px] font-mono ${
+                    drawerHeight === 'medium' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                  title="Medium drawer height (340px)"
+                >
+                  M
+                </button>
+                <button
+                  onClick={() => setDrawerHeight('large')}
+                  className={`px-1.5 py-0.5 rounded text-[10px] font-mono ${
+                    drawerHeight === 'large' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                  title="Large drawer height (480px)"
+                >
+                  L
+                </button>
+              </div>
+            )}
+
+            {/* Expand / Collapse toggle chevron button */}
+            <button
+              onClick={() => setStderrDrawerOpen(!stderrDrawerOpen)}
+              className="p-1 rounded hover:bg-slate-800 text-slate-300 hover:text-white transition"
+              title={stderrDrawerOpen ? 'Collapse Stderr Drawer' : 'Expand Stderr Drawer'}
+            >
+              {stderrDrawerOpen ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
+            </button>
+          </div>
+        </div>
+
+        {/* Drawer Body (Expandable Monospace Terminal Panel) */}
+        {stderrDrawerOpen && (
+          <div
+            className={`bg-slate-950 flex flex-col font-mono text-xs overflow-hidden transition-all duration-200 ${
+              drawerHeight === 'compact'
+                ? 'h-52'
+                : drawerHeight === 'large'
+                ? 'h-[480px]'
+                : 'h-80'
+            }`}
+          >
+            {/* Terminal Tab Bar & Search */}
+            <div className="bg-slate-900/90 border-b border-slate-800 px-4 py-2 flex flex-wrap items-center justify-between gap-3 shrink-0">
+              <div className="flex items-center gap-1.5">
+                <button
+                  onClick={() => setActiveLogTab('all')}
+                  className={`px-2.5 py-1 rounded text-[11px] font-semibold transition ${
+                    activeLogTab === 'all'
+                      ? 'bg-indigo-600 text-white'
+                      : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+                  }`}
+                >
+                  All Logs ({stderrLogs.length})
+                </button>
+                <button
+                  onClick={() => setActiveLogTab('errors')}
+                  className={`px-2.5 py-1 rounded text-[11px] font-semibold transition flex items-center gap-1.5 ${
+                    activeLogTab === 'errors'
+                      ? 'bg-rose-600 text-white'
+                      : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+                  }`}
+                >
+                  <AlertCircle className="w-3 h-3 text-rose-400" />
+                  <span>Errors Only ({errorCount})</span>
+                </button>
+                <button
+                  onClick={() => setActiveLogTab('raw')}
+                  className={`px-2.5 py-1 rounded text-[11px] font-semibold transition ${
+                    activeLogTab === 'raw'
+                      ? 'bg-indigo-600 text-white'
+                      : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+                  }`}
+                >
+                  Raw Stderr Stream
+                </button>
+              </div>
+
+              {/* Filter search input */}
+              <div className="flex items-center gap-2">
+                <div className="relative">
+                  <Search className="w-3.5 h-3.5 text-slate-500 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <input
+                    type="text"
+                    value={stderrFilterSearch}
+                    onChange={(e) => setStderrFilterSearch(e.target.value)}
+                    placeholder="Filter stderr logs..."
+                    className="bg-slate-950 border border-slate-800 rounded-md pl-8 pr-3 py-1 text-[11px] text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-slate-700 w-48"
+                  />
+                  {stderrFilterSearch && (
+                    <button
+                      onClick={() => setStderrFilterSearch('')}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 text-[10px]"
+                    >
+                      ✕
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Logs Content Area */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-3 font-mono text-xs select-text">
+              {filteredLogs.length === 0 ? (
+                <div className="h-full flex flex-col items-center justify-center text-center py-10 space-y-3 text-slate-500">
+                  <div className="w-10 h-10 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-600">
+                    <Terminal className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-slate-400">No Stderr Output Recorded</p>
+                    <p className="text-[11px] text-slate-500 max-w-sm mt-0.5">
+                      The Python runner processes are executing without stderr warnings or errors. If a protocol fails or Python emits tracebacks, they will appear here in real-time.
+                    </p>
+                  </div>
+                  <button
+                    onClick={simulateError}
+                    className="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs text-rose-300 font-semibold flex items-center gap-1.5 transition"
+                  >
+                    <Bug className="w-3.5 h-3.5 text-rose-400" />
+                    Trigger Simulated Test Error
+                  </button>
+                </div>
+              ) : activeLogTab === 'raw' ? (
+                /* Raw Combined Stream View */
+                <pre className="text-slate-300 whitespace-pre-wrap leading-relaxed select-text bg-slate-950 p-3 rounded-lg border border-slate-900">
+                  {rawCombinedStderr}
+                </pre>
+              ) : (
+                /* Card List View */
+                filteredLogs.map((log) => {
+                  const isErr = log.status === 'error';
+                  return (
+                    <div
+                      key={log.id}
+                      className={`rounded-xl border p-3.5 transition ${
+                        isErr
+                          ? 'bg-rose-950/20 border-rose-900/50 shadow-sm'
+                          : 'bg-slate-900/50 border-slate-800'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between pb-2 mb-2 border-b border-slate-800/80">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span
+                            className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                              isErr
+                                ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
+                                : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                            }`}
+                          >
+                            {isErr ? 'ERROR' : 'WARNING'}
+                          </span>
+                          <span className="font-bold text-white text-[11px]">
+                            {log.command}
+                          </span>
+                          {log.target && (
+                            <span className="text-cyan-400 text-[11px]">({log.target})</span>
+                          )}
+                          <span className="text-slate-500 text-[10px]">
+                            HTTP {log.httpCode || 0} • {log.durationMs || 0}ms
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-slate-500 text-[10px]">{log.timestamp}</span>
+                          <button
+                            onClick={() => {
+                              navigator.clipboard.writeText(log.stderr);
+                            }}
+                            className="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-slate-200 transition"
+                            title="Copy this error stderr"
+                          >
+                            <Copy className="w-3 h-3" />
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Stderr Body with Traceback Formatting */}
+                      <pre className="text-xs whitespace-pre-wrap leading-relaxed overflow-x-auto select-text font-mono">
+                        {renderFormattedStderr(log.stderr)}
+                      </pre>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </div>
+        )}
+      </aside>
     </div>
   );
 }

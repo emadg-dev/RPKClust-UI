@@ -36,10 +36,36 @@ function apiPlugin(): Plugin {
             res.setHeader('Content-Type', 'application/json');
             if (code !== 0) {
               res.statusCode = 500;
-              res.end(JSON.stringify({status: 'error', stderr, message: 'Python execution failed'}));
+              let responseObj: any = {
+                status: 'error',
+                stderr: stderr || 'Process terminated with non-zero exit code ' + code,
+                message: 'Python execution failed (exit code ' + code + ')',
+              };
+              try {
+                if (stdout && stdout.trim().length > 0) {
+                  const parsed = JSON.parse(stdout);
+                  responseObj = { ...parsed, stderr: stderr || parsed.stderr || parsed.trace };
+                }
+              } catch (_) {}
+              res.end(JSON.stringify(responseObj));
             } else {
-              res.statusCode = 200;
-              res.end(stdout);
+              try {
+                const parsed = JSON.parse(stdout);
+                if (stderr && stderr.trim().length > 0) {
+                  parsed.stderr = stderr;
+                }
+                res.statusCode = parsed.status === 'error' ? 400 : 200;
+                res.end(JSON.stringify(parsed));
+              } catch (e) {
+                res.statusCode = 500;
+                res.end(
+                  JSON.stringify({
+                    status: 'error',
+                    stderr: stderr + (stdout ? '\n' + stdout : ''),
+                    message: 'Invalid JSON response from Python runner',
+                  })
+                );
+              }
             }
           });
 

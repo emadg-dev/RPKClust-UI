@@ -3,7 +3,6 @@ Sequence ID Detector: fixed-step counter without value wrap-around.
 """
 
 from typing import List, Optional
-import numpy as np
 from rpkclust.detectors.base import Context
 from rpkclust.model import Hit
 
@@ -17,20 +16,20 @@ class SequenceDetector:
 
         k = len(slices[0])
         # Sort messages by timestamp
-        order = np.argsort([m.ts for m in ctx.messages])
+        order = sorted(range(len(ctx.messages)), key=lambda idx: ctx.messages[idx].ts)
         max_val = (1 << (8 * k)) - 1
 
         for endian in ("big", "little"):
-            vals = np.array([int.from_bytes(slices[idx], byteorder=endian) for idx in order], dtype=np.int64)
-            diffs = np.diff(vals)
+            vals = [int.from_bytes(slices[idx], byteorder=endian) for idx in order]
+            diffs = [vals[i + 1] - vals[i] for i in range(len(vals) - 1)]
 
             if len(diffs) == 0:
                 continue
 
             delta = diffs[0]
-            if delta != 0 and np.all(diffs == delta):
+            if delta != 0 and all(d == delta for d in diffs):
                 # Check no wrap-around: values are strictly inside [0, 2^(8k)-1]
-                if np.all((vals >= 0) & (vals <= max_val)):
+                if all(0 <= v <= max_val for v in vals):
                     return Hit(
                         rule=self.name,
                         offset=ctx.offset,
@@ -42,11 +41,11 @@ class SequenceDetector:
             for direction in ("c2s", "s2c"):
                 dir_indices = [idx for idx in order if ctx.messages[idx].direction == direction]
                 if len(dir_indices) >= 3:
-                    dir_vals = np.array([int.from_bytes(slices[i], byteorder=endian) for i in dir_indices], dtype=np.int64)
-                    dir_diffs = np.diff(dir_vals)
+                    dir_vals = [int.from_bytes(slices[i], byteorder=endian) for i in dir_indices]
+                    dir_diffs = [dir_vals[i + 1] - dir_vals[i] for i in range(len(dir_vals) - 1)]
                     d_delta = dir_diffs[0]
-                    if d_delta != 0 and np.all(dir_diffs == d_delta):
-                        if np.all((dir_vals >= 0) & (dir_vals <= max_val)):
+                    if d_delta != 0 and all(d == d_delta for d in dir_diffs):
+                        if all(0 <= v <= max_val for v in dir_vals):
                             return Hit(
                                 rule=self.name,
                                 offset=ctx.offset,
@@ -55,3 +54,4 @@ class SequenceDetector:
                             )
 
         return None
+

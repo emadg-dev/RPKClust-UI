@@ -1,5 +1,4 @@
 import struct
-import numpy as np
 from rpkclust.model import Message, Pair
 from rpkclust.config import Config
 from rpkclust.detectors.base import Context

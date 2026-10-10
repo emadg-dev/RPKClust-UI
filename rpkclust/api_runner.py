@@ -13,11 +13,15 @@ from rpkclust.pipeline import run_pipeline
 from rpkclust.eval.ground_truth import run_benchmark_on_pcap, PROTOCOL_TRUE_KEYWORDS
 from rpkclust.catalog import SOURCES, get_catalog, resolve_dataset
 
-def _format_pipeline_output(pipeline_res, sample_msgs, benchmark_res=None, source_meta=None) -> dict:
+def _format_pipeline_output(pipeline_res, sample_msgs, benchmark_res=None, source_meta=None, pairs=None) -> dict:
     out = {
         "status": "ok",
         "source_meta": source_meta,
         "benchmark": benchmark_res,
+        "pairs": [
+            {"req_id": p.req_id, "resp_id": p.resp_id, "dt": round(p.dt, 6)}
+            for p in (pairs or [])
+        ],
         "boundary": {
             "B": pipeline_res.boundary.B,
             "min_len": pipeline_res.boundary.min_len,
@@ -175,14 +179,23 @@ def process_request(data: dict) -> dict:
 
         pipeline_res = run_pipeline(trace, config)
 
+        pair_lookup = {}
+        for p in trace.pairs:
+            pair_lookup[p.req_id] = p.resp_id
+            pair_lookup[p.resp_id] = p.req_id
+
         sample_msgs = []
-        for m in trace.messages[:25]:
+        for m in trace.messages[:60]:
             sample_msgs.append({
                 "id": m.id,
                 "direction": m.direction,
                 "hex": m.data.hex(),
                 "length": len(m.data),
-                "cluster": pipeline_res.clusters.get(m.id, "unclassified")
+                "cluster": pipeline_res.clusters.get(m.id, "unclassified"),
+                "label": m.label,
+                "session_id": m.session_id,
+                "ts": round(m.ts, 6),
+                "paired_id": pair_lookup.get(m.id)
             })
 
         source_meta = {
@@ -192,24 +205,39 @@ def process_request(data: dict) -> dict:
             "file": pcap_path,
             "meta": d_meta
         }
-        return _format_pipeline_output(pipeline_res, sample_msgs, res, source_meta=source_meta)
+        return _format_pipeline_output(pipeline_res, sample_msgs, res, source_meta=source_meta, pairs=trace.pairs)
 
     elif cmd == "run_custom":
         raw_text = data.get("text", "")
         trace = load_hex_lines(raw_text, config)
         pipeline_res = run_pipeline(trace, config)
 
+        pair_lookup = {}
+        for p in trace.pairs:
+            pair_lookup[p.req_id] = p.resp_id
+            pair_lookup[p.resp_id] = p.req_id
+
         sample_msgs = []
-        for m in trace.messages[:30]:
+        for m in trace.messages[:60]:
             sample_msgs.append({
                 "id": m.id,
                 "direction": m.direction,
                 "hex": m.data.hex(),
                 "length": len(m.data),
-                "cluster": pipeline_res.clusters.get(m.id, "unclassified")
+                "cluster": pipeline_res.clusters.get(m.id, "unclassified"),
+                "label": m.label,
+                "session_id": m.session_id,
+                "ts": round(m.ts, 6),
+                "paired_id": pair_lookup.get(m.id)
             })
 
-        return _format_pipeline_output(pipeline_res, sample_msgs)
+        return _format_pipeline_output(pipeline_res, sample_msgs, pairs=trace.pairs)
+
+    elif cmd == "simulate_error":
+        msg = data.get("message", "Simulated protocol parsing exception for debugging")
+        sys.stderr.write(f"Traceback (most recent call last):\n  File 'rpkclust/pipeline.py', line 142, in run_pipeline\n    raise ValueError('{msg}')\nValueError: {msg}\n")
+        sys.stderr.flush()
+        sys.exit(1)
 
     return {"status": "error", "message": f"Unknown command {cmd}"}
 
@@ -217,11 +245,19 @@ def main():
     try:
         input_data = json.load(sys.stdin)
         out = process_request(input_data)
+        if out.get("status") == "error":
+            err_text = out.get("message", "Error in processing")
+            sys.stderr.write(f"[rpkclust.api_runner ERROR] {err_text}\n")
+            sys.stderr.flush()
         print(json.dumps(out))
     except Exception as e:
         import traceback
-        err_msg = {"status": "error", "message": str(e), "trace": traceback.format_exc()}
+        tb = traceback.format_exc()
+        sys.stderr.write(tb)
+        sys.stderr.flush()
+        err_msg = {"status": "error", "message": str(e), "trace": tb, "stderr": tb}
         print(json.dumps(err_msg))
+        sys.exit(1)
 
 if __name__ == "__main__":
     main()

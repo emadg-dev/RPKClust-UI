@@ -120,7 +120,46 @@ def parse_pcap_packets(pcap_path: str):
         magic = f.read(4)
 
     if magic == b"\x0a\x0d\x0d\x0a":
-        # PCAPNG file format
+        # PCAPNG file format: pure-Python zero-dependency block parser
+        try:
+            with open(pcap_path, "rb") as pf:
+                data = pf.read()
+            pos = 0
+            endian = "<"
+            parsed_any = False
+            while pos + 8 <= len(data):
+                b_type, b_len = struct.unpack_from(endian + "II", data, pos)
+                if b_type == 0x0A0D0D0A:
+                    bom = data[pos + 8 : pos + 12]
+                    endian = ">" if bom == b"\x1a\x2b\x3c\x4d" else "<"
+                    b_type, b_len = struct.unpack_from(endian + "II", data, pos)
+                if b_len < 12 or pos + b_len > len(data):
+                    break
+                if b_type == 0x00000006:  # Enhanced Packet Block
+                    ts_high, ts_low, cap_len, _ = struct.unpack_from(endian + "IIII", data, pos + 12)
+                    ts = ((ts_high << 32) | ts_low) / 1000000.0
+                    raw_bytes = data[pos + 28 : pos + 28 + cap_len]
+                    res = _parse_raw_eth_ip(raw_bytes)
+                    if res:
+                        src, dst, sport, dport, payload = res
+                        if payload:
+                            parsed_any = True
+                            yield float(ts), src, dst, sport, dport, payload
+                elif b_type == 0x00000002:  # Simple Packet Block
+                    raw_bytes = data[pos + 12 : pos + b_len - 4]
+                    res = _parse_raw_eth_ip(raw_bytes)
+                    if res:
+                        src, dst, sport, dport, payload = res
+                        if payload:
+                            parsed_any = True
+                            yield 0.0, src, dst, sport, dport, payload
+                pos += b_len
+            if parsed_any:
+                return
+        except Exception:
+            pass
+
+        # Optional scapy fallback
         try:
             from scapy.utils import PcapNgReader
             r = PcapNgReader(pcap_path)
@@ -138,7 +177,7 @@ def parse_pcap_packets(pcap_path: str):
                             yield float(ts), src, dst, sport, dport, payload
                 except EOFError:
                     break
-        except Exception as e:
+        except Exception:
             pass
         return
 

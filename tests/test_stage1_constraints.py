@@ -1,4 +1,3 @@
-import pytest
 from rpkclust.model import Message, Candidate, Pair
 from rpkclust.config import Config
 from rpkclust.constraints.posterior import compute_star_posterior
