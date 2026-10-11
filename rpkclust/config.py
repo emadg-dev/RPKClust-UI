@@ -12,8 +12,8 @@ class Config:
     # FOR candidate generation window sizes
     fo_lengths_for_candidates: Tuple[int, ...] = (1, 2, 4)
 
-    # FOR cardinality pre-filter (R-07: None disables by default)
-    candidate_max_distinct_ratio: Optional[float] = None
+    # FOR cardinality pre-filter (R-07: 0.5 enables by default per spec)
+    candidate_max_distinct_ratio: Optional[float] = 0.5
 
     # NFOR TLV parameters
     # When tlv_auto_params=False (default), use fixed tlv_t_len / tlv_l_len / tlv_endian

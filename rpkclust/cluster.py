@@ -12,30 +12,17 @@ def cluster_messages(
 ) -> Dict[int, str]:
     """
     Cluster messages based on inferred keyword values per direction.
-    If one direction identified a high-confidence keyword (e.g. client function code),
-    and the other direction has lower confidence, the global keyword is used.
+    Each message uses ONLY its direction's keyword result.
     """
-    all_kws = [kw for kw in keywords.values() if kw and kw.candidate]
-    best_overall = max(all_kws, key=lambda k: k.posterior) if all_kws else None
-
     clusters: Dict[int, str] = {}
 
     for m in messages:
-        dir_key = m.direction if m.direction in ("c2s", "s2c") else "c2s"
+        dir_key = m.direction if m.direction in ("c2s", "s2c", "both") else "c2s"
         kw_res = keywords.get(dir_key)
 
         chosen_cand = None
         if kw_res and kw_res.candidate:
-            if best_overall and (best_overall.posterior >= kw_res.posterior):
-                # Use higher-confidence dominant keyword across protocol if extractable
-                if best_overall.candidate.extract(m) is not None:
-                    chosen_cand = best_overall.candidate
-                else:
-                    chosen_cand = kw_res.candidate
-            else:
-                chosen_cand = kw_res.candidate
-        elif best_overall:
-            chosen_cand = best_overall.candidate
+            chosen_cand = kw_res.candidate
 
         if chosen_cand is not None:
             val = chosen_cand.extract(m)

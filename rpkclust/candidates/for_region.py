@@ -32,6 +32,7 @@ def generate_for_candidates(
     # Byte-level tagging of semantic regions in FOR [0, boundary_b - 1]
     excluded_bytes: Set[int] = set()
     sparse_bytes: Set[int] = set()
+    constant_bytes: Set[int] = set()
     exclusion_reasons: Dict[int, List[str]] = {}
 
     exclude_rules = set(config.for_exclude_rules)
@@ -48,18 +49,21 @@ def generate_for_candidates(
         elif h.rule in exclude_rules:
             for b_idx in range(h_start, h_end):
                 excluded_bytes.add(b_idx)
+                if h.rule == "constant":
+                    constant_bytes.add(b_idx)
                 exclusion_reasons.setdefault(b_idx, []).append(h.rule)
 
     # Line 3: E = E_sem \ F_sparse
-    # (If a byte was tagged sparse, it is not excluded)
-    effective_excluded = excluded_bytes - sparse_bytes
+    # (If a byte was tagged sparse AND NOT constant, it is not excluded)
+    sparse_rescue = sparse_bytes - constant_bytes
+    effective_excluded = excluded_bytes - sparse_rescue
 
     # Line 4: U = [0, B - 1] \ E
     all_for_bytes = set(range(boundary_b))
     U = all_for_bytes - effective_excluded
 
-    # Line 5: S = U U F_sparse
-    S = U.union(sparse_bytes)
+    # Line 5: S = U U (F_sparse \ F_constant)
+    S = U.union(sparse_rescue)
 
     candidates: List[Candidate] = []
     num_msgs = len(target_msgs)
@@ -73,20 +77,19 @@ def generate_for_candidates(
             # Line 8: Modulo alignment check s == 0 (mod L)
             if s % L == 0:
                 # Line 9: Continuity check
-                    if L == 1 or is_continuous(S, s, L):
-                        # Check basic cardinality (drop constants — already caught by detectors)
-                        values = [m.data[s:s + L] for m in target_msgs if len(m.data) >= s + L]
-                        if len(values) == num_msgs:
-                            distinct_cnt = len(set(values))
-                            # Drop constant candidate (1 unique value)
-                            if distinct_cnt <= 1:
+                if L == 1 or is_continuous(S, s, L):
+                    # Check basic cardinality (drop constants — already caught by detectors)
+                    values = [m.data[s:s + L] for m in target_msgs if len(m.data) >= s + L]
+                    if len(values) == num_msgs:
+                        distinct_cnt = len(set(values))
+                        # Drop constant candidate (1 unique value) - always apply
+                        if distinct_cnt <= 1:
+                            continue
+                        # R-07: cardinality pre-filter applies when set
+                        max_ratio = config.candidate_max_distinct_ratio
+                        if max_ratio is not None and num_msgs >= 2:
+                            if distinct_cnt / num_msgs > max_ratio:
                                 continue
-                            # R-07: cardinality pre-filter off by default;
-                            # only apply if config.candidate_max_distinct_ratio is set
-                            max_ratio = config.candidate_max_distinct_ratio
-                            if max_ratio is not None and num_msgs >= 10:
-                                if distinct_cnt / num_msgs > max_ratio:
-                                    continue
 
                         cand = Candidate(
                             region="FOR",
@@ -101,6 +104,7 @@ def generate_for_candidates(
         "boundary_b": boundary_b,
         "excluded_bytes": sorted(effective_excluded),
         "sparse_bytes": sorted(sparse_bytes),
+        "constant_bytes": sorted(constant_bytes),
         "available_S": sorted(S),
         "exclusion_reasons": {k: list(set(v)) for k, v in exclusion_reasons.items()},
     }

@@ -1,3 +1,5 @@
 {
-  "tests/test_detectors.py::test_length_detector": true
+  "tests/test_detectors.py::test_length_detector": true,
+  "tests/test_fig1_pipeline.py::test_fig1_pipeline_reproduction": true,
+  "tests/test_model_config.py::test_new_config_defaults": true
 }
