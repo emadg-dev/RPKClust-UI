@@ -74,7 +74,6 @@ def all_hits(
     t_end = max((m.ts for m in messages), default=0.0)
     capture_range = (t_start, t_end)
 
-    detectors = get_detectors(config)
     hits: List[Hit] = []
 
     for offset in range(limit):

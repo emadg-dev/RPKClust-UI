@@ -8,6 +8,7 @@ import time
 import os
 import json
 from typing import List, Optional, Dict, Any, Tuple
+from rpkclust.detectors.registry import BOUNDARY_RULES
 from rpkclust.model import Message, Pair, Trace, BoundaryResult, Candidate, KeywordResult, Result
 from rpkclust.config import Config
 from rpkclust.boundary import find_boundary
@@ -53,10 +54,12 @@ def run_pipeline(
     # )
     from rpkclust.detectors.registry import all_hits, EXTRA_RULES
 
-    extra = all_hits(messages, config, max_offset=boundary.B,
-                    pairs=pairs, detectors=EXTRA_RULES)
+    # Spec (05): a position can match several rules; keep ALL tags for candidate
+    # filtering. B itself still comes from the first-match boundary scan.
+    tag_hits = all_hits(messages, config, max_offset=boundary.B,
+                        pairs=pairs, detectors=BOUNDARY_RULES + EXTRA_RULES)
     cand_boundary = BoundaryResult(
-        B=boundary.B, hits=boundary.hits + extra,
+        B=boundary.B, hits=tag_hits,
         min_len=boundary.min_len, direction=boundary.direction)
 
     candidates, cand_diagnostics = generate_candidates(

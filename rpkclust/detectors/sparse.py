@@ -18,6 +18,7 @@ class SparseDetector:
         k = len(slices[0])
         unique_vals = set(slices)
         zero_bytes = b"\x00" * k
+        
 
         # 0 must not be in unique values
         if zero_bytes in unique_vals:

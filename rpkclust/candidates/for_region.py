@@ -88,14 +88,14 @@ def generate_for_candidates(
                                 if distinct_cnt / num_msgs > max_ratio:
                                     continue
 
-                        cand = Candidate(
-                            region="FOR",
-                            offset=s,
-                            length=L,
-                            kind="window",
-                            direction=direction,
-                        )
-                        candidates.append(cand)
+                            cand = Candidate(
+                                region="FOR",
+                                offset=s,
+                                length=L,
+                                kind="window",
+                                direction=direction,
+                            )
+                            candidates.append(cand)
 
     diagnostics = {
         "boundary_b": boundary_b,
