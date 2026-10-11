@@ -44,7 +44,7 @@ class Config:
     enable_length: bool = True
     # Rules excluded from FOR candidates (R-05: Length excluded from boundary, kept in FOR exclusion)
     for_exclude_rules: List[str] = field(default_factory=lambda: [
-        "constant", "sequence", "timestamp", "float", #"length", "checksum", "address"
+        "constant", "sequence", "timestamp", "float", "length", "checksum", "address"
     ])
 
     # Boundary detection

@@ -7,6 +7,7 @@ import sys
 import json
 import os
 import time
+from typing import List
 from rpkclust.config import Config
 from rpkclust.io.loader import load_hex_lines, load_pcap, load_csv
 from rpkclust.pipeline import run_pipeline
