@@ -41,7 +41,7 @@ SOURCES = {
                 "header_len": 13,
                 "keyword_field": "Application Function Code (offset 12, 1B)",
                 "true_keyword": {"offset": 12, "length": 1, "region": "FOR", "name": "Application Function Code"},
-                "expected_B": 13,
+                "expected_B": 12,
                 "description": "Distributed Network Protocol 3 telemetry and control between master and outstation RTUs."
             },
             {
@@ -54,7 +54,7 @@ SOURCES = {
                 "header_len": 240,
                 "keyword_field": "Message Type Option 53 (offset 242, 1B)",
                 "true_keyword": {"offset": 242, "length": 1, "region": "FOR", "name": "DHCP Option 53 (Msg Type)"},
-                "expected_B": 245,
+                "expected_B": 240,
                 "description": "Dynamic Host Configuration Protocol discover/offer/request/ack exchanges."
             },
             {
@@ -67,7 +67,7 @@ SOURCES = {
                 "header_len": 2,
                 "keyword_field": "Opcode (offset 0, 2B)",
                 "true_keyword": {"offset": 0, "length": 2, "region": "FOR", "name": "Opcode"},
-                "expected_B": 2,
+                "expected_B": 1,
                 "description": "Trivial File Transfer Protocol RRQ, WRQ, DATA, ACK, and ERROR message packets."
             },
             {
@@ -93,7 +93,7 @@ SOURCES = {
                 "header_len": 32,
                 "keyword_field": "SMB Command (offset 8, 1B)",
                 "true_keyword": {"offset": 8, "length": 1, "region": "FOR", "name": "SMB Command"},
-                "expected_B": 39,
+                "expected_B": 32,
                 "description": "Server Message Block version 1 commands (Negotiate, Session Setup, Tree Connect, Trans2)."
             },
             {
@@ -106,7 +106,7 @@ SOURCES = {
                 "header_len": 64,
                 "keyword_field": "SMB2 Command (offset 16, 2B)",
                 "true_keyword": {"offset": 16, "length": 2, "region": "FOR", "name": "SMB2 Command"},
-                "expected_B": 70,
+                "expected_B": 64,
                 "description": "SMBv2 multi-credit protocol commands including Create, Close, Read, Write, and Ioctl."
             }
         ]

@@ -420,6 +420,13 @@ export default function App() {
     }
   }, [selectedSource, selectedMsgCount]);
 
+  // Re-run benchmarks when message count changes for BinaryInferno
+  useEffect(() => {
+    if (selectedSource === 'binaryinferno') {
+      runAllBenchmarks('binaryinferno');
+    }
+  }, [selectedMsgCount]);
+
   // When selectedDataset changes, load that dataset
   useEffect(() => {
     loadDataset(selectedSource, selectedDataset);
@@ -518,7 +525,12 @@ export default function App() {
   // Filter benchmarks for display in Table 2 / 3 / 4
   const displayedBenchmarks = benchmarks.filter((b) => {
     if (benchmarkFilter === 'all') return true;
-    return b.source_id === benchmarkFilter;
+    if (b.source_id !== benchmarkFilter) return false;
+    // For BinaryInferno, also filter by selected message count
+    if (b.source_id === 'binaryinferno' && b.total_messages !== undefined) {
+      return b.total_messages === selectedMsgCount;
+    }
+    return true;
   });
 
   // Compute RPKClust average V-Measure from netplier benchmark results
