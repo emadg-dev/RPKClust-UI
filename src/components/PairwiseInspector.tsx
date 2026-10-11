@@ -22,17 +22,7 @@ import {
   ArrowLeftRight
 } from 'lucide-react';
 
-export interface SampleMessage {
-  id: number;
-  direction: string;
-  hex: string;
-  length: number;
-  cluster: string;
-  label?: string | null;
-  session_id?: string | null;
-  ts?: number;
-  paired_id?: number | null;
-}
+import { SampleMessage } from '../types';
 
 export interface AlignedByte {
   index: number;
