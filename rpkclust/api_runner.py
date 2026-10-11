@@ -105,14 +105,15 @@ def process_request(data: dict) -> dict:
                 is_csv = data_path.endswith(".csv")
                 try:
                     if is_csv:
-                        res = run_benchmark_on_csv(data_path, d["protocol"], config=config, max_messages=100)
+                        res = run_benchmark_on_csv(data_path, d["protocol"], config=config, max_messages=100, expected_B=d.get("expected_B", 0))
                     else:
-                        res = run_benchmark_on_pcap(data_path, d["protocol"], config=config, max_messages=100)
+                        res = run_benchmark_on_pcap(data_path, d["protocol"], config=config, max_messages=100, expected_B=d.get("expected_B", 0))
                     res["source_id"] = src["id"]
                     res["source_name"] = src["name"]
                     res["dataset_id"] = d["id"]
                     res["dataset_name"] = d["name"]
                     res["category"] = d["category"]
+                    res["expected_B"] = d.get("expected_B", 0)
                     results.append(res)
                 except Exception as e:
                     results.append({
@@ -147,9 +148,9 @@ def process_request(data: dict) -> dict:
         for s in sizes:
             t_start = time.perf_counter()
             if is_csv:
-                b_res = run_benchmark_on_csv(data_path, proto, config=config, max_messages=s)
+                b_res = run_benchmark_on_csv(data_path, proto, config=config, max_messages=s, expected_B=d_meta.get("expected_B", 0))
             else:
-                b_res = run_benchmark_on_pcap(data_path, proto, config=config, max_messages=s)
+                b_res = run_benchmark_on_pcap(data_path, proto, config=config, max_messages=s, expected_B=d_meta.get("expected_B", 0))
             elapsed = time.perf_counter() - t_start
 
             netplier_time_approx = round(0.0012 * (s ** 2) + 0.05 * s, 3)
@@ -186,10 +187,10 @@ def process_request(data: dict) -> dict:
         is_csv = pcap_path.endswith(".csv")
         max_msgs = data.get("max_messages", 100)
         if is_csv:
-            res = run_benchmark_on_csv(pcap_path, proto, config=config, max_messages=max_msgs)
+            res = run_benchmark_on_csv(pcap_path, proto, config=config, max_messages=max_msgs, expected_B=d_meta.get("expected_B", 0) if d_meta else 0)
             trace = load_csv(pcap_path, config)
         else:
-            res = run_benchmark_on_pcap(pcap_path, proto, config=config, max_messages=max_msgs)
+            res = run_benchmark_on_pcap(pcap_path, proto, config=config, max_messages=max_msgs, expected_B=d_meta.get("expected_B", 0) if d_meta else 0)
             trace = load_pcap(pcap_path, config)
 
         if max_msgs and len(trace.messages) > max_msgs:

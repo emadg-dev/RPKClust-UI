@@ -73,7 +73,7 @@ def load_hex_lines(file_or_content: str, config: Optional[Config] = None) -> Tra
             line_clean = re.sub(r"^[mM]\d+[\s:]+", "", line_clean).strip()
             tokens = line_clean.split()
             # If the last token is not valid hex byte (2 chars 0-9a-f), it is a label
-            if tokens and not re.fullmatch(r"[0-9a-fA-F]{2}", tokens[-1]):
+            if tokens and not re.fullmatch(r"[0-9a-fA-F]+", tokens[-1]):
                 label = tokens[-1]
                 tokens = tokens[:-1]
 
@@ -328,12 +328,17 @@ def _parse_raw_eth_ip(raw_pkt: bytes, link_type: int = 1):
 
 def load_pcap(pcap_path: str, config: Optional[Config] = None) -> Trace:
     """
-    Load messages from a PCAP/PCAPNG file.
-    Extracts transport layer payload (TCP/UDP) for each packet.
+    Load messages from a PCAP/PCAPNG file or BinaryInferno text format (.txt.input).
+    Detects format by file extension and content.
     """
     if config is None:
         config = Config()
 
+    # BinaryInferno text format: one hex message per line
+    if pcap_path.endswith(".txt.input") or pcap_path.endswith(".hex"):
+        return load_hex_lines(pcap_path, config)
+
+    # PCAP/PCAPNG format
     messages: List[Message] = []
     msg_idx = 0
 

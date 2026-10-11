@@ -259,6 +259,7 @@ export default function App() {
   const [sourcesCatalog, setSourcesCatalog] = useState<Record<string, SourceMeta>>(DEFAULT_SOURCES);
   const [selectedSource, setSelectedSource] = useState<string>('netplier');
   const [selectedDataset, setSelectedDataset] = useState<string>('modbus');
+  const [selectedMsgCount, setSelectedMsgCount] = useState<number>(100);
   const [sourceDropdownOpen, setSourceDropdownOpen] = useState<boolean>(false);
   const [benchmarkFilter, setBenchmarkFilter] = useState<string>('all');
 
@@ -403,14 +404,21 @@ export default function App() {
   useEffect(() => {
     const curSource = sourcesCatalog[selectedSource] || DEFAULT_SOURCES[selectedSource];
     if (curSource && curSource.datasets.length > 0) {
-      const exists = curSource.datasets.some((d) => d.id === selectedDataset);
+      // Filter datasets by message count for binaryinferno
+      const filteredDatasets = curSource.datasets.filter((d) => {
+        if (selectedSource === 'binaryinferno') {
+          return d.packets === selectedMsgCount;
+        }
+        return true;
+      });
+      const exists = filteredDatasets.some((d) => d.id === selectedDataset);
       if (!exists) {
-        setSelectedDataset(curSource.datasets[0].id);
+        setSelectedDataset(filteredDatasets[0]?.id || curSource.datasets[0].id);
       } else {
         loadDataset(selectedSource, selectedDataset);
       }
     }
-  }, [selectedSource]);
+  }, [selectedSource, selectedMsgCount]);
 
   // When selectedDataset changes, load that dataset
   useEffect(() => {
@@ -986,46 +994,74 @@ export default function App() {
             </div>
           </div>
 
-          {/* Dataset Selector Carousel / Chips for current source */}
-          <div className="mt-4 pt-4 border-t border-slate-800/80">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
-                <Database className="w-3.5 h-3.5 text-cyan-400" />
-                Available PCAP Traces in {currentSource.short_name}:
-              </span>
-              <span className="text-[11px] text-slate-400 font-mono">
-                Selected: <strong className="text-cyan-300">{currentDatasetMeta?.name}</strong> (
-                {currentDatasetMeta?.packets} msgs)
-              </span>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {availableDatasets.map((d) => {
-                const isSelected = selectedDataset === d.id;
-                return (
-                  <button
-                    key={d.id}
-                    onClick={() => setSelectedDataset(d.id)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition border flex items-center gap-2 ${
-                      isSelected
-                        ? 'bg-gradient-to-r from-cyan-900/60 to-indigo-900/60 border-cyan-500/60 text-white shadow-sm ring-1 ring-cyan-500/30'
-                        : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-700'
-                    }`}
-                  >
-                    <span
-                      className={`w-2 h-2 rounded-full ${
-                        isSelected ? 'bg-cyan-400 animate-pulse' : 'bg-slate-600'
+{/* Dataset Selector Carousel / Chips for current source */}
+          {/* Message Count Selector for BinaryInferno - rendered before dataset selector */}
+          {selectedSource === 'binaryinferno' && (
+            <div className="mt-4 pt-4 border-t border-slate-800/80 mb-3">
+              <div className="mb-3">
+                <label className="text-xs font-bold text-slate-300 flex items-center gap-1.5 mb-2">
+                  <RotateCcw className="w-3.5 h-3.5 text-emerald-400" />
+                  Message Count
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  {[100, 500, 1000].map((count) => (
+                    <button
+                      key={count}
+                      onClick={() => setSelectedMsgCount(count)}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition border flex items-center gap-2 ${
+                        selectedMsgCount === count
+                          ? 'bg-emerald-900/60 border-emerald-500/60 text-white shadow-sm ring-1 ring-emerald-500/30'
+                          : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-700'
                       }`}
-                    />
-                    <span>{d.name}</span>
-                    <span className="text-[10px] font-mono px-1 rounded bg-slate-900/80 text-slate-400">
-                      {d.packets}p
-                    </span>
-                  </button>
-                );
-              })}
+                    >
+                      <span>{count} msgs</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+            
+            {/* Dataset Selector Carousel / Chips for current source */}
+            <div className="mt-4 pt-4 border-t border-slate-800/80">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+                  <Database className="w-3.5 h-3.5 text-cyan-400" />
+                  Available PCAP Traces in {currentSource.short_name}:
+                </span>
+                <span className="text-[11px] text-slate-400 font-mono">
+                  Selected: <strong className="text-cyan-300">{currentDatasetMeta?.name}</strong> (
+                  {currentDatasetMeta?.packets} msgs)
+                </span>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {availableDatasets.map((d) => {
+                  const isSelected = selectedDataset === d.id;
+                  return (
+                    <button
+                      key={d.id}
+                      onClick={() => setSelectedDataset(d.id)}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition border flex items-center gap-2 ${
+                        isSelected
+                          ? 'bg-gradient-to-r from-cyan-900/60 to-indigo-900/60 border-cyan-500/60 text-white shadow-sm ring-1 ring-cyan-500/30'
+                          : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-700'
+                      }`}
+                    >
+                      <span
+                        className={`w-2 h-2 rounded-full ${
+                          isSelected ? 'bg-cyan-400 animate-pulse' : 'bg-slate-600'
+                        }`}
+                      />
+                      <span>{d.name}</span>
+                      <span className="text-[10px] font-mono px-1 rounded bg-slate-900/80 text-slate-400">
+                        {d.packets}p
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           </div>
-        </div>
 
         {/* TAB 1: Results (Tables 2, 3, 4 & Baselines) */}
         {activeTab === 'results' && (

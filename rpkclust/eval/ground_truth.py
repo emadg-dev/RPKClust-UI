@@ -16,10 +16,13 @@ PROTOCOL_TRUE_KEYWORDS = {
     "dnp3": {"offset": 12, "length": 1, "region": "FOR", "name": "Application Function Code"},
     "modbus": {"offset": 7, "length": 1, "region": "FOR", "name": "Function Code"},
     "ntp": {"offset": 0, "length": 1, "bits": (5, 7), "name": "Mode (bits 5-7)"},
+    "ntp48": {"offset": 0, "length": 1, "bits": (5, 7), "name": "Mode (bits 5-7)"},
     "dhcp": {"offset": 242, "length": 1, "region": "FOR", "name": "DHCP Message Type (Option 53)"},
     "tftp": {"offset": 0, "length": 2, "region": "FOR", "name": "Opcode (RRQ/WRQ/DATA/ACK)"},
     "smb": {"offset": 8, "length": 1, "region": "FOR", "name": "SMB Command"},
     "smb2": {"offset": 16, "length": 2, "region": "FOR", "name": "SMB2 Command"},
+    "bgp": {"offset": 18, "length": 1, "region": "FOR", "name": "BGP Message Type"},
+    "mavlink": {"offset": 5, "length": 1, "region": "FOR", "name": "MAVLink Message ID (v1)"},
 }
 
 def extract_ground_truth_label(protocol: str, data: bytes) -> Optional[str]:
@@ -37,7 +40,7 @@ def extract_ground_truth_label(protocol: str, data: bytes) -> Optional[str]:
         elif p in ("modbus",):
             if len(data) > 7:
                 return data[7:8].hex()
-        elif p in ("ntp",):
+        elif p in ("ntp", "ntp48"):
             if len(data) > 0:
                 return str(data[0] & 0x07)
         elif p in ("smb",):
@@ -49,6 +52,14 @@ def extract_ground_truth_label(protocol: str, data: bytes) -> Optional[str]:
         elif p in ("tftp",):
             if len(data) >= 2:
                 return data[0:2].hex()
+        elif p == "bgp":
+            if len(data) > 18:
+                return data[18:19].hex()
+        elif p == "mavlink":
+            # MAVLink v1: message ID at offset 5 (1 byte)
+            # MAVLink v2: message ID at offset 5-7 (3 bytes, little-endian)
+            if len(data) > 5:
+                return data[5:6].hex()  # v1 message ID
     except Exception:
         return None
     return None
@@ -58,7 +69,8 @@ def run_benchmark_on_pcap(
     pcap_file: str,
     protocol: str,
     config: Optional[Config] = None,
-    max_messages: Optional[int] = None
+    max_messages: Optional[int] = None,
+    expected_B: Optional[int] = None
 ) -> Dict[str, any]:
     """
     Execute RPKClust on a PCAP dataset and evaluate metrics against ground truth.
@@ -85,6 +97,12 @@ def run_benchmark_on_pcap(
         elif p == "smb2":
             if len(data) < 8 or data[4:8] != b"\xfeSMB":
                 continue
+        elif p == "bgp":
+            # BGP messages are over TCP port 179, with a 19-byte marker (16 0xFF + 2-byte len + 1-byte type)
+            pass
+        elif p == "mavlink":
+            # MAVLink messages have a start sign (0xFE for v1, 0xFD for v2) at offset 0
+            pass
 
         lbl = extract_ground_truth_label(protocol, data)
         cleaned_msgs.append(Message(
@@ -149,7 +167,8 @@ def run_benchmark_on_pcap(
         "homogeneity": h,
         "completeness": c,
         "v_measure": v,
-        "timing_sec": res.diagnostics["timing"]["total_sec"]
+        "timing_sec": res.diagnostics["timing"]["total_sec"],
+        "expected_B": expected_B if expected_B is not None else 0
     }
 
 
@@ -157,7 +176,8 @@ def run_benchmark_on_csv(
     csv_path: str,
     protocol: str,
     config: Optional[Config] = None,
-    max_messages: Optional[int] = None
+    max_messages: Optional[int] = None,
+    expected_B: Optional[int] = None
 ) -> Dict[str, any]:
     """
     Execute RPKClust on a CNN-pre CSV dataset and evaluate metrics against ground truth.
@@ -233,5 +253,6 @@ def run_benchmark_on_csv(
         "homogeneity": h,
         "completeness": c,
         "v_measure": v,
-        "timing_sec": res.diagnostics["timing"]["total_sec"]
+        "timing_sec": res.diagnostics["timing"]["total_sec"],
+        "expected_B": expected_B if expected_B is not None else 0
     }
