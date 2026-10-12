@@ -8,13 +8,13 @@ import {
 import {
   MessageTraceResponse,
   PipelineTraceResponse,
+  LensKind,
 } from '../../types';
 import { TraceRunState } from '../../hooks/usePipelineTrace';
-import ByteLensGrid, {
-  LensKind,
+import MessageByteViewer, {
   RULES,
   SAT_LENGTHS,
-} from './ByteLensGrid';
+} from '../MessageByteViewer';
 import ByteInspector from './ByteInspector';
 import CandidatePathTable from './CandidatePathTable';
 
@@ -219,7 +219,9 @@ export default function MessageTracker({
               </span>
             </div>
 
-            <ByteLensGrid
+            <MessageByteViewer
+              mode="grid"
+              boundaryB={overview.boundary?.B ?? 0}
               bytes={trace.bytes}
               rules={trace.rules}
               trueKeyword={overview.meta.true_keyword}

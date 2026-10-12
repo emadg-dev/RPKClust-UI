@@ -21,5 +21,14 @@
   "tests/test_stage2_constraints.py::test_bit_use_example",
   "tests/test_stage2_constraints.py::test_paper_bit_use_example",
   "tests/test_stage2_constraints.py::test_position_constraint",
-  "tests/test_stage2_constraints.py::test_two_stage_combination"
+  "tests/test_stage2_constraints.py::test_two_stage_combination",
+  "tests/test_trace.py::test_blocking_logic",
+  "tests/test_trace.py::test_consistency",
+  "tests/test_trace.py::test_determinism",
+  "tests/test_trace.py::test_fig1_fixture",
+  "tests/test_trace.py::test_health_boundary_equals_min_len",
+  "tests/test_trace.py::test_json_safety",
+  "tests/test_trace.py::test_label_isolation",
+  "tests/test_trace.py::test_no_behavior_change",
+  "tests/test_trace.py::test_stage_error_capture"
 ]

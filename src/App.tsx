@@ -7,11 +7,11 @@ import HyperparameterKnobs from './components/HyperparameterKnobs';
 import DatasetProvenance from './components/DatasetProvenance';
 import StderrDrawer from './components/StderrDrawer';
 import ResultsTab from './components/tabs/ResultsTab';
-import ChartsTab from './components/tabs/ChartsTab';
 import InspectorTab from './components/tabs/InspectorTab';
-import Stage2Tab from './components/tabs/Stage2Tab';
 import CustomTraceTab from './components/tabs/CustomTraceTab';
 import PipelineTab from './components/tabs/PipelineTab';
+import CandidateRankingView from './components/CandidateRankingView';
+import ClusteringMetricsView from './components/ClusteringMetricsView';
 
 
 import { PairwiseInspector } from './components/PairwiseInspector';
@@ -239,7 +239,7 @@ export default function App() {
         )}
 
         {activeTab === 'charts' && (
-          <ChartsTab benchmarks={benchmarks} />
+          <ClusteringMetricsView variant="chart" benchmarks={benchmarks} />
         )}
 
         {activeTab === 'inspector' && (
@@ -258,7 +258,7 @@ export default function App() {
         )}
 
         {activeTab === 'stage2' && (
-          <Stage2Tab topCandidate={topCandidate} />
+          <CandidateRankingView mode="chart" topCandidate={topCandidate} />
         )}
 
         {activeTab === 'custom' && (

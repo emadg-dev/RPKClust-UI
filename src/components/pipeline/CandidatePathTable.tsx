@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ChevronDown, ChevronRight, Trophy, BookMarked } from 'lucide-react';
 import { CandidatePath } from '../../types';
+import { BitUsageChart } from '../CandidateRankingView';
 
 interface CandidatePathTableProps {
   path: CandidatePath[];
@@ -178,25 +179,13 @@ export default function CandidatePathTable({ path }: CandidatePathTableProps) {
                             <div className="label font-semibold mb-1">
                               Stage 2 bit usage (Q(k) empirical vs P(k) theoretical)
                             </div>
-                            <div className="flex items-end gap-0.5 h-16">
-                              {c.stage2.q_k.map((q, k) => {
-                                const p = c.stage2!.p_k[k] || 0;
-                                return (
-                                  <span key={k} className="flex items-end gap-0.5">
-                                    <span
-                                      className="w-1.5 bg-cyan2 rounded-sm"
-                                      style={{ height: `${Math.max(2, q * 56)}px` }}
-                                      title={`k=${k + 1} Q=${q.toFixed(2)}`}
-                                    />
-                                    <span
-                                      className="w-1.5 bg-amber2 rounded-sm"
-                                      style={{ height: `${Math.max(2, p * 56)}px` }}
-                                      title={`k=${k + 1} P=${p.toFixed(2)}`}
-                                    />
-                                  </span>
-                                );
-                              })}
-                            </div>
+                          <BitUsageChart
+                            q_k={c.stage2.q_k}
+                            p_k={c.stage2.p_k}
+                            maxHeight={56}
+                            className="flex items-end gap-0.5 h-16"
+                            barClassName="w-1.5"
+                          />
                             <div className="text-low mt-1">
                               int_value={c.stage2.int_value} · msb={c.stage2.msb} ·
                               p_bit={c.stage2.p_bit.toFixed(3)} · p_offset={c.stage2.p_offset.toFixed(3)} ·

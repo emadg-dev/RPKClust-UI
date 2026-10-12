@@ -1,6 +1,6 @@
 import React from 'react';
-import BoundaryResultsTable from '../BoundaryResultsTable';
-import ClusteringMetricsTable from '../ClusteringMetricsTable';
+import BoundaryDisplay from '../BoundaryDisplay';
+import ClusteringMetricsView from '../ClusteringMetricsView';
 import BaselineComparisonCard from '../BaselineComparisonCard';
 import { BenchmarkResult, SourceMeta, BaselineComparison, ActiveTab } from '../../types';
 
@@ -29,17 +29,18 @@ export default function ResultsTab({
 }: ResultsTabProps) {
   return (
     <div className="space-y-6">
-      <BoundaryResultsTable
+      <BoundaryDisplay
+        variant="benchmark"
         benchmarks={displayedBenchmarks}
         sourcesCatalog={sourcesCatalog}
         benchmarkFilter={benchmarkFilter}
         onRunAllBenchmarks={onRunAllBenchmarks}
         onBenchmarkClick={onBenchmarkClick}
         onTabChange={onTabChange}
-        benchLoading={benchLoading}
       />
 
-      <ClusteringMetricsTable
+      <ClusteringMetricsView
+        variant="table"
         benchmarks={displayedBenchmarks}
         benchLoading={benchLoading}
         onReEvaluate={() => onRunAllBenchmarks(benchmarkFilter)}

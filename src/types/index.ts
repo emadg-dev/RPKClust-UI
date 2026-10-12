@@ -177,6 +177,36 @@ export interface BaselineComparison {
   forAware: string;
 }
 
+// ---- Shared byte-viewer types (MessageByteViewer) ----
+
+export type LensKind = 'region' | 'status' | 'tags' | 'in_S' | 'satisfaction';
+
+export interface AlignedByte {
+  index: number;
+  byteA: number | null;
+  byteB: number | null;
+  hexA: string;
+  hexB: string;
+  asciiA: string;
+  asciiB: string;
+  type: 'match' | 'mismatch' | 'gapA' | 'gapB';
+  offsetA: number | null;
+  offsetB: number | null;
+  isForA: boolean;
+  isForB: boolean;
+  hitA?: string;
+  hitB?: string;
+}
+
+export interface AlignmentSummary {
+  alignedLength: number;
+  matches: number;
+  mismatches: number;
+  gaps: number;
+  identityPercent: number;
+  score: number;
+}
+
 // ---------------------------------------------------------------------------
 // Pipeline Tracker (spec 4.1 / 4.2 / 4.3)
 // ---------------------------------------------------------------------------

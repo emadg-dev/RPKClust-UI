@@ -1,54 +1,20 @@
 import React, { useState, useMemo } from 'react';
 import {
   GitCompare,
-  ArrowRight,
   CheckCircle,
   XCircle,
   AlertTriangle,
   Layers,
-  Binary,
-  Hash,
-  Activity,
-  Zap,
   RotateCcw,
-  Sliders,
   ChevronLeft,
   ChevronRight,
-  Sparkles,
   Info,
-  Check,
-  Eye,
   FileCode,
   ArrowLeftRight
 } from 'lucide-react';
 
-import { SampleMessage } from '../types';
-
-export interface AlignedByte {
-  index: number;
-  byteA: number | null;
-  byteB: number | null;
-  hexA: string;
-  hexB: string;
-  asciiA: string;
-  asciiB: string;
-  type: 'match' | 'mismatch' | 'gapA' | 'gapB';
-  offsetA: number | null;
-  offsetB: number | null;
-  isForA: boolean;
-  isForB: boolean;
-  hitA?: string;
-  hitB?: string;
-}
-
-export interface AlignmentSummary {
-  alignedLength: number;
-  matches: number;
-  mismatches: number;
-  gaps: number;
-  identityPercent: number;
-  score: number;
-}
+import { SampleMessage, AlignedByte, AlignmentSummary } from '../types';
+import MessageByteViewer from './MessageByteViewer';
 
 export interface StageGate {
   stageNumber: number;
@@ -227,7 +193,6 @@ export const PairwiseInspector: React.FC<PairwiseInspectorProps> = ({
   const [indexA, setIndexA] = useState<number>(0);
   const [indexB, setIndexB] = useState<number>(messages.length > 1 ? 1 : 0);
   const [activeStage, setActiveStage] = useState<number>(0);
-  const [hoveredAlignedIdx, setHoveredAlignedIdx] = useState<number | null>(null);
   const [customHexMode, setCustomHexMode] = useState<boolean>(false);
   const [customHexA, setCustomHexA] = useState<string>('00010000000601030000000A');
   const [customHexB, setCustomHexB] = useState<string>('0001000000030103020014');
@@ -794,279 +759,14 @@ export const PairwiseInspector: React.FC<PairwiseInspectorProps> = ({
         )}
       </div>
 
-      {/* Global Sequence Alignment Stats & Color Legend */}
-      <div className="panel p-5 space-y-4">
-        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-default pb-3">
-          <div className="flex items-center gap-2">
-            <Binary className="w-4 h-4 text-cyan" />
-            <h3 className="text-sm font-semibold text-hi">Sequence Alignment & Synchronized Hex Stream</h3>
-          </div>
-
-          {/* Color Legend */}
-          <div className="flex flex-wrap items-center gap-3 text-xs">
-            <span className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded bg-emerald-wash-30 border border-emerald-wash-50" />
-              <span className="text-emerald-soft">Match (=)</span>
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded bg-rose-wash-30 border border-rose-wash-50" />
-              <span className="text-rose-soft">Mismatch (≠)</span>
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded bg-inset2-wash-50 border border-dashed border-faint" />
-              <span className="text-low">Gap (–)</span>
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded bg-cyan-wash-30 border border-cyan" />
-              <span className="text-cyan-soft">FOR Region [0..{boundaryB - 1}]</span>
-            </span>
-          </div>
-        </div>
-
-        {/* Alignment Metrics Ribbon */}
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-          <div className="panel-inner p-3 text-center">
-            <div className="text-[11px] text-low uppercase tracking-wider">Aligned Positions</div>
-            <div className="text-xl font-bold font-mono text-hi mt-0.5">{summary.alignedLength}</div>
-          </div>
-          <div className="bg-base border border-emerald-abyss-wash rounded p-3 text-center">
-            <div className="text-[11px] text-emerald uppercase tracking-wider">Exact Matches</div>
-            <div className="text-xl font-bold font-mono text-emerald-soft mt-0.5">
-              {summary.matches} <span className="text-xs text-emerald2 font-normal">({summary.identityPercent}%)</span>
-            </div>
-          </div>
-          <div className="bg-base border border-rose-abyss-wash-40 rounded p-3 text-center">
-            <div className="text-[11px] text-rose uppercase tracking-wider">Mismatches</div>
-            <div className="text-xl font-bold font-mono text-rose-soft mt-0.5">{summary.mismatches}</div>
-          </div>
-          <div className="panel-inner p-3 text-center">
-            <div className="text-[11px] text-low uppercase tracking-wider">Gaps / Indels</div>
-            <div className="text-xl font-bold font-mono text-mid mt-0.5">{summary.gaps}</div>
-          </div>
-          <div className="bg-base border border-cyan-abyss-wash rounded p-3 text-center">
-            <div className="text-[11px] text-cyan uppercase tracking-wider">Alignment Score</div>
-            <div className="text-xl font-bold font-mono text-cyan-soft mt-0.5">{summary.score}</div>
-          </div>
-        </div>
-
-        {/* Split Aligned Hex Stream */}
-        <div className="panel-inner p-4 overflow-x-auto space-y-3">
-          <div className="inline-block min-w-full">
-            {/* Header: Column offsets & Region demarcation */}
-            <div className="flex items-center gap-1.5 pb-2 border-b border-default text-[11px] font-mono text-faint">
-              <span className="w-16 shrink-0 text-right pr-2">Offset:</span>
-              <div className="flex gap-1">
-                {aligned.map((col, idx) => (
-                  <span
-                    key={idx}
-                    className={`w-8 text-center shrink-0 ${
-                      col.offsetA !== null && col.offsetA < boundaryB ? 'text-cyan font-bold' : 'text-faint'
-                    }`}
-                  >
-                    {idx < 100 ? idx.toString().padStart(2, '0') : idx}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            {/* Region Label Bar */}
-            <div className="flex items-center gap-1.5 py-1 text-[10px] font-mono">
-              <span className="w-16 shrink-0 text-right pr-2 text-faint">Region:</span>
-              <div className="flex gap-1">
-                {aligned.map((col, idx) => {
-                  const isFor = (col.offsetA !== null && col.offsetA < boundaryB) || (col.offsetB !== null && col.offsetB < boundaryB);
-                  return (
-                    <span
-                      key={idx}
-                      className={`w-8 text-center shrink-0 rounded-[2px] py-0.5 ${
-                        isFor ? 'bg-cyan-dark-wash text-cyan-soft font-semibold border-b border-cyan2' : 'bg-panel text-faint'
-                      }`}
-                    >
-                      {isFor ? 'FOR' : 'NFOR'}
-                    </span>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Message A Bytes */}
-            <div className="flex items-center gap-1.5 py-1 text-xs font-mono">
-              <span className="w-16 shrink-0 text-right pr-2 text-cyan font-semibold">Msg A:</span>
-              <div className="flex gap-1">
-                {aligned.map((col, idx) => {
-                  const isHovered = hoveredAlignedIdx === idx;
-                  const isHighlightedInStage =
-                    (col.offsetA !== null && currentGate.highlights.relevantOffsetsA.includes(col.offsetA)) ||
-                    (col.offsetB !== null && currentGate.highlights.relevantOffsetsB.includes(col.offsetB));
-
-                  let bgClass = 'bg-panel text-low border border-default';
-                  if (col.type === 'match') {
-                    bgClass = 'bg-emerald-dark-wash text-emerald-soft border border-emerald-wash-40 font-bold';
-                  } else if (col.type === 'mismatch') {
-                    bgClass = 'bg-rose-dark-wash-70 text-rose-soft border border-rose-wash-40 font-bold';
-                  } else {
-                    bgClass = 'bg-panel-wash-40 text-fainter border border-dashed border-default';
-                  }
-
-                  if (isHighlightedInStage) {
-                    bgClass += ' outline outline-1 outline-cyan';
-                  }
-
-                  if (isHovered) {
-                    bgClass += ' brightness-150 z-10';
-                  }
-
-                  return (
-                    <div
-                      key={idx}
-                      onMouseEnter={() => setHoveredAlignedIdx(idx)}
-                      onMouseLeave={() => setHoveredAlignedIdx(null)}
-                      className={`w-8 h-8 rounded flex items-center justify-center shrink-0 cursor-pointer select-none transition ${bgClass}`}
-                      title={`Aligned #${idx} | Msg A: ${col.hexA} (Offset ${col.offsetA ?? 'Gap'})`}
-                    >
-                      {col.hexA}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Connector Line */}
-            <div className="flex items-center gap-1.5 py-0.5 text-xs font-mono">
-              <span className="w-16 shrink-0 text-right pr-2 text-fainter">Match:</span>
-              <div className="flex gap-1">
-                {aligned.map((col, idx) => {
-                  let char = ' ';
-                  let color = 'text-fainter';
-                  if (col.type === 'match') {
-                    char = '|';
-                    color = 'text-emerald font-bold';
-                  } else if (col.type === 'mismatch') {
-                    char = '≠';
-                    color = 'text-rose font-bold';
-                  } else {
-                    char = '·';
-                    color = 'text-fainter';
-                  }
-                  return (
-                    <span key={idx} className={`w-8 text-center shrink-0 ${color}`}>
-                      {char}
-                    </span>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Message B Bytes */}
-            <div className="flex items-center gap-1.5 py-1 text-xs font-mono">
-              <span className="w-16 shrink-0 text-right pr-2 text-purple font-semibold">Msg B:</span>
-              <div className="flex gap-1">
-                {aligned.map((col, idx) => {
-                  const isHovered = hoveredAlignedIdx === idx;
-                  const isHighlightedInStage =
-                    (col.offsetA !== null && currentGate.highlights.relevantOffsetsA.includes(col.offsetA)) ||
-                    (col.offsetB !== null && currentGate.highlights.relevantOffsetsB.includes(col.offsetB));
-
-                  let bgClass = 'bg-panel text-low border border-default';
-                  if (col.type === 'match') {
-                    bgClass = 'bg-emerald-dark-wash text-emerald-soft border border-emerald-wash-40 font-bold';
-                  } else if (col.type === 'mismatch') {
-                    bgClass = 'bg-rose-dark-wash-70 text-rose-soft border border-rose-wash-40 font-bold';
-                  } else {
-                    bgClass = 'bg-panel-wash-40 text-fainter border border-dashed border-default';
-                  }
-
-                  if (isHighlightedInStage) {
-                    bgClass += ' outline outline-1 outline-purple';
-                  }
-
-                  if (isHovered) {
-                    bgClass += ' brightness-150 z-10';
-                  }
-
-                  return (
-                    <div
-                      key={idx}
-                      onMouseEnter={() => setHoveredAlignedIdx(idx)}
-                      onMouseLeave={() => setHoveredAlignedIdx(null)}
-                      className={`w-8 h-8 rounded flex items-center justify-center shrink-0 cursor-pointer select-none transition ${bgClass}`}
-                      title={`Aligned #${idx} | Msg B: ${col.hexB} (Offset ${col.offsetB ?? 'Gap'})`}
-                    >
-                      {col.hexB}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* ASCII Preview */}
-            <div className="flex items-center gap-1.5 pt-1.5 border-t border-dark text-[11px] font-mono text-faint">
-              <span className="w-16 shrink-0 text-right pr-2">ASCII:</span>
-              <div className="flex gap-1">
-                {aligned.map((col, idx) => (
-                  <span key={idx} className="w-8 text-center shrink-0 text-low">
-                    {col.asciiA === col.asciiB && col.asciiA !== '·' ? (
-                      <span className="text-emerald font-bold">{col.asciiA}</span>
-                    ) : (
-                      <span>
-                        {col.asciiA}
-                        {col.asciiB !== col.asciiA ? `/${col.asciiB}` : ''}
-                      </span>
-                    )}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Hover Inspector Tooltip Strip */}
-        <div className="panel-inner px-4 py-2.5 text-xs font-mono flex flex-wrap items-center justify-between gap-2 min-h-10">
-          {hoveredAlignedIdx !== null && aligned[hoveredAlignedIdx] ? (
-            (() => {
-              const col = aligned[hoveredAlignedIdx];
-              return (
-                <div className="flex flex-wrap items-center gap-3">
-                  <span className="text-mid font-semibold">Position #{hoveredAlignedIdx}:</span>
-                  <span className="text-cyan">
-                    Msg A: 0x{col.hexA} (Offset {col.offsetA !== null ? col.offsetA : 'Gap'})
-                  </span>
-                  <span className="text-faint">↔</span>
-                  <span className="text-purple">
-                    Msg B: 0x{col.hexB} (Offset {col.offsetB !== null ? col.offsetB : 'Gap'})
-                  </span>
-                  <span className="text-faint">·</span>
-                  <span
-                    className={`font-bold ${
-                      col.type === 'match'
-                        ? 'text-emerald'
-                        : col.type === 'mismatch'
-                        ? 'text-rose'
-                        : 'text-low'
-                    }`}
-                  >
-                    {col.type.toUpperCase()}
-                  </span>
-                  <span className="text-faint">·</span>
-                  <span className="text-low">
-                    Region: {col.isForA || col.isForB ? 'Fixed-Offset (FOR)' : 'Non-Fixed (NFOR)'}
-                  </span>
-                  {col.hitA && (
-                    <span className="text-amber bg-amber-dark-wash-60 border border-amber-deep px-1.5 py-0.5 rounded text-[11px]">
-                      Detector Rule: {col.hitA}
-                    </span>
-                  )}
-                </div>
-              );
-            })()
-          ) : (
-            <div className="text-faint flex items-center gap-2">
-              <Info className="w-3.5 h-3.5" />
-              <span>Hover any aligned byte cell above to inspect offset positions, detector hits, and exact hex values.</span>
-            </div>
-          )}
-        </div>
-      </div>
+      <MessageByteViewer
+        mode="aligned"
+        aligned={aligned}
+        summary={summary}
+        boundaryB={boundaryB}
+        highlightOffsetsA={currentGate.highlights.relevantOffsetsA}
+        highlightOffsetsB={currentGate.highlights.relevantOffsetsB}
+      />
 
       {/* Interactive 5-Stage Pipeline Stepper & Pass/Fail Evaluation Gates */}
       <div className="panel p-6 space-y-6">

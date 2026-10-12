@@ -1,8 +1,8 @@
 import React from 'react';
 import { Sliders, RefreshCw } from 'lucide-react';
-import ByteHexView from '../ByteHexView';
-import { BoundaryDiagnostics } from '../BoundaryDiagnostics';
-import CandidateRankingTable from '../CandidateRankingTable';
+import MessageByteViewer from '../MessageByteViewer';
+import BoundaryDisplay from '../BoundaryDisplay';
+import CandidateRankingView from '../CandidateRankingView';
 import { ProtocolDetails, SampleMessage, SourceMeta, DatasetMeta, ActiveTab } from '../../types';
 
 interface InspectorTabProps {
@@ -58,25 +58,37 @@ export default function InspectorTab({
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <ByteHexView
+        <MessageByteViewer
+          mode="single"
           activeMsg={activeMsg}
           boundaryB={boundaryB}
-          currentDetails={currentDetails}
           selectedMessage={selectedMessage}
           messages={messages}
           onMessageChange={setSelectedMessage}
+          keywordOffset={
+            currentDetails?.keywords?.['c2s']?.offset ??
+            currentDetails?.keywords?.['both']?.offset ??
+            null
+          }
+          keywordLength={
+            currentDetails?.keywords?.['c2s']?.length ??
+            currentDetails?.keywords?.['both']?.length ??
+            1
+          }
         />
 
-        <BoundaryDiagnostics
-          boundaryB={boundaryB}
+        <BoundaryDisplay
+          variant="diagnostic"
+          B={boundaryB}
           minLen={currentDetails?.boundary?.min_len ?? null}
           candidateCount={currentDetails?.candidates?.length ?? null}
           hits={currentDetails?.boundary?.hits ?? []}
         />
       </div>
 
-      <CandidateRankingTable
-        ranking={
+      <CandidateRankingView
+        mode="table"
+        candidates={
           currentDetails?.keywords?.['c2s']?.ranking ??
           currentDetails?.keywords?.['both']?.ranking
         }

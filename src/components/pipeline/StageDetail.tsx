@@ -2,13 +2,13 @@ import React from 'react';
 import { AlertTriangle, CheckCircle2, SkipForward, XCircle } from 'lucide-react';
 import { PipelineStage, PipelineTraceResponse } from '../../types';
 import LoadStage from './stages/LoadStage';
-import BoundaryStage from './stages/BoundaryStage';
 import TaggingStage from './stages/TaggingStage';
 import CandidatesStage from './stages/CandidatesStage';
 import Stage1Panel from './stages/Stage1Panel';
-import Stage2Panel from './stages/Stage2Panel';
 import ClusterStage from './stages/ClusterStage';
-import MetricsStage from './stages/MetricsStage';
+import CandidateRankingView from '../CandidateRankingView';
+import BoundaryDisplay from '../BoundaryDisplay';
+import ClusteringMetricsView from '../ClusteringMetricsView';
 
 interface StageDetailProps {
   stage: PipelineStage;
@@ -70,13 +70,13 @@ export default function StageDetail({ stage, overview }: StageDetailProps) {
 
       <div className="p-5">
         {stage.id === 'load' && <LoadStage summary={overview.load} />}
-        {stage.id === 'boundary' && <BoundaryStage summary={overview.boundary} />}
+        {stage.id === 'boundary' && <BoundaryDisplay variant="pipeline" summary={overview.boundary} />}
         {stage.id === 'tagging' && <TaggingStage summary={overview.tagging} />}
         {stage.id === 'candidates' && <CandidatesStage summary={overview.candidates} />}
         {stage.id === 'stage1' && <Stage1Panel directions={overview.stage1} />}
-        {stage.id === 'stage2' && <Stage2Panel directions={overview.stage2} />}
+        {stage.id === 'stage2' && <CandidateRankingView mode="detailed" directions={overview.stage2} />}
         {stage.id === 'cluster' && <ClusterStage directions={overview.cluster} />}
-        {stage.id === 'metrics' && <MetricsStage summary={overview.metrics} />}
+        {stage.id === 'metrics' && <ClusteringMetricsView variant="pipeline" metrics={overview.metrics} />}
       </div>
     </div>
   );
