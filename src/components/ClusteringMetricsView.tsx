@@ -42,6 +42,7 @@ function TableMode({ benchmarks, benchLoading, onReEvaluate }: TableModeProps) {
               <th className="px-5 py-3">Source &amp; Protocol</th>
               <th className="px-5 py-3">True Keyword Field</th>
               <th className="px-5 py-3">Inferred Keyword</th>
+              <th className="px-5 py-3">Keyword Error (Δ bytes)</th>
               <th className="px-5 py-3">Homogeneity (h)</th>
               <th className="px-5 py-3">Completeness (c)</th>
               <th className="px-5 py-3">V-Measure (v)</th>
@@ -58,6 +59,31 @@ function TableMode({ benchmarks, benchLoading, onReEvaluate }: TableModeProps) {
                 b.true_keyword?.offset !== undefined
                   ? `${b.true_keyword.name || 'Opcode'} (Off ${b.true_keyword.offset}, Len ${b.true_keyword.length || 1})`
                   : '-';
+              const trueOff = b.true_keyword?.offset;
+              const trueLen = b.true_keyword?.length ?? 1;
+              let kwErr: { text: string; cls: string } | null = null;
+              if (trueOff !== undefined && c2sKw) {
+                const offErr = c2sKw.offset - trueOff;
+                const lenErr = c2sKw.length - trueLen;
+                if (offErr === 0 && lenErr === 0) {
+                  kwErr = {
+                    text: '0 bytes (Exact)',
+                    cls: 'bg-emerald-wash text-emerald-soft border border-emerald-wash-30',
+                  };
+                } else if (offErr === 0) {
+                  kwErr = {
+                    text: `0 bytes (len Δ${lenErr > 0 ? '+' : ''}${lenErr})`,
+                    cls: 'bg-amber-wash text-amber-soft border border-amber-wash-30',
+                  };
+                } else {
+                  const lenSuffix =
+                    lenErr !== 0 ? ` · len Δ${lenErr > 0 ? '+' : ''}${lenErr}` : '';
+                  kwErr = {
+                    text: `${Math.abs(offErr)} bytes${lenSuffix}`,
+                    cls: 'bg-rose-wash text-rose-soft border border-rose-wash-30',
+                  };
+                }
+              }
 
               return (
                 <tr key={`${b.source_id}-${b.dataset_id || b.protocol}`} className="hover-bg-inset transition">
@@ -71,6 +97,15 @@ function TableMode({ benchmarks, benchLoading, onReEvaluate }: TableModeProps) {
                   </td>
                   <td className="px-5 py-3.5 text-mid font-semibold">{trueStr}</td>
                   <td className="px-5 py-3.5 font-bold text-cyan">{inferredStr}</td>
+                  <td className="px-5 py-3.5">
+                    {kwErr ? (
+                      <span className={`badge font-bold ${kwErr.cls}`}>
+                        {kwErr.text}
+                      </span>
+                    ) : (
+                      <span className="text-low">–</span>
+                    )}
+                  </td>
                   <td className="px-5 py-3.5 font-semibold text-emerald">
                     {(b.homogeneity * 100).toFixed(1)}%
                   </td>
