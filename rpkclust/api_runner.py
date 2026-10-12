@@ -7,7 +7,7 @@ import sys
 import json
 import os
 import time
-from typing import List
+from typing import List, Dict
 from rpkclust.config import Config
 from rpkclust.io.loader import load_hex_lines, load_pcap, load_csv
 from rpkclust.model import Trace
@@ -85,6 +85,28 @@ def _format_pipeline_output(pipeline_res, sample_msgs, benchmark_res=None, sourc
         "diagnostics": pipeline_res.diagnostics,
         "sample_messages": sample_msgs
     }
+    return out
+
+
+def _message_dicts(trace, pipeline_res) -> List[dict]:
+    """Serialize every message in the trace with its cluster assignment."""
+    pair_lookup = {}
+    for p in trace.pairs:
+        pair_lookup[p.req_id] = p.resp_id
+        pair_lookup[p.resp_id] = p.req_id
+    out = []
+    for m in trace.messages:
+        out.append({
+            "id": m.id,
+            "direction": m.direction,
+            "hex": m.data.hex(),
+            "length": len(m.data),
+            "cluster": pipeline_res.clusters.get(m.id, "unclassified"),
+            "label": m.label,
+            "session_id": m.session_id,
+            "ts": round(m.ts, 6),
+            "paired_id": pair_lookup.get(m.id)
+        })
     return out
 
 def _load_trace_input(input_spec: dict, config: Config):
@@ -304,24 +326,7 @@ def process_request(data: dict) -> dict:
 
         pipeline_res = run_pipeline(trace, config)
 
-        pair_lookup = {}
-        for p in trace.pairs:
-            pair_lookup[p.req_id] = p.resp_id
-            pair_lookup[p.resp_id] = p.req_id
-
-        sample_msgs = []
-        for m in trace.messages[:60]:
-            sample_msgs.append({
-                "id": m.id,
-                "direction": m.direction,
-                "hex": m.data.hex(),
-                "length": len(m.data),
-                "cluster": pipeline_res.clusters.get(m.id, "unclassified"),
-                "label": m.label,
-                "session_id": m.session_id,
-                "ts": round(m.ts, 6),
-                "paired_id": pair_lookup.get(m.id)
-            })
+        sample_msgs = _message_dicts(trace, pipeline_res)[:60]
 
         source_meta = {
             "source_id": source_id,
@@ -337,26 +342,68 @@ def process_request(data: dict) -> dict:
         trace = load_hex_lines(raw_text, config)
         pipeline_res = run_pipeline(trace, config)
 
-        pair_lookup = {}
-        for p in trace.pairs:
-            pair_lookup[p.req_id] = p.resp_id
-            pair_lookup[p.resp_id] = p.req_id
-
-        sample_msgs = []
-        for m in trace.messages[:60]:
-            sample_msgs.append({
-                "id": m.id,
-                "direction": m.direction,
-                "hex": m.data.hex(),
-                "length": len(m.data),
-                "cluster": pipeline_res.clusters.get(m.id, "unclassified"),
-                "label": m.label,
-                "session_id": m.session_id,
-                "ts": round(m.ts, 6),
-                "paired_id": pair_lookup.get(m.id)
-            })
+        sample_msgs = _message_dicts(trace, pipeline_res)[:60]
 
         return _format_pipeline_output(pipeline_res, sample_msgs, pairs=trace.pairs)
+
+    elif cmd == "cluster_messages":
+        source_id = data.get("source_id", "netplier")
+        dataset_id = data.get("dataset_id", "modbus")
+        max_msgs = data.get("max_messages", 100)
+
+        d_meta = resolve_dataset(source_id, dataset_id)
+        if d_meta is None or not os.path.exists(d_meta["file"]):
+            return {"status": "error", "message": f"Dataset {source_id}/{dataset_id} not found"}
+        path = d_meta["file"]
+        protocol = d_meta["protocol"]
+
+        raw_trace = load_csv(path, config) if path.endswith(".csv") else load_pcap(path, config)
+        cleaned_msgs, _dropped, _info = clean_protocol_messages(
+            raw_trace.messages, protocol, max_msgs
+        )
+        from rpkclust.model import Trace as TraceModel
+        trace = TraceModel(messages=cleaned_msgs, pairs=raw_trace.pairs, capture_range=raw_trace.capture_range)
+
+        pipeline_res = run_pipeline(trace, config)
+        msgs = _message_dicts(trace, pipeline_res)
+
+        groups: Dict[str, Dict[str, object]] = {}
+        for m in msgs:
+            g = groups.setdefault(
+                m["cluster"],
+                {"key": m["cluster"], "size": 0, "c2s": 0, "s2c": 0, "labels": {}, "example_hex": m["hex"][:64]},
+            )
+            g["size"] = int(g["size"]) + 1
+            if m["direction"] == "c2s":
+                g["c2s"] = int(g["c2s"]) + 1
+            else:
+                g["s2c"] = int(g["s2c"]) + 1
+            if m["label"] is not None:
+                lbl = str(m["label"])
+                g["labels"][lbl] = int(g["labels"].get(lbl, 0)) + 1
+
+        cluster_list = sorted(groups.values(), key=lambda g: -int(g["size"]))
+
+        keyword_summary = {}
+        for d, kw in pipeline_res.keywords.items():
+            if kw and kw.candidate:
+                keyword_summary[d] = {
+                    "offset": kw.candidate.offset,
+                    "length": kw.candidate.length,
+                    "region": kw.candidate.region,
+                    "posterior": kw.posterior,
+                }
+
+        return {
+            "status": "ok",
+            "source_id": source_id,
+            "dataset_id": dataset_id,
+            "protocol": protocol,
+            "total_messages": len(msgs),
+            "keyword": keyword_summary,
+            "clusters": cluster_list,
+            "messages": msgs,
+        }
 
     elif cmd == "pipeline_trace":
         return _cmd_pipeline_trace(data, config)

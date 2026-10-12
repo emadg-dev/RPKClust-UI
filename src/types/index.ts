@@ -150,6 +150,40 @@ export interface SampleMessage {
   paired_id?: number | null;
 }
 
+// ---- Clustered Messages page (cluster_messages) ----
+
+export interface ClusterMessage {
+  id: number;
+  direction: string;
+  hex: string;
+  length: number;
+  cluster: string;
+  label: string | null;
+  session_id: number | null;
+  ts: number;
+  paired_id: number | null;
+}
+
+export interface ClusterGroup {
+  key: string;
+  size: number;
+  c2s: number;
+  s2c: number;
+  labels: Record<string, number>;
+  example_hex: string;
+}
+
+export interface ClusterMessagesResponse {
+  status: string;
+  source_id: string;
+  dataset_id: string;
+  protocol: string;
+  total_messages: number;
+  keyword: Record<string, { offset: number; length: number; region: string; posterior: number }>;
+  clusters: ClusterGroup[];
+  messages: ClusterMessage[];
+}
+
 export interface LastApiStatus {
   command: string;
   target?: string;
@@ -158,7 +192,7 @@ export interface LastApiStatus {
   hasStderr: boolean;
 }
 
-export type ActiveTab = 'results' | 'charts' | 'inspector' | 'stage2' | 'custom' | 'pairwise' | 'pipeline';
+export type ActiveTab = 'results' | 'charts' | 'inspector' | 'stage2' | 'custom' | 'pairwise' | 'pipeline' | 'clusters';
 
 export type DrawerHeight = 'compact' | 'medium' | 'large';
 

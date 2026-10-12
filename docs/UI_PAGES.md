@@ -18,16 +18,17 @@
 9. [Page — Stage 1 & 2 Math](#9-page--stage-1--2-math)
 10. [Page — Custom Trace](#10-page--custom-trace)
 11. [Page — Pipeline](#11-page--pipeline)
-12. [Stderr Drawer (Bottom Console)](#12-stderr-drawer-bottom-console)
-13. [Backend API Commands](#13-backend-api-commands)
-14. [Data Sources Catalog](#14-data-sources-catalog)
-15. [Default Hyperparameters](#15-default-hyperparameters)
+12. [Page — Clusters](#12-page--clusters)
+13. [Stderr Drawer (Bottom Console)](#13-stderr-drawer-bottom-console)
+14. [Backend API Commands](#14-backend-api-commands)
+15. [Data Sources Catalog](#15-data-sources-catalog)
+16. [Default Hyperparameters](#16-default-hyperparameters)
 
 ---
 
 ## 1. App Overview
 
-RPKClust-UI is a research dashboard for binary protocol reverse engineering. It combines a Python backend (`rpkclust/`) with a React/TypeScript frontend. The app has **7 tabbed pages**, a global header, a collapsible hyperparameter panel, a dataset provenance bar, and a bottom stderr console.
+RPKClust-UI is a research dashboard for binary protocol reverse engineering. It combines a Python backend (`rpkclust/`) with a React/TypeScript frontend. The app has **8 tabbed pages**, a global header, a collapsible hyperparameter panel, a dataset provenance bar, and a bottom stderr console.
 
 **Tab list** (in order):
 | # | Tab ID | Label | Icon |
@@ -39,6 +40,7 @@ RPKClust-UI is a research dashboard for binary protocol reverse engineering. It 
 | 5 | `stage2` | Stage 1 & 2 Math | Cpu |
 | 6 | `custom` | Custom Trace | FileCode |
 | 7 | `pipeline` | Pipeline | Activity |
+| 8 | `clusters` | Clusters | Boxes |
 
 **Communication**: All backend calls go through `POST /api/run` (Vite middleware in `vite.config.ts` spawns `python3 -m rpkclust.api_runner`, piping the request body to stdin and returning stdout as JSON).
 
@@ -367,7 +369,44 @@ Inline panel showing whether recomputed posteriors match the pipeline (abs tol 1
 
 ---
 
-## 12. Stderr Drawer (Bottom Console)
+## 12. Page — Clusters
+
+**Tab ID**: `clusters`
+**Location**: `src/components/tabs/ClustersTab.tsx`
+**API command**: `cluster_messages`
+
+**Purpose**: Lists every message of the evaluated dataset with its full hex value, grouped by the cluster it was assigned to after RPKClust evaluation. Auto-loads when the tab is opened (and when source/dataset/message-count changes).
+
+### Top bar
+
+| Element | Type | Function |
+|---------|------|----------|
+| **Re-run Clustering** | button | RefreshCw icon (spins while loading); re-runs `cluster_messages` for the current source/dataset with current hyperparameters. |
+
+### Summary stat cards (4)
+
+| Card | Content |
+|------|---------|
+| **Total Messages** | `total_messages` — number of cleaned messages clustered. |
+| **Clusters** | Number of distinct cluster keys (incl. `c2s_unclassified` / `s2c_none`). |
+| **Inferred Keyword (c2s)** | Winning c2s (or `both`) keyword: `Off N · Len M`. |
+| **Ground-Truth Labeled** | Count of messages carrying a ground-truth label. |
+
+### Filter bar
+
+Text input filtering clusters by key, and messages by hex substring, label, or message id. ✕ button clears.
+
+### Cluster accordion
+
+One card per cluster, sorted by size (descending). Largest cluster is expanded by default.
+
+**Header row**: cluster key (mono, cyan, e.g. `c2s_0404`), size badge (`N msgs`), direction split (`c2s X · s2c Y`), top-3 ground-truth labels with counts and purity % (e.g. `labels: 0a×12, 0b×8 (60% pure)`).
+
+**Expanded body** — message table, columns: Id, Dir (c2s=sky badge / s2c=emerald badge), Len (bytes), Session, Paired (paired message id), Hex (full message bytes, space-separated, wraps), Label (ground-truth label badge, `–` when unlabeled).
+
+---
+
+## 13. Stderr Drawer (Bottom Console)
 
 **Location**: `src/components/StderrDrawer.tsx` — fixed bottom bar, always present.
 
@@ -395,7 +434,7 @@ Inline panel showing whether recomputed posteriors match the pipeline (abs tol 1
 
 ---
 
-## 13. Backend API Commands
+## 14. Backend API Commands
 
 All commands are sent via `POST /api/run` with a JSON body containing `cmd`. Defined in `src/hooks/useApiCall.ts` and `src/hooks/usePipelineTrace.ts`.
 
@@ -405,6 +444,7 @@ All commands are sent via `POST /api/run` with a JSON body containing `cmd`. Def
 | `benchmark_all` | Run benchmarks | `{ cmd: 'benchmark_all', source_id, config }` | Runs all benchmarks for a source (or 'all'). |
 | `run_dataset` | Load dataset | `{ cmd: 'run_dataset', source_id, dataset_id, config }` | Runs the pipeline on a dataset, returns `ProtocolDetails`. |
 | `run_custom` | Custom trace run | `{ cmd: 'run_custom', text, config }` | Runs the pipeline on custom hex text. |
+| `cluster_messages` | Clusters page (auto-load + Re-run) | `{ cmd: 'cluster_messages', source_id, dataset_id, max_messages, config }` | Runs the pipeline and returns **all** cleaned messages with full hex + cluster assignment, plus per-cluster summaries (size, direction split, label distribution). |
 | `pipeline_trace` | Pipeline overview | `{ cmd: 'pipeline_trace', input, config }` | Returns `PipelineTraceResponse` (all 8 stages + health + consistency + messages). |
 | `message_trace` | Per-message trace | `{ cmd: 'message_trace', input, config, message_id }` | Returns `MessageTraceResponse` (bytes, rules, histograms, candidate path, final). |
 | `simulate_error` | Simulate Error button | `{ cmd: 'simulate_error', message }` | Triggers a simulated exception for testing the stderr drawer. |
@@ -418,7 +458,7 @@ for_exclude_rules: enabled_detectors (minus 'sparse')
 
 ---
 
-## 14. Data Sources Catalog
+## 15. Data Sources Catalog
 
 **Location**: `src/constants/index.ts` (`DEFAULT_SOURCES`)
 
@@ -438,7 +478,7 @@ Each dataset defines: `id`, `name`, `protocol`, `file`, `category`, `packets`, `
 
 ---
 
-## 15. Default Hyperparameters
+## 16. Default Hyperparameters
 
 **Location**: `src/constants/index.ts` (`DEFAULT_PARAMS`)
 
@@ -467,5 +507,6 @@ Each dataset defines: `id`, `name`, `protocol`, `file`, `category`, `packets`, `
 | `CandidateRankingView` | `table` / `detailed` / `chart` | Region Inspector (table), Pipeline StageDetail stage2 (detailed), Stage 1 & 2 Math page (chart) |
 | `BoundaryDisplay` | `diagnostic` / `benchmark` / `pipeline` | Region Inspector (diagnostic), Results (benchmark), Pipeline StageDetail boundary (pipeline) |
 | `ClusteringMetricsView` | `table` / `chart` / `pipeline` | Results (table), Charts page (chart), Pipeline StageDetail metrics (pipeline) |
+| `ClustersTab` | (page) | Clusters page — all messages with hex grouped by cluster |
 | `BitUsageChart` | (sub-component) | CandidateRankingView detailed, CandidatePathTable expanded rows |
 | `usePipelineData` | (hooks) | Shared data extraction across components |

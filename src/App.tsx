@@ -10,6 +10,7 @@ import ResultsTab from './components/tabs/ResultsTab';
 import InspectorTab from './components/tabs/InspectorTab';
 import CustomTraceTab from './components/tabs/CustomTraceTab';
 import PipelineTab from './components/tabs/PipelineTab';
+import ClustersTab from './components/tabs/ClustersTab';
 import CandidateRankingView from './components/CandidateRankingView';
 import ClusteringMetricsView from './components/ClusteringMetricsView';
 
@@ -289,6 +290,18 @@ export default function App() {
             datasetId={selectedDataset}
             maxMessages={selectedMsgCount}
             params={params}
+          />
+        )}
+
+        {activeTab === 'clusters' && (
+          <ClustersTab
+            executeApiCall={api.executeApiCall}
+            sourceId={selectedSource}
+            datasetId={selectedDataset}
+            maxMessages={selectedMsgCount}
+            params={params}
+            datasetName={currentDatasetMeta?.name}
+            protocolName={currentDatasetMeta?.protocol}
           />
         )}
       </main>
