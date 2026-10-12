@@ -35,7 +35,7 @@ const TAB_ITEMS: Array<{ id: ActiveTab; label: string; icon: React.ReactNode }> 
   { id: 'inspector', label: 'Region Inspector', icon: <Layers className="w-4 h-4" /> },
   { id: 'pairwise', label: 'Pairwise Inspector', icon: <GitCompare className="w-4 h-4" /> },
   { id: 'stage2', label: 'Stage 1 & 2 Math', icon: <Cpu className="w-4 h-4" /> },
-  { id: 'custom', label: 'Fig 1 & Custom', icon: <FileCode className="w-4 h-4" /> },
+  { id: 'custom', label: 'Custom Trace', icon: <FileCode className="w-4 h-4" /> },
   { id: 'pipeline', label: 'Pipeline', icon: <Activity className="w-4 h-4" /> },
 ];
 

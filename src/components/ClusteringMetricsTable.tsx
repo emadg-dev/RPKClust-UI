@@ -15,7 +15,7 @@ export default function ClusteringMetricsTable({ benchmarks, benchLoading, onReE
         <div>
           <h3 className="font-bold text-white text-base flex items-center gap-2">
             <BarChart3 className="w-5 h-5 text-emerald-400" />
-            Table 3 &amp; 4: Keyword Identification and Clustering Metrics
+            Keyword Identification and Clustering Metrics
           </h3>
           <p className="text-xs text-slate-400 mt-0.5">
             Clustering evaluation based on Homogeneity ($h$), Completeness ($c$), and V-measure ($v$).

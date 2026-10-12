@@ -15,7 +15,7 @@ export default function Stage2Tab({ topCandidate }: Stage2TabProps) {
           Stage 2 Self-Constraint: Bit-Usage Euclidean Distance Analysis
         </h3>
         <p className="text-xs text-slate-400">
-          Visualizing empirical bit-position activation $Q(k)$ against theoretical geometric distribution $P(k)$ (Eq. 7 &amp; 8) for top keyword candidate at offset {topCandidate?.offset ?? 0}.
+          Visualizing empirical bit-position activation $Q(k)$ against theoretical geometric distribution $P(k)$ for top keyword candidate at offset {topCandidate?.offset ?? 0}.
         </p>
 
         {topCandidate?.q_k && topCandidate.q_k.length > 0 ? (

@@ -56,6 +56,7 @@ export default function App() {
   };
 
   const runAllBenchmarks = async (filterSource: string = benchmarkFilter) => {
+    setBenchmarkFilter(filterSource);
     setBenchLoading(true);
     try {
       const { data } = await api.executeApiCall({

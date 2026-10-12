@@ -15,7 +15,7 @@ export default function BaselineComparisonCard({ rpkAvgV, baselines }: BaselineC
         Cross-Method Comparison (RPKClust vs NetPlier vs AutoFormat)
       </h3>
       <p className="text-xs text-slate-400">
-        Summary of algorithmic design differences and execution efficiency as described in Section 4.
+        Summary of algorithmic design differences and execution efficiency.
       </p>
 
       <div className="overflow-x-auto">

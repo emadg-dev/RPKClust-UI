@@ -88,7 +88,7 @@ export default function HyperparameterKnobs({
             </div>
             <div>
               <div className="flex justify-between mb-1">
-                <span className="text-slate-300">Sparse Ratio Threshold (Eq 4):</span>
+                <span className="text-slate-300">Sparse Ratio Threshold:</span>
                 <span className="font-mono text-cyan-300 font-bold">{params.sparse_ratio}</span>
               </div>
               <input
@@ -100,7 +100,7 @@ export default function HyperparameterKnobs({
                 onChange={(e) => setParams({ ...params, sparse_ratio: parseFloat(e.target.value) })}
                 className="w-full accent-indigo-500"
               />
-              <span className="text-[10px] text-slate-500">Default: 0.02 (Eq. 4)</span>
+                <span className="text-[10px] text-slate-500">Default: 0.02</span>
             </div>
           </div>
 
@@ -170,7 +170,7 @@ export default function HyperparameterKnobs({
                 onChange={(e) => setParams({ ...params, pos_for_slope: parseFloat(e.target.value) })}
                 className="w-full accent-indigo-500"
               />
-              <span className="text-[10px] text-slate-500">Eq 11: max(base - slope * off, floor)</span>
+                <span className="text-[10px] text-slate-500">max(base - slope * off, floor)</span>
             </div>
           </div>
 

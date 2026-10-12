@@ -27,7 +27,7 @@ export default function BoundaryResultsTable({
         <div>
           <h3 className="font-bold text-white text-base flex items-center gap-2">
             <Table className="w-5 h-5 text-indigo-400" />
-            Table 2: Boundary Detection Results (Algorithm 1 vs Ground Truth)
+            Boundary Detection Results
           </h3>
           <p className="text-xs text-slate-400 mt-0.5">
             Comparison of inferred boundary $B$ against ground-truth protocol header lengths across datasets.
