@@ -37,7 +37,8 @@ def main():
                 continue
             try:
                 fn = run_benchmark_on_csv if path.endswith(".csv") else run_benchmark_on_pcap
-                r = fn(path, d["protocol"], config=cfg, max_messages=max_msgs)
+                n = d["packets"] if src_id == "binaryinferno" else max_msgs
+                r = fn(path, d["protocol"], config=cfg, max_messages=n)
                 kws = r["inferred_keywords"]
                 row.update(
                     B=r["boundary_B"],

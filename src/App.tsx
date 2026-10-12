@@ -11,6 +11,7 @@ import ChartsTab from './components/tabs/ChartsTab';
 import InspectorTab from './components/tabs/InspectorTab';
 import Stage2Tab from './components/tabs/Stage2Tab';
 import CustomTraceTab from './components/tabs/CustomTraceTab';
+import PipelineTab from './components/tabs/PipelineTab';
 
 
 import { PairwiseInspector } from './components/PairwiseInspector';
@@ -277,6 +278,16 @@ export default function App() {
             hits={currentDetails?.boundary?.hits ?? []}
             datasetName={currentDatasetMeta?.name}
             protocolName={currentDatasetMeta?.protocol}
+          />
+        )}
+
+        {activeTab === 'pipeline' && (
+          <PipelineTab
+            executeApiCall={api.executeApiCall}
+            sourceId={selectedSource}
+            datasetId={selectedDataset}
+            maxMessages={selectedMsgCount}
+            params={params}
           />
         )}
       </main>

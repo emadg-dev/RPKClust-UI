@@ -10,9 +10,17 @@ import time
 from typing import List
 from rpkclust.config import Config
 from rpkclust.io.loader import load_hex_lines, load_pcap, load_csv
+from rpkclust.model import Trace
 from rpkclust.pipeline import run_pipeline
-from rpkclust.eval.ground_truth import run_benchmark_on_pcap, run_benchmark_on_csv, PROTOCOL_TRUE_KEYWORDS
+from rpkclust.eval.ground_truth import (
+    run_benchmark_on_pcap, run_benchmark_on_csv, PROTOCOL_TRUE_KEYWORDS,
+    clean_protocol_messages,
+)
 from rpkclust.catalog import SOURCES, get_catalog, resolve_dataset
+from rpkclust.trace import (
+    build_overview, build_message_trace,
+    capture_cache_key, load_cached_capture, save_cached_capture,
+)
 
 def _format_pipeline_output(pipeline_res, sample_msgs, benchmark_res=None, source_meta=None, pairs=None) -> dict:
     out = {
@@ -78,6 +86,100 @@ def _format_pipeline_output(pipeline_res, sample_msgs, benchmark_res=None, sourc
         "sample_messages": sample_msgs
     }
     return out
+
+def _load_trace_input(input_spec: dict, config: Config):
+    """
+    Shared loader for pipeline_trace / message_trace. Uses the same
+    loading and cleaning helpers as run_benchmark_on_pcap / run_dataset
+    so the message set equals what the Results tab evaluates.
+    Returns (trace, meta).
+    """
+    kind = input_spec.get("kind", "dataset")
+    if kind == "custom":
+        text = input_spec.get("text", "")
+        trace = load_hex_lines(text, config)
+        meta = {
+            "source_id": "custom",
+            "dataset_id": "custom",
+            "protocol": "custom",
+            "file": None,
+            "true_keyword": None,
+            "expected_B": None,
+            "dropped_by_cleaning": 0,
+            "cleaning_info": {},
+            "n_raw": len(trace.messages),
+        }
+        return trace, meta
+
+    source_id = input_spec.get("source_id", "netplier")
+    dataset_id = input_spec.get("dataset_id", "modbus")
+    max_messages = input_spec.get("max_messages", 100)
+    d_meta = resolve_dataset(source_id, dataset_id)
+    if d_meta is None or not os.path.exists(d_meta["file"]):
+        raise FileNotFoundError(f"Dataset {source_id}/{dataset_id} not found")
+    path = d_meta["file"]
+    protocol = d_meta["protocol"]
+    raw_trace = load_csv(path, config) if path.endswith(".csv") else load_pcap(path, config)
+    cleaned, dropped, cleaning_info = clean_protocol_messages(
+        raw_trace.messages, protocol, max_messages
+    )
+    trace = Trace(
+        messages=cleaned,
+        pairs=raw_trace.pairs,
+        capture_range=raw_trace.capture_range,
+    )
+    meta = {
+        "source_id": source_id,
+        "dataset_id": dataset_id,
+        "protocol": protocol,
+        "file": path,
+        "true_keyword": d_meta.get("true_keyword"),
+        "expected_B": d_meta.get("expected_B", 0),
+        "dropped_by_cleaning": dropped,
+        "cleaning_info": cleaning_info,
+        "n_raw": len(raw_trace.messages),
+    }
+    return trace, meta
+
+
+def _cmd_pipeline_trace(data: dict, config: Config) -> dict:
+    input_spec = data.get("input", {})
+    t_load = time.perf_counter()
+    try:
+        trace, meta = _load_trace_input(input_spec, config)
+    except FileNotFoundError as e:
+        return {"status": "error", "message": str(e)}
+    meta["load_ms"] = round((time.perf_counter() - t_load) * 1000.0, 3)
+    res = run_pipeline(trace, config, capture=True)
+    capture = res.trace
+    overview = build_overview(capture, meta, config)
+    overview["status"] = "ok"
+    return overview
+
+
+def _cmd_message_trace(data: dict, config: Config) -> dict:
+    input_spec = data.get("input", {})
+    message_id = data.get("message_id", 0)
+    t_load = time.perf_counter()
+    try:
+        trace, meta = _load_trace_input(input_spec, config)
+    except FileNotFoundError as e:
+        return {"status": "error", "message": str(e)}
+    meta["load_ms"] = round((time.perf_counter() - t_load) * 1000.0, 3)
+    # Optional on-disk capture cache (never required for correctness)
+    cache_key = capture_cache_key(input_spec, config, meta)
+    capture = load_cached_capture(cache_key)
+    if capture is None:
+        res = run_pipeline(trace, config, capture=True)
+        capture = res.trace
+        save_cached_capture(cache_key, capture)
+    try:
+        msg_trace = build_message_trace(capture, message_id, config)
+    except ValueError as e:
+        return {"status": "error", "message": str(e)}
+    msg_trace["status"] = "ok"
+    return msg_trace
+
 
 def process_request(data: dict) -> dict:
     cmd = data.get("cmd", "run")
@@ -188,37 +290,17 @@ def process_request(data: dict) -> dict:
         max_msgs = data.get("max_messages", 100)
         if is_csv:
             res = run_benchmark_on_csv(pcap_path, proto, config=config, max_messages=max_msgs, expected_B=d_meta.get("expected_B", 0) if d_meta else 0)
-            trace = load_csv(pcap_path, config)
+            raw_trace = load_csv(pcap_path, config)
         else:
             res = run_benchmark_on_pcap(pcap_path, proto, config=config, max_messages=max_msgs, expected_B=d_meta.get("expected_B", 0) if d_meta else 0)
-            trace = load_pcap(pcap_path, config)
+            raw_trace = load_pcap(pcap_path, config)
 
-        if max_msgs and len(trace.messages) > max_msgs:
-            from rpkclust.model import Trace as TraceModel
-            trace = TraceModel(messages=trace.messages[:max_msgs], pairs=trace.pairs, capture_range=trace.capture_range)
-
-        if proto == "modbus":
-            from rpkclust.model import Message as MsgModel, Trace as TraceModel
-            cleaned_msgs: List[MsgModel] = []
-            for m in trace.messages:
-                data = m.data
-                if len(data) >= 6:
-                    length = int.from_bytes(data[4:6], byteorder="big", signed=False)
-                    if len(data) > length + 6:
-                        data = data[:length + 6]
-                cleaned_msgs.append(MsgModel(
-                    id=m.id,
-                    data=data,
-                    ts=m.ts,
-                    src=m.src,
-                    dst=m.dst,
-                    sport=m.sport,
-                    dport=m.dport,
-                    direction=m.direction,
-                    session_id=m.session_id,
-                    label=m.label,
-                ))
-            trace = TraceModel(messages=cleaned_msgs, pairs=trace.pairs, capture_range=trace.capture_range)
+        # Shared cleaning helper (same message set as the Results tab)
+        cleaned_msgs, _dropped, _info = clean_protocol_messages(
+            raw_trace.messages, proto, max_msgs
+        )
+        from rpkclust.model import Trace as TraceModel
+        trace = TraceModel(messages=cleaned_msgs, pairs=raw_trace.pairs, capture_range=raw_trace.capture_range)
 
         pipeline_res = run_pipeline(trace, config)
 
@@ -275,6 +357,12 @@ def process_request(data: dict) -> dict:
             })
 
         return _format_pipeline_output(pipeline_res, sample_msgs, pairs=trace.pairs)
+
+    elif cmd == "pipeline_trace":
+        return _cmd_pipeline_trace(data, config)
+
+    elif cmd == "message_trace":
+        return _cmd_message_trace(data, config)
 
     elif cmd == "simulate_error":
         msg = data.get("message", "Simulated protocol parsing exception for debugging")

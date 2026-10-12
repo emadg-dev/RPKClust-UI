@@ -12,6 +12,7 @@ import {
   FileCode,
   SlidersHorizontal,
   ExternalLink,
+  Activity,
 } from 'lucide-react';
 import { SourceMeta, ActiveTab } from '../types';
 
@@ -35,6 +36,7 @@ const TAB_ITEMS: Array<{ id: ActiveTab; label: string; icon: React.ReactNode }> 
   { id: 'pairwise', label: 'Pairwise Inspector', icon: <GitCompare className="w-4 h-4" /> },
   { id: 'stage2', label: 'Stage 1 & 2 Math', icon: <Cpu className="w-4 h-4" /> },
   { id: 'custom', label: 'Fig 1 & Custom', icon: <FileCode className="w-4 h-4" /> },
+  { id: 'pipeline', label: 'Pipeline', icon: <Activity className="w-4 h-4" /> },
 ];
 
 export default function Header({

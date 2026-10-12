@@ -303,6 +303,7 @@ SOURCES = {
                 "expected_B": 48,
                 "description": "NTP packets with client, server, and symmetric active modes."
             },
+            # BinaryInferno SMB has no NetBIOS header
             {
                 "id": "smb_100",
                 "name": "SMBv1 (100 msgs)",
@@ -310,23 +311,25 @@ SOURCES = {
                 "file": "data/binaryinferno/100/smb.txt.input",
                 "category": "Storage / File Sharing",
                 "packets": 100,
-                "header_len": 32,
-                "keyword_field": "SMB Command (offset 8, 1B)",
-                "true_keyword": {"offset": 8, "length": 1, "region": "FOR", "name": "SMB Command"},
-                "expected_B": 32,
+                "header_len": 28,
+                "keyword_field": "SMB Command (offset 4, 1B)",
+                "true_keyword": {"offset": 4, "length": 1, "region": "FOR", "name": "SMB Command"},
+                "expected_B": 28,
                 "description": "SMBv1 commands (Negotiate, Session Setup, Tree Connect, Trans2)."
             },
+            # BinaryInferno SMB has no NetBIOS header
+            # BinaryInferno SMB has no NetBIOS header
             {
-                "id": "smb2_100",
-                "name": "SMBv2 (100 msgs)",
+                "id": "smb2_1000",
+                "name": "SMBv2 (1000 msgs)",
                 "protocol": "smb2",
-                "file": "data/binaryinferno/100/smb2.txt.input",
+                "file": "data/binaryinferno/1000/smb2.txt.input",
                 "category": "Storage / File Sharing",
-                "packets": 100,
-                "header_len": 64,
-                "keyword_field": "SMB2 Command (offset 16, 2B)",
-                "true_keyword": {"offset": 16, "length": 2, "region": "FOR", "name": "SMB2 Command"},
-                "expected_B": 64,
+                "packets": 1000,
+                "header_len": 60,
+                "keyword_field": "SMB2 Command (offset 12, 2B)",
+                "true_keyword": {"offset": 12, "length": 2, "region": "FOR", "name": "SMB2 Command"},
+                "expected_B": 60,
                 "description": "SMBv2 multi-credit protocol commands."
             },
             {
@@ -407,6 +410,7 @@ SOURCES = {
                 "expected_B": 48,
                 "description": "NTP packets with client, server, and symmetric active modes."
             },
+            # BinaryInferno SMB has no NetBIOS header
             {
                 "id": "smb_500",
                 "name": "SMBv1 (500 msgs)",
@@ -414,12 +418,13 @@ SOURCES = {
                 "file": "data/binaryinferno/500/smb.txt.input",
                 "category": "Storage / File Sharing",
                 "packets": 500,
-                "header_len": 32,
-                "keyword_field": "SMB Command (offset 8, 1B)",
-                "true_keyword": {"offset": 8, "length": 1, "region": "FOR", "name": "SMB Command"},
-                "expected_B": 32,
+                "header_len": 28,
+                "keyword_field": "SMB Command (offset 4, 1B)",
+                "true_keyword": {"offset": 4, "length": 1, "region": "FOR", "name": "SMB Command"},
+                "expected_B": 28,
                 "description": "SMBv1 commands (Negotiate, Session Setup, Tree Connect, Trans2)."
             },
+            # BinaryInferno SMB has no NetBIOS header
             {
                 "id": "smb2_500",
                 "name": "SMBv2 (500 msgs)",
@@ -427,10 +432,10 @@ SOURCES = {
                 "file": "data/binaryinferno/500/smb2.txt.input",
                 "category": "Storage / File Sharing",
                 "packets": 500,
-                "header_len": 64,
-                "keyword_field": "SMB2 Command (offset 16, 2B)",
-                "true_keyword": {"offset": 16, "length": 2, "region": "FOR", "name": "SMB2 Command"},
-                "expected_B": 64,
+                "header_len": 60,
+                "keyword_field": "SMB2 Command (offset 12, 2B)",
+                "true_keyword": {"offset": 12, "length": 2, "region": "FOR", "name": "SMB2 Command"},
+                "expected_B": 60,
                 "description": "SMBv2 multi-credit protocol commands."
             },
             {
@@ -511,6 +516,7 @@ SOURCES = {
                 "expected_B": 48,
                 "description": "NTP packets with client, server, and symmetric active modes."
             },
+            # BinaryInferno SMB has no NetBIOS header
             {
                 "id": "smb_1000",
                 "name": "SMBv1 (1000 msgs)",
@@ -518,10 +524,10 @@ SOURCES = {
                 "file": "data/binaryinferno/1000/smb.txt.input",
                 "category": "Storage / File Sharing",
                 "packets": 1000,
-                "header_len": 32,
-                "keyword_field": "SMB Command (offset 8, 1B)",
-                "true_keyword": {"offset": 8, "length": 1, "region": "FOR", "name": "SMB Command"},
-                "expected_B": 32,
+                "header_len": 28,
+                "keyword_field": "SMB Command (offset 4, 1B)",
+                "true_keyword": {"offset": 4, "length": 1, "region": "FOR", "name": "SMB Command"},
+                "expected_B": 28,
                 "description": "SMBv1 commands (Negotiate, Session Setup, Tree Connect, Trans2)."
             },
             {

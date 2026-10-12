@@ -44,11 +44,13 @@ def extract_ground_truth_label(protocol: str, data: bytes) -> Optional[str]:
             if len(data) > 0:
                 return str(data[0] & 0x07)
         elif p in ("smb",):
-            if len(data) > 8:
-                return data[8:9].hex()
+            base = 0 if data[0:4] == b"\xffSMB" else 4
+            if len(data) > base + 4:
+                return data[base + 4:base + 5].hex()
         elif p == "smb2":
-            if len(data) > 18:
-                return data[16:18].hex()
+            base = 0 if data[0:4] == b"\xfeSMB" else 4
+            if len(data) > base + 13:
+                return data[base + 12:base + 14].hex()
         elif p in ("tftp",):
             if len(data) >= 2:
                 return data[0:2].hex()
@@ -63,6 +65,66 @@ def extract_ground_truth_label(protocol: str, data: bytes) -> Optional[str]:
     except Exception:
         return None
     return None
+
+
+def clean_protocol_messages(
+    messages: List[Message],
+    protocol: str,
+    max_messages: Optional[int] = None
+) -> Tuple[List[Message], int, Dict[str, int]]:
+    """
+    Shared protocol cleaning: modbus length truncation, smb/smb2 magic filter
+    and ground-truth label extraction. Single source of truth used by
+    run_benchmark_on_pcap, run_benchmark_on_csv, api_runner (run_dataset,
+    pipeline_trace, message_trace) so every path sees the same message set.
+
+    Returns (cleaned_messages, dropped_count, info) where info breaks the
+    drops/truncations down by cause (display only).
+    """
+    p = protocol.lower()
+    cleaned_msgs: List[Message] = []
+    dropped = 0
+    info = {"modbus_truncated": 0, "smb_filtered": 0, "smb2_filtered": 0}
+    for m in messages:
+        data = m.data
+        if p == "modbus":
+            if len(data) >= 6:
+                length = int.from_bytes(data[4:6], byteorder="big", signed=False)
+                if len(data) > length + 6:
+                    data = data[:length + 6]
+                    info["modbus_truncated"] += 1
+        elif p == "smb":
+            # Accept with (base=4) or without (base=0) NetBIOS header
+            if not (len(data) >= 4 and data[0:4] == b"\xffSMB") and \
+               not (len(data) >= 8 and data[4:8] == b"\xffSMB"):
+                dropped += 1
+                info["smb_filtered"] += 1
+                continue
+        elif p == "smb2":
+            if not (len(data) >= 4 and data[0:4] == b"\xfeSMB") and \
+               not (len(data) >= 8 and data[4:8] == b"\xfeSMB"):
+                dropped += 1
+                info["smb2_filtered"] += 1
+                continue
+
+        lbl = extract_ground_truth_label(protocol, data)
+        cleaned_msgs.append(Message(
+            id=len(cleaned_msgs),
+            data=data,
+            ts=m.ts,
+            src=m.src,
+            dst=m.dst,
+            sport=m.sport,
+            dport=m.dport,
+            direction=m.direction,
+            session_id=m.session_id,
+            label=lbl
+        ))
+
+    if max_messages and len(cleaned_msgs) > max_messages:
+        cleaned_msgs = cleaned_msgs[:max_messages]
+
+    return cleaned_msgs, dropped, info
 
 
 def run_benchmark_on_pcap(
@@ -81,45 +143,10 @@ def run_benchmark_on_pcap(
     trace = load_pcap(pcap_file, config)
     messages = trace.messages
 
-    # Filter protocol-specific headers if necessary
-    p = protocol.lower()
-    cleaned_msgs: List[Message] = []
-    for m in messages:
-        data = m.data
-        if p == "modbus":
-            if len(data) >= 6:
-                length = int.from_bytes(data[4:6], byteorder="big", signed=False)
-                if len(data) > length + 6:
-                    data = data[:length + 6]
-        elif p == "smb":
-            if len(data) < 8 or data[4:8] != b"\xffSMB":
-                continue
-        elif p == "smb2":
-            if len(data) < 8 or data[4:8] != b"\xfeSMB":
-                continue
-        elif p == "bgp":
-            # BGP messages are over TCP port 179, with a 19-byte marker (16 0xFF + 2-byte len + 1-byte type)
-            pass
-        elif p == "mavlink":
-            # MAVLink messages have a start sign (0xFE for v1, 0xFD for v2) at offset 0
-            pass
-
-        lbl = extract_ground_truth_label(protocol, data)
-        cleaned_msgs.append(Message(
-            id=len(cleaned_msgs),
-            data=data,
-            ts=m.ts,
-            src=m.src,
-            dst=m.dst,
-            sport=m.sport,
-            dport=m.dport,
-            direction=m.direction,
-            session_id=m.session_id,
-            label=lbl
-        ))
-
-    if max_messages and len(cleaned_msgs) > max_messages:
-        cleaned_msgs = cleaned_msgs[:max_messages]
+    # Filter protocol-specific headers (shared cleaning helper)
+    cleaned_msgs, _dropped, _info = clean_protocol_messages(
+        messages, protocol, max_messages
+    )
 
     eval_trace = Trace(
         messages=cleaned_msgs,
@@ -148,10 +175,10 @@ def run_benchmark_on_pcap(
                 "posterior": kw.posterior
             }
 
-    true_spec = PROTOCOL_TRUE_KEYWORDS.get(p, {})
+    true_spec = PROTOCOL_TRUE_KEYWORDS.get(protocol.lower(), {})
     if not true_spec:
         for k, v in PROTOCOL_TRUE_KEYWORDS.items():
-            if k in p or p in k:
+            if k in protocol.lower() or protocol.lower() in k:
                 true_spec = v
                 break
 
@@ -189,25 +216,10 @@ def run_benchmark_on_csv(
     trace = load_csv(csv_path, config)
     messages = trace.messages
 
-    p = protocol.lower()
-    cleaned_msgs: List[Message] = []
-    for m in messages:
-        lbl = extract_ground_truth_label(protocol, m.data)
-        cleaned_msgs.append(Message(
-            id=len(cleaned_msgs),
-            data=m.data,
-            ts=m.ts,
-            src=m.src,
-            dst=m.dst,
-            sport=m.sport,
-            dport=m.dport,
-            direction=m.direction,
-            session_id=m.session_id,
-            label=lbl,
-        ))
-
-    if max_messages and len(cleaned_msgs) > max_messages:
-        cleaned_msgs = cleaned_msgs[:max_messages]
+    # Shared cleaning helper (label extraction + protocol filters)
+    cleaned_msgs, _dropped, _info = clean_protocol_messages(
+        messages, protocol, max_messages
+    )
 
     eval_trace = Trace(
         messages=cleaned_msgs,
@@ -234,10 +246,10 @@ def run_benchmark_on_csv(
                 "posterior": kw.posterior
             }
 
-    true_spec = PROTOCOL_TRUE_KEYWORDS.get(p, {})
+    true_spec = PROTOCOL_TRUE_KEYWORDS.get(protocol.lower(), {})
     if not true_spec:
         for k, v in PROTOCOL_TRUE_KEYWORDS.items():
-            if k in p or p in k:
+            if k in protocol.lower() or protocol.lower() in k:
                 true_spec = v
                 break
 

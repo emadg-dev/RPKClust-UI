@@ -1,0 +1,3202 @@
+{
+  "message": {
+    "id": 0,
+    "direction": "c2s",
+    "length": 14,
+    "session_id": 0,
+    "paired_id": 6,
+    "label": "0f",
+    "hex": "57de00000008ff0f000500010100",
+    "truncated": false
+  },
+  "bytes": [
+    {
+      "offset": 0,
+      "hex": "57",
+      "ascii": "W",
+      "region": "FOR",
+      "beyond_min_len": false,
+      "status": "available",
+      "tags": [],
+      "exclusion_reasons": [],
+      "in_S": true,
+      "candidate_ids": [
+        0,
+        1
+      ]
+    },
+    {
+      "offset": 1,
+      "hex": "de",
+      "ascii": ".",
+      "region": "FOR",
+      "beyond_min_len": false,
+      "status": "available",
+      "tags": [],
+      "exclusion_reasons": [],
+      "in_S": true,
+      "candidate_ids": [
+        1,
+        2
+      ]
+    },
+    {
+      "offset": 2,
+      "hex": "00",
+      "ascii": ".",
+      "region": "FOR",
+      "beyond_min_len": false,
+      "status": "excluded",
+      "tags": [
+        "constant",
+        "length"
+      ],
+      "exclusion_reasons": [
+        "constant",
+        "length"
+      ],
+      "in_S": false,
+      "candidate_ids": []
+    },
+    {
+      "offset": 3,
+      "hex": "00",
+      "ascii": ".",
+      "region": "FOR",
+      "beyond_min_len": false,
+      "status": "excluded",
+      "tags": [
+        "constant",
+        "length"
+      ],
+      "exclusion_reasons": [
+        "constant",
+        "length"
+      ],
+      "in_S": false,
+      "candidate_ids": []
+    },
+    {
+      "offset": 4,
+      "hex": "00",
+      "ascii": ".",
+      "region": "FOR",
+      "beyond_min_len": false,
+      "status": "rescued",
+      "tags": [
+        "length",
+        "constant",
+        "sparse"
+      ],
+      "exclusion_reasons": [
+        "constant",
+        "length"
+      ],
+      "in_S": true,
+      "candidate_ids": [
+        3,
+        4
+      ]
+    },
+    {
+      "offset": 5,
+      "hex": "08",
+      "ascii": ".",
+      "region": "FOR",
+      "beyond_min_len": false,
+      "status": "rescued",
+      "tags": [
+        "length",
+        "sparse"
+      ],
+      "exclusion_reasons": [
+        "length"
+      ],
+      "in_S": true,
+      "candidate_ids": [
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "offset": 6,
+      "hex": "ff",
+      "ascii": ".",
+      "region": "FOR",
+      "beyond_min_len": false,
+      "status": "rescued",
+      "tags": [
+        "sparse",
+        "constant"
+      ],
+      "exclusion_reasons": [
+        "constant"
+      ],
+      "in_S": true,
+      "candidate_ids": [
+        4,
+        6
+      ]
+    },
+    {
+      "offset": 7,
+      "hex": "0f",
+      "ascii": ".",
+      "region": "FOR",
+      "beyond_min_len": false,
+      "status": "rescued",
+      "tags": [
+        "sparse"
+      ],
+      "exclusion_reasons": [],
+      "in_S": true,
+      "candidate_ids": [
+        4,
+        6,
+        7
+      ]
+    },
+    {
+      "offset": 8,
+      "hex": "00",
+      "ascii": ".",
+      "region": "NFOR",
+      "beyond_min_len": false,
+      "status": "not_evaluated",
+      "tags": [],
+      "exclusion_reasons": [],
+      "in_S": false,
+      "candidate_ids": []
+    },
+    {
+      "offset": 9,
+      "hex": "05",
+      "ascii": ".",
+      "region": "NFOR",
+      "beyond_min_len": false,
+      "status": "not_evaluated",
+      "tags": [],
+      "exclusion_reasons": [],
+      "in_S": false,
+      "candidate_ids": []
+    },
+    {
+      "offset": 10,
+      "hex": "00",
+      "ascii": ".",
+      "region": "NFOR",
+      "beyond_min_len": true,
+      "status": "not_evaluated",
+      "tags": [],
+      "exclusion_reasons": [],
+      "in_S": false,
+      "candidate_ids": []
+    },
+    {
+      "offset": 11,
+      "hex": "01",
+      "ascii": ".",
+      "region": "NFOR",
+      "beyond_min_len": true,
+      "status": "not_evaluated",
+      "tags": [],
+      "exclusion_reasons": [],
+      "in_S": false,
+      "candidate_ids": []
+    },
+    {
+      "offset": 12,
+      "hex": "01",
+      "ascii": ".",
+      "region": "NFOR",
+      "beyond_min_len": true,
+      "status": "not_evaluated",
+      "tags": [],
+      "exclusion_reasons": [],
+      "in_S": false,
+      "candidate_ids": []
+    },
+    {
+      "offset": 13,
+      "hex": "00",
+      "ascii": ".",
+      "region": "NFOR",
+      "beyond_min_len": true,
+      "status": "not_evaluated",
+      "tags": [],
+      "exclusion_reasons": [],
+      "in_S": false,
+      "candidate_ids": []
+    }
+  ],
+  "rules": [
+    {
+      "rule": "constant",
+      "offset": 0,
+      "length": 1,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.16,
+      "detail": "constant: 13 distinct values, modal 6d share 16/100",
+      "info": {}
+    },
+    {
+      "rule": "constant",
+      "offset": 0,
+      "length": 2,
+      "fires": false,
+      "msg_ok": true,
+      "blocking": false,
+      "fraction_ok": 0.02,
+      "detail": "constant: 53 distinct values, modal 57de share 2/100",
+      "info": {}
+    },
+    {
+      "rule": "constant",
+      "offset": 0,
+      "length": 4,
+      "fires": false,
+      "msg_ok": true,
+      "blocking": false,
+      "fraction_ok": 0.02,
+      "detail": "constant: 53 distinct values, modal 57de0000 share 2/100",
+      "info": {}
+    },
+    {
+      "rule": "constant",
+      "offset": 0,
+      "length": 8,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.02,
+      "detail": "constant: 99 distinct values, modal 317f00000006ff01 share 2/100",
+      "info": {}
+    },
+    {
+      "rule": "sequence",
+      "offset": 0,
+      "length": 1,
+      "fires": false,
+      "msg_ok": true,
+      "blocking": false,
+      "fraction_ok": 0.45,
+      "detail": "sequence: modal step=0 (big), 44/99 diffs at modal step",
+      "info": {}
+    },
+    {
+      "rule": "sequence",
+      "offset": 0,
+      "length": 2,
+      "fires": false,
+      "msg_ok": true,
+      "blocking": false,
+      "fraction_ok": 0.2,
+      "detail": "sequence: modal step=0 (big), 19/99 diffs at modal step",
+      "info": {}
+    },
+    {
+      "rule": "sequence",
+      "offset": 0,
+      "length": 3,
+      "fires": false,
+      "msg_ok": true,
+      "blocking": false,
+      "fraction_ok": 0.2,
+      "detail": "sequence: modal step=0 (big), 19/99 diffs at modal step",
+      "info": {}
+    },
+    {
+      "rule": "sequence",
+      "offset": 0,
+      "length": 4,
+      "fires": false,
+      "msg_ok": true,
+      "blocking": false,
+      "fraction_ok": 0.2,
+      "detail": "sequence: modal step=0 (big), 19/99 diffs at modal step",
+      "info": {}
+    },
+    {
+      "rule": "timestamp",
+      "offset": 0,
+      "length": 4,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "timestamp: window [1352640129, 1352812930] (slack 86400s)",
+      "info": {}
+    },
+    {
+      "rule": "timestamp",
+      "offset": 0,
+      "length": 8,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "timestamp: window [1352640129, 1352812930] (slack 86400s)",
+      "info": {}
+    },
+    {
+      "rule": "sparse",
+      "offset": 0,
+      "length": 1,
+      "fires": false,
+      "msg_ok": null,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "sparse: unique=13/256 ratio=0.0508 zero present in 0 msgs (0.0%)",
+      "info": {}
+    },
+    {
+      "rule": "sparse",
+      "offset": 0,
+      "length": 2,
+      "fires": false,
+      "msg_ok": null,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "sparse: unique=53/65536 ratio=0.0008 zero present in 0 msgs (0.0%)",
+      "info": {}
+    },
+    {
+      "rule": "address",
+      "offset": 0,
+      "length": 2,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "address: swap relation holds for 0/100 messages",
+      "info": {}
+    },
+    {
+      "rule": "address",
+      "offset": 0,
+      "length": 3,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "address: swap relation holds for 0/100 messages",
+      "info": {}
+    },
+    {
+      "rule": "address",
+      "offset": 0,
+      "length": 4,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "address: swap relation holds for 0/100 messages",
+      "info": {}
+    },
+    {
+      "rule": "checksum",
+      "offset": 0,
+      "length": 1,
+      "fires": false,
+      "msg_ok": null,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "checksum: no data before offset 0",
+      "info": {}
+    },
+    {
+      "rule": "checksum",
+      "offset": 0,
+      "length": 2,
+      "fires": false,
+      "msg_ok": null,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "checksum: no data before offset 0",
+      "info": {}
+    },
+    {
+      "rule": "checksum",
+      "offset": 0,
+      "length": 4,
+      "fires": false,
+      "msg_ok": null,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "checksum: no data before offset 0",
+      "info": {}
+    },
+    {
+      "rule": "float",
+      "offset": 0,
+      "length": 4,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.01,
+      "detail": "float: 1/100 plausible IEEE-754 values",
+      "info": {}
+    },
+    {
+      "rule": "float",
+      "offset": 0,
+      "length": 8,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "float: 0/100 plausible IEEE-754 values",
+      "info": {}
+    },
+    {
+      "rule": "length",
+      "offset": 0,
+      "length": 1,
+      "fires": false,
+      "msg_ok": null,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "length: modal c=-97 outside [-32, 32]",
+      "info": {}
+    },
+    {
+      "rule": "length",
+      "offset": 0,
+      "length": 2,
+      "fires": false,
+      "msg_ok": null,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "length: modal c=-12797 outside [-32, 32]",
+      "info": {}
+    },
+    {
+      "rule": "length",
+      "offset": 0,
+      "length": 4,
+      "fires": false,
+      "msg_ok": null,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "length: modal c=-830406644 outside [-32, 32]",
+      "info": {}
+    },
+    {
+      "rule": "constant",
+      "offset": 1,
+      "length": 1,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.05,
+      "detail": "constant: 44 distinct values, modal 0a share 5/100",
+      "info": {}
+    },
+    {
+      "rule": "constant",
+      "offset": 1,
+      "length": 2,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.05,
+      "detail": "constant: 44 distinct values, modal 0a00 share 5/100",
+      "info": {}
+    },
+    {
+      "rule": "constant",
+      "offset": 1,
+      "length": 4,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.05,
+      "detail": "constant: 44 distinct values, modal 0a000000 share 5/100",
+      "info": {}
+    },
+    {
+      "rule": "constant",
+      "offset": 1,
+      "length": 8,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.02,
+      "detail": "constant: 97 distinct values, modal 0700000006ff0100 share 2/100",
+      "info": {}
+    },
+    {
+      "rule": "sequence",
+      "offset": 1,
+      "length": 1,
+      "fires": false,
+      "msg_ok": true,
+      "blocking": false,
+      "fraction_ok": 0.21,
+      "detail": "sequence: modal step=0 (big), 20/99 diffs at modal step",
+      "info": {}
+    },
+    {
+      "rule": "sequence",
+      "offset": 1,
+      "length": 2,
+      "fires": false,
+      "msg_ok": true,
+      "blocking": false,
+      "fraction_ok": 0.21,
+      "detail": "sequence: modal step=0 (big), 20/99 diffs at modal step",
+      "info": {}
+    },
+    {
+      "rule": "sequence",
+      "offset": 1,
+      "length": 3,
+      "fires": false,
+      "msg_ok": true,
+      "blocking": false,
+      "fraction_ok": 0.21,
+      "detail": "sequence: modal step=0 (big), 20/99 diffs at modal step",
+      "info": {}
+    },
+    {
+      "rule": "sequence",
+      "offset": 1,
+      "length": 4,
+      "fires": false,
+      "msg_ok": true,
+      "blocking": false,
+      "fraction_ok": 0.21,
+      "detail": "sequence: modal step=0 (big), 20/99 diffs at modal step",
+      "info": {}
+    },
+    {
+      "rule": "timestamp",
+      "offset": 1,
+      "length": 4,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "timestamp: window [1352640129, 1352812930] (slack 86400s)",
+      "info": {}
+    },
+    {
+      "rule": "timestamp",
+      "offset": 1,
+      "length": 8,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "timestamp: window [1352640129, 1352812930] (slack 86400s)",
+      "info": {}
+    },
+    {
+      "rule": "sparse",
+      "offset": 1,
+      "length": 1,
+      "fires": false,
+      "msg_ok": null,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "sparse: unique=44/256 ratio=0.1719 zero present in 0 msgs (0.0%)",
+      "info": {}
+    },
+    {
+      "rule": "sparse",
+      "offset": 1,
+      "length": 2,
+      "fires": false,
+      "msg_ok": null,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "sparse: unique=44/65536 ratio=0.0007 zero present in 0 msgs (0.0%)",
+      "info": {}
+    },
+    {
+      "rule": "address",
+      "offset": 1,
+      "length": 2,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "address: swap relation holds for 0/100 messages",
+      "info": {}
+    },
+    {
+      "rule": "address",
+      "offset": 1,
+      "length": 3,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "address: swap relation holds for 0/100 messages",
+      "info": {}
+    },
+    {
+      "rule": "address",
+      "offset": 1,
+      "length": 4,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "address: swap relation holds for 0/100 messages",
+      "info": {}
+    },
+    {
+      "rule": "checksum",
+      "offset": 1,
+      "length": 1,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "checksum: no algorithm matches over [0:1]",
+      "info": {}
+    },
+    {
+      "rule": "checksum",
+      "offset": 1,
+      "length": 2,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "checksum: no algorithm matches over [0:1]",
+      "info": {}
+    },
+    {
+      "rule": "checksum",
+      "offset": 1,
+      "length": 4,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "checksum: no algorithm matches over [0:1]",
+      "info": {}
+    },
+    {
+      "rule": "float",
+      "offset": 1,
+      "length": 4,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.18,
+      "detail": "float: 18/100 plausible IEEE-754 values",
+      "info": {}
+    },
+    {
+      "rule": "float",
+      "offset": 1,
+      "length": 8,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "float: 0/100 plausible IEEE-754 values",
+      "info": {}
+    },
+    {
+      "rule": "length",
+      "offset": 1,
+      "length": 1,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": null,
+      "fraction_ok": 0.05,
+      "detail": "length: c=3 (total_len, big), 5/100 msgs at modal c",
+      "info": {}
+    },
+    {
+      "rule": "length",
+      "offset": 1,
+      "length": 2,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": null,
+      "fraction_ok": 0.05,
+      "detail": "length: c=3 (total_len, little), 5/100 msgs at modal c",
+      "info": {}
+    },
+    {
+      "rule": "length",
+      "offset": 1,
+      "length": 4,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": null,
+      "fraction_ok": 0.05,
+      "detail": "length: c=3 (total_len, little), 5/100 msgs at modal c",
+      "info": {}
+    },
+    {
+      "rule": "constant",
+      "offset": 2,
+      "length": 1,
+      "fires": true,
+      "msg_ok": true,
+      "blocking": false,
+      "fraction_ok": 1.0,
+      "detail": "constant: 1 distinct values, modal 00 share 100/100",
+      "info": {
+        "value": "00",
+        "entropy": 0.0
+      }
+    },
+    {
+      "rule": "constant",
+      "offset": 2,
+      "length": 2,
+      "fires": true,
+      "msg_ok": true,
+      "blocking": false,
+      "fraction_ok": 1.0,
+      "detail": "constant: 1 distinct values, modal 0000 share 100/100",
+      "info": {
+        "value": "0000",
+        "entropy": 0.0
+      }
+    },
+    {
+      "rule": "constant",
+      "offset": 2,
+      "length": 4,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.54,
+      "detail": "constant: 9 distinct values, modal 00000006 share 54/100",
+      "info": {}
+    },
+    {
+      "rule": "constant",
+      "offset": 2,
+      "length": 8,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.17,
+      "detail": "constant: 29 distinct values, modal 00000006ff010000 share 17/100",
+      "info": {}
+    },
+    {
+      "rule": "sequence",
+      "offset": 2,
+      "length": 1,
+      "fires": false,
+      "msg_ok": true,
+      "blocking": false,
+      "fraction_ok": 1.0,
+      "detail": "sequence: modal step=0 (big), 99/99 diffs at modal step",
+      "info": {}
+    },
+    {
+      "rule": "sequence",
+      "offset": 2,
+      "length": 2,
+      "fires": false,
+      "msg_ok": true,
+      "blocking": false,
+      "fraction_ok": 1.0,
+      "detail": "sequence: modal step=0 (big), 99/99 diffs at modal step",
+      "info": {}
+    },
+    {
+      "rule": "sequence",
+      "offset": 2,
+      "length": 3,
+      "fires": false,
+      "msg_ok": true,
+      "blocking": false,
+      "fraction_ok": 1.0,
+      "detail": "sequence: modal step=0 (big), 99/99 diffs at modal step",
+      "info": {}
+    },
+    {
+      "rule": "sequence",
+      "offset": 2,
+      "length": 4,
+      "fires": false,
+      "msg_ok": true,
+      "blocking": false,
+      "fraction_ok": 0.34,
+      "detail": "sequence: modal step=0 (big), 33/99 diffs at modal step",
+      "info": {}
+    },
+    {
+      "rule": "timestamp",
+      "offset": 2,
+      "length": 4,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "timestamp: window [1352640129, 1352812930] (slack 86400s)",
+      "info": {}
+    },
+    {
+      "rule": "timestamp",
+      "offset": 2,
+      "length": 8,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "timestamp: window [1352640129, 1352812930] (slack 86400s)",
+      "info": {}
+    },
+    {
+      "rule": "sparse",
+      "offset": 2,
+      "length": 1,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": null,
+      "fraction_ok": 0.0,
+      "detail": "sparse: unique=1/256 ratio=0.0039 zero present in 100 msgs (100.0%)",
+      "info": {}
+    },
+    {
+      "rule": "sparse",
+      "offset": 2,
+      "length": 2,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": null,
+      "fraction_ok": 0.0,
+      "detail": "sparse: unique=1/65536 ratio=0.0000 zero present in 100 msgs (100.0%)",
+      "info": {}
+    },
+    {
+      "rule": "address",
+      "offset": 2,
+      "length": 2,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "address: swap relation holds for 0/100 messages",
+      "info": {}
+    },
+    {
+      "rule": "address",
+      "offset": 2,
+      "length": 3,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "address: swap relation holds for 0/100 messages",
+      "info": {}
+    },
+    {
+      "rule": "address",
+      "offset": 2,
+      "length": 4,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "address: swap relation holds for 0/100 messages",
+      "info": {}
+    },
+    {
+      "rule": "checksum",
+      "offset": 2,
+      "length": 1,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "checksum: no algorithm matches over [0:2]",
+      "info": {}
+    },
+    {
+      "rule": "checksum",
+      "offset": 2,
+      "length": 2,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "checksum: no algorithm matches over [0:2]",
+      "info": {}
+    },
+    {
+      "rule": "checksum",
+      "offset": 2,
+      "length": 4,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "checksum: no algorithm matches over [0:2]",
+      "info": {}
+    },
+    {
+      "rule": "float",
+      "offset": 2,
+      "length": 4,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.03,
+      "detail": "float: 3/100 plausible IEEE-754 values",
+      "info": {}
+    },
+    {
+      "rule": "float",
+      "offset": 2,
+      "length": 8,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "float: 0/100 plausible IEEE-754 values",
+      "info": {}
+    },
+    {
+      "rule": "length",
+      "offset": 2,
+      "length": 1,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": null,
+      "fraction_ok": 0.54,
+      "detail": "length: c=12 (total_len, big), 54/100 msgs at modal c",
+      "info": {}
+    },
+    {
+      "rule": "length",
+      "offset": 2,
+      "length": 2,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": null,
+      "fraction_ok": 0.54,
+      "detail": "length: c=12 (total_len, big), 54/100 msgs at modal c",
+      "info": {}
+    },
+    {
+      "rule": "length",
+      "offset": 2,
+      "length": 4,
+      "fires": true,
+      "msg_ok": true,
+      "blocking": false,
+      "fraction_ok": 1.0,
+      "detail": "length: c=6 (total_len, big), 100/100 msgs at modal c",
+      "info": {
+        "c": 6,
+        "variant": "total_len",
+        "endian": "big"
+      }
+    },
+    {
+      "rule": "constant",
+      "offset": 3,
+      "length": 1,
+      "fires": true,
+      "msg_ok": true,
+      "blocking": false,
+      "fraction_ok": 1.0,
+      "detail": "constant: 1 distinct values, modal 00 share 100/100",
+      "info": {
+        "value": "00",
+        "entropy": 0.0
+      }
+    },
+    {
+      "rule": "constant",
+      "offset": 3,
+      "length": 2,
+      "fires": true,
+      "msg_ok": true,
+      "blocking": false,
+      "fraction_ok": 1.0,
+      "detail": "constant: 1 distinct values, modal 0000 share 100/100",
+      "info": {
+        "value": "0000",
+        "entropy": 0.0
+      }
+    },
+    {
+      "rule": "constant",
+      "offset": 3,
+      "length": 4,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.54,
+      "detail": "constant: 9 distinct values, modal 000006ff share 54/100",
+      "info": {}
+    },
+    {
+      "rule": "sequence",
+      "offset": 3,
+      "length": 1,
+      "fires": false,
+      "msg_ok": true,
+      "blocking": false,
+      "fraction_ok": 1.0,
+      "detail": "sequence: modal step=0 (big), 99/99 diffs at modal step",
+      "info": {}
+    },
+    {
+      "rule": "sequence",
+      "offset": 3,
+      "length": 2,
+      "fires": false,
+      "msg_ok": true,
+      "blocking": false,
+      "fraction_ok": 1.0,
+      "detail": "sequence: modal step=0 (big), 99/99 diffs at modal step",
+      "info": {}
+    },
+    {
+      "rule": "sequence",
+      "offset": 3,
+      "length": 3,
+      "fires": false,
+      "msg_ok": true,
+      "blocking": false,
+      "fraction_ok": 0.34,
+      "detail": "sequence: modal step=0 (big), 33/99 diffs at modal step",
+      "info": {}
+    },
+    {
+      "rule": "sequence",
+      "offset": 3,
+      "length": 4,
+      "fires": false,
+      "msg_ok": true,
+      "blocking": false,
+      "fraction_ok": 0.34,
+      "detail": "sequence: modal step=0 (big), 33/99 diffs at modal step",
+      "info": {}
+    },
+    {
+      "rule": "timestamp",
+      "offset": 3,
+      "length": 4,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "timestamp: window [1352640129, 1352812930] (slack 86400s)",
+      "info": {}
+    },
+    {
+      "rule": "sparse",
+      "offset": 3,
+      "length": 1,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": null,
+      "fraction_ok": 0.0,
+      "detail": "sparse: unique=1/256 ratio=0.0039 zero present in 100 msgs (100.0%)",
+      "info": {}
+    },
+    {
+      "rule": "sparse",
+      "offset": 3,
+      "length": 2,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": null,
+      "fraction_ok": 0.0,
+      "detail": "sparse: unique=1/65536 ratio=0.0000 zero present in 100 msgs (100.0%)",
+      "info": {}
+    },
+    {
+      "rule": "address",
+      "offset": 3,
+      "length": 2,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "address: swap relation holds for 0/100 messages",
+      "info": {}
+    },
+    {
+      "rule": "address",
+      "offset": 3,
+      "length": 3,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "address: swap relation holds for 0/100 messages",
+      "info": {}
+    },
+    {
+      "rule": "address",
+      "offset": 3,
+      "length": 4,
+      "fires": false,
+      "msg_ok": null,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "address: offset+2w exceeds min_len",
+      "info": {}
+    },
+    {
+      "rule": "checksum",
+      "offset": 3,
+      "length": 1,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "checksum: no algorithm matches over [0:3]",
+      "info": {}
+    },
+    {
+      "rule": "checksum",
+      "offset": 3,
+      "length": 2,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "checksum: no algorithm matches over [0:3]",
+      "info": {}
+    },
+    {
+      "rule": "checksum",
+      "offset": 3,
+      "length": 4,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "checksum: no algorithm matches over [0:3]",
+      "info": {}
+    },
+    {
+      "rule": "float",
+      "offset": 3,
+      "length": 4,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "float: 0/100 plausible IEEE-754 values",
+      "info": {}
+    },
+    {
+      "rule": "length",
+      "offset": 3,
+      "length": 1,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": null,
+      "fraction_ok": 0.54,
+      "detail": "length: c=12 (total_len, big), 54/100 msgs at modal c",
+      "info": {}
+    },
+    {
+      "rule": "length",
+      "offset": 3,
+      "length": 2,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": null,
+      "fraction_ok": 0.54,
+      "detail": "length: c=12 (total_len, big), 54/100 msgs at modal c",
+      "info": {}
+    },
+    {
+      "rule": "length",
+      "offset": 3,
+      "length": 4,
+      "fires": false,
+      "msg_ok": null,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "length: modal c=-1779 outside [-32, 32]",
+      "info": {}
+    },
+    {
+      "rule": "constant",
+      "offset": 4,
+      "length": 1,
+      "fires": true,
+      "msg_ok": true,
+      "blocking": false,
+      "fraction_ok": 1.0,
+      "detail": "constant: 1 distinct values, modal 00 share 100/100",
+      "info": {
+        "value": "00",
+        "entropy": 0.0
+      }
+    },
+    {
+      "rule": "constant",
+      "offset": 4,
+      "length": 2,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.54,
+      "detail": "constant: 9 distinct values, modal 0006 share 54/100",
+      "info": {}
+    },
+    {
+      "rule": "constant",
+      "offset": 4,
+      "length": 4,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.18,
+      "detail": "constant: 14 distinct values, modal 0006ff01 share 18/100",
+      "info": {}
+    },
+    {
+      "rule": "sequence",
+      "offset": 4,
+      "length": 1,
+      "fires": false,
+      "msg_ok": true,
+      "blocking": false,
+      "fraction_ok": 1.0,
+      "detail": "sequence: modal step=0 (big), 99/99 diffs at modal step",
+      "info": {}
+    },
+    {
+      "rule": "sequence",
+      "offset": 4,
+      "length": 2,
+      "fires": false,
+      "msg_ok": true,
+      "blocking": false,
+      "fraction_ok": 0.34,
+      "detail": "sequence: modal step=0 (big), 33/99 diffs at modal step",
+      "info": {}
+    },
+    {
+      "rule": "sequence",
+      "offset": 4,
+      "length": 3,
+      "fires": false,
+      "msg_ok": true,
+      "blocking": false,
+      "fraction_ok": 0.34,
+      "detail": "sequence: modal step=0 (big), 33/99 diffs at modal step",
+      "info": {}
+    },
+    {
+      "rule": "sequence",
+      "offset": 4,
+      "length": 4,
+      "fires": false,
+      "msg_ok": true,
+      "blocking": false,
+      "fraction_ok": 0.25,
+      "detail": "sequence: modal step=0 (big), 24/99 diffs at modal step",
+      "info": {}
+    },
+    {
+      "rule": "timestamp",
+      "offset": 4,
+      "length": 4,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "timestamp: window [1352640129, 1352812930] (slack 86400s)",
+      "info": {}
+    },
+    {
+      "rule": "sparse",
+      "offset": 4,
+      "length": 1,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": null,
+      "fraction_ok": 0.0,
+      "detail": "sparse: unique=1/256 ratio=0.0039 zero present in 100 msgs (100.0%)",
+      "info": {}
+    },
+    {
+      "rule": "sparse",
+      "offset": 4,
+      "length": 2,
+      "fires": true,
+      "msg_ok": true,
+      "blocking": false,
+      "fraction_ok": 1.0,
+      "detail": "sparse: unique=9/65536 ratio=0.0001 zero present in 0 msgs (0.0%)",
+      "info": {
+        "unique_count": 9,
+        "ratio": 0.0001373291015625,
+        "k": 2
+      }
+    },
+    {
+      "rule": "address",
+      "offset": 4,
+      "length": 2,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "address: swap relation holds for 0/100 messages",
+      "info": {}
+    },
+    {
+      "rule": "address",
+      "offset": 4,
+      "length": 3,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "address: swap relation holds for 0/100 messages",
+      "info": {}
+    },
+    {
+      "rule": "address",
+      "offset": 4,
+      "length": 4,
+      "fires": false,
+      "msg_ok": null,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "address: offset+2w exceeds min_len",
+      "info": {}
+    },
+    {
+      "rule": "checksum",
+      "offset": 4,
+      "length": 1,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "checksum: no algorithm matches over [0:4]",
+      "info": {}
+    },
+    {
+      "rule": "checksum",
+      "offset": 4,
+      "length": 2,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "checksum: no algorithm matches over [0:4]",
+      "info": {}
+    },
+    {
+      "rule": "checksum",
+      "offset": 4,
+      "length": 4,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "checksum: no algorithm matches over [0:4]",
+      "info": {}
+    },
+    {
+      "rule": "float",
+      "offset": 4,
+      "length": 4,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "float: 0/100 plausible IEEE-754 values",
+      "info": {}
+    },
+    {
+      "rule": "length",
+      "offset": 4,
+      "length": 1,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": null,
+      "fraction_ok": 0.54,
+      "detail": "length: c=12 (total_len, big), 54/100 msgs at modal c",
+      "info": {}
+    },
+    {
+      "rule": "length",
+      "offset": 4,
+      "length": 2,
+      "fires": true,
+      "msg_ok": true,
+      "blocking": false,
+      "fraction_ok": 1.0,
+      "detail": "length: c=6 (total_len, big), 100/100 msgs at modal c",
+      "info": {
+        "c": 6,
+        "variant": "total_len",
+        "endian": "big"
+      }
+    },
+    {
+      "rule": "length",
+      "offset": 4,
+      "length": 4,
+      "fires": false,
+      "msg_ok": null,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "length: modal c=-458485 outside [-32, 32]",
+      "info": {}
+    },
+    {
+      "rule": "constant",
+      "offset": 5,
+      "length": 1,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.54,
+      "detail": "constant: 9 distinct values, modal 06 share 54/100",
+      "info": {}
+    },
+    {
+      "rule": "constant",
+      "offset": 5,
+      "length": 2,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.54,
+      "detail": "constant: 9 distinct values, modal 06ff share 54/100",
+      "info": {}
+    },
+    {
+      "rule": "constant",
+      "offset": 5,
+      "length": 4,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.17,
+      "detail": "constant: 18 distinct values, modal 06ff0100 share 17/100",
+      "info": {}
+    },
+    {
+      "rule": "sequence",
+      "offset": 5,
+      "length": 1,
+      "fires": false,
+      "msg_ok": true,
+      "blocking": false,
+      "fraction_ok": 0.34,
+      "detail": "sequence: modal step=0 (big), 33/99 diffs at modal step",
+      "info": {}
+    },
+    {
+      "rule": "sequence",
+      "offset": 5,
+      "length": 2,
+      "fires": false,
+      "msg_ok": true,
+      "blocking": false,
+      "fraction_ok": 0.34,
+      "detail": "sequence: modal step=0 (big), 33/99 diffs at modal step",
+      "info": {}
+    },
+    {
+      "rule": "sequence",
+      "offset": 5,
+      "length": 3,
+      "fires": false,
+      "msg_ok": true,
+      "blocking": false,
+      "fraction_ok": 0.25,
+      "detail": "sequence: modal step=0 (big), 24/99 diffs at modal step",
+      "info": {}
+    },
+    {
+      "rule": "sequence",
+      "offset": 5,
+      "length": 4,
+      "fires": false,
+      "msg_ok": true,
+      "blocking": false,
+      "fraction_ok": 0.22,
+      "detail": "sequence: modal step=0 (big), 21/99 diffs at modal step",
+      "info": {}
+    },
+    {
+      "rule": "timestamp",
+      "offset": 5,
+      "length": 4,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "timestamp: window [1352640129, 1352812930] (slack 86400s)",
+      "info": {}
+    },
+    {
+      "rule": "sparse",
+      "offset": 5,
+      "length": 1,
+      "fires": false,
+      "msg_ok": null,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "sparse: unique=9/256 ratio=0.0352 zero present in 0 msgs (0.0%)",
+      "info": {}
+    },
+    {
+      "rule": "sparse",
+      "offset": 5,
+      "length": 2,
+      "fires": true,
+      "msg_ok": true,
+      "blocking": false,
+      "fraction_ok": 1.0,
+      "detail": "sparse: unique=9/65536 ratio=0.0001 zero present in 0 msgs (0.0%)",
+      "info": {
+        "unique_count": 9,
+        "ratio": 0.0001373291015625,
+        "k": 2
+      }
+    },
+    {
+      "rule": "address",
+      "offset": 5,
+      "length": 2,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "address: swap relation holds for 0/100 messages",
+      "info": {}
+    },
+    {
+      "rule": "address",
+      "offset": 5,
+      "length": 3,
+      "fires": false,
+      "msg_ok": null,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "address: offset+2w exceeds min_len",
+      "info": {}
+    },
+    {
+      "rule": "address",
+      "offset": 5,
+      "length": 4,
+      "fires": false,
+      "msg_ok": null,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "address: offset+2w exceeds min_len",
+      "info": {}
+    },
+    {
+      "rule": "checksum",
+      "offset": 5,
+      "length": 1,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.01,
+      "detail": "checksum: crc8 over [0:5] (big) matches 1/100",
+      "info": {}
+    },
+    {
+      "rule": "checksum",
+      "offset": 5,
+      "length": 2,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "checksum: no algorithm matches over [0:5]",
+      "info": {}
+    },
+    {
+      "rule": "checksum",
+      "offset": 5,
+      "length": 4,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "checksum: no algorithm matches over [0:5]",
+      "info": {}
+    },
+    {
+      "rule": "float",
+      "offset": 5,
+      "length": 4,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.03,
+      "detail": "float: 3/100 plausible IEEE-754 values",
+      "info": {}
+    },
+    {
+      "rule": "length",
+      "offset": 5,
+      "length": 1,
+      "fires": true,
+      "msg_ok": true,
+      "blocking": false,
+      "fraction_ok": 1.0,
+      "detail": "length: c=6 (total_len, big), 100/100 msgs at modal c",
+      "info": {
+        "c": 6,
+        "variant": "total_len",
+        "endian": "big"
+      }
+    },
+    {
+      "rule": "length",
+      "offset": 5,
+      "length": 2,
+      "fires": false,
+      "msg_ok": null,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "length: modal c=-65274 outside [-32, 32]",
+      "info": {}
+    },
+    {
+      "rule": "length",
+      "offset": 5,
+      "length": 4,
+      "fires": false,
+      "msg_ok": null,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "length: modal c=-117375220 outside [-32, 32]",
+      "info": {}
+    },
+    {
+      "rule": "constant",
+      "offset": 6,
+      "length": 1,
+      "fires": true,
+      "msg_ok": true,
+      "blocking": false,
+      "fraction_ok": 1.0,
+      "detail": "constant: 1 distinct values, modal ff share 100/100",
+      "info": {
+        "value": "ff",
+        "entropy": 0.0
+      }
+    },
+    {
+      "rule": "constant",
+      "offset": 6,
+      "length": 2,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.33,
+      "detail": "constant: 4 distinct values, modal ff04 share 33/100",
+      "info": {}
+    },
+    {
+      "rule": "constant",
+      "offset": 6,
+      "length": 4,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.17,
+      "detail": "constant: 26 distinct values, modal ff010000 share 17/100",
+      "info": {}
+    },
+    {
+      "rule": "sequence",
+      "offset": 6,
+      "length": 1,
+      "fires": false,
+      "msg_ok": true,
+      "blocking": false,
+      "fraction_ok": 1.0,
+      "detail": "sequence: modal step=0 (big), 99/99 diffs at modal step",
+      "info": {}
+    },
+    {
+      "rule": "sequence",
+      "offset": 6,
+      "length": 2,
+      "fires": false,
+      "msg_ok": true,
+      "blocking": false,
+      "fraction_ok": 0.67,
+      "detail": "sequence: modal step=0 (big), 66/99 diffs at modal step",
+      "info": {}
+    },
+    {
+      "rule": "sequence",
+      "offset": 6,
+      "length": 3,
+      "fires": false,
+      "msg_ok": true,
+      "blocking": false,
+      "fraction_ok": 0.29,
+      "detail": "sequence: modal step=0 (big), 28/99 diffs at modal step",
+      "info": {}
+    },
+    {
+      "rule": "sequence",
+      "offset": 6,
+      "length": 4,
+      "fires": false,
+      "msg_ok": true,
+      "blocking": false,
+      "fraction_ok": 0.2,
+      "detail": "sequence: modal step=0 (big), 19/99 diffs at modal step",
+      "info": {}
+    },
+    {
+      "rule": "timestamp",
+      "offset": 6,
+      "length": 4,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "timestamp: window [1352640129, 1352812930] (slack 86400s)",
+      "info": {}
+    },
+    {
+      "rule": "sparse",
+      "offset": 6,
+      "length": 1,
+      "fires": true,
+      "msg_ok": true,
+      "blocking": false,
+      "fraction_ok": 1.0,
+      "detail": "sparse: unique=1/256 ratio=0.0039 zero present in 0 msgs (0.0%)",
+      "info": {
+        "unique_count": 1,
+        "ratio": 0.00390625,
+        "k": 1
+      }
+    },
+    {
+      "rule": "sparse",
+      "offset": 6,
+      "length": 2,
+      "fires": true,
+      "msg_ok": true,
+      "blocking": false,
+      "fraction_ok": 1.0,
+      "detail": "sparse: unique=4/65536 ratio=0.0001 zero present in 0 msgs (0.0%)",
+      "info": {
+        "unique_count": 4,
+        "ratio": 6.103515625e-05,
+        "k": 2
+      }
+    },
+    {
+      "rule": "address",
+      "offset": 6,
+      "length": 2,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "address: swap relation holds for 0/100 messages",
+      "info": {}
+    },
+    {
+      "rule": "address",
+      "offset": 6,
+      "length": 3,
+      "fires": false,
+      "msg_ok": null,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "address: offset+2w exceeds min_len",
+      "info": {}
+    },
+    {
+      "rule": "address",
+      "offset": 6,
+      "length": 4,
+      "fires": false,
+      "msg_ok": null,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "address: offset+2w exceeds min_len",
+      "info": {}
+    },
+    {
+      "rule": "checksum",
+      "offset": 6,
+      "length": 1,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "checksum: no algorithm matches over [0:6]",
+      "info": {}
+    },
+    {
+      "rule": "checksum",
+      "offset": 6,
+      "length": 2,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "checksum: no algorithm matches over [0:6]",
+      "info": {}
+    },
+    {
+      "rule": "checksum",
+      "offset": 6,
+      "length": 4,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "checksum: no algorithm matches over [0:6]",
+      "info": {}
+    },
+    {
+      "rule": "float",
+      "offset": 6,
+      "length": 4,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.07,
+      "detail": "float: 7/100 plausible IEEE-754 values",
+      "info": {}
+    },
+    {
+      "rule": "length",
+      "offset": 6,
+      "length": 1,
+      "fires": false,
+      "msg_ok": null,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "length: modal c=-243 outside [-32, 32]",
+      "info": {}
+    },
+    {
+      "rule": "length",
+      "offset": 6,
+      "length": 2,
+      "fires": false,
+      "msg_ok": null,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "length: modal c=-65271 outside [-32, 32]",
+      "info": {}
+    },
+    {
+      "rule": "length",
+      "offset": 6,
+      "length": 4,
+      "fires": false,
+      "msg_ok": null,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "length: modal c=-4278255604 outside [-32, 32]",
+      "info": {}
+    },
+    {
+      "rule": "constant",
+      "offset": 7,
+      "length": 1,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.33,
+      "detail": "constant: 4 distinct values, modal 04 share 33/100",
+      "info": {}
+    },
+    {
+      "rule": "constant",
+      "offset": 7,
+      "length": 2,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.17,
+      "detail": "constant: 15 distinct values, modal 0100 share 17/100",
+      "info": {}
+    },
+    {
+      "rule": "sequence",
+      "offset": 7,
+      "length": 1,
+      "fires": false,
+      "msg_ok": true,
+      "blocking": false,
+      "fraction_ok": 0.67,
+      "detail": "sequence: modal step=0 (big), 66/99 diffs at modal step",
+      "info": {}
+    },
+    {
+      "rule": "sequence",
+      "offset": 7,
+      "length": 2,
+      "fires": false,
+      "msg_ok": true,
+      "blocking": false,
+      "fraction_ok": 0.29,
+      "detail": "sequence: modal step=0 (big), 28/99 diffs at modal step",
+      "info": {}
+    },
+    {
+      "rule": "sequence",
+      "offset": 7,
+      "length": 3,
+      "fires": false,
+      "msg_ok": true,
+      "blocking": false,
+      "fraction_ok": 0.2,
+      "detail": "sequence: modal step=0 (big), 19/99 diffs at modal step",
+      "info": {}
+    },
+    {
+      "rule": "sparse",
+      "offset": 7,
+      "length": 1,
+      "fires": true,
+      "msg_ok": true,
+      "blocking": false,
+      "fraction_ok": 1.0,
+      "detail": "sparse: unique=4/256 ratio=0.0156 zero present in 0 msgs (0.0%)",
+      "info": {
+        "unique_count": 4,
+        "ratio": 0.015625,
+        "k": 1
+      }
+    },
+    {
+      "rule": "sparse",
+      "offset": 7,
+      "length": 2,
+      "fires": false,
+      "msg_ok": null,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "sparse: unique=15/65536 ratio=0.0002 zero present in 0 msgs (0.0%)",
+      "info": {}
+    },
+    {
+      "rule": "address",
+      "offset": 7,
+      "length": 2,
+      "fires": false,
+      "msg_ok": null,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "address: offset+2w exceeds min_len",
+      "info": {}
+    },
+    {
+      "rule": "address",
+      "offset": 7,
+      "length": 3,
+      "fires": false,
+      "msg_ok": null,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "address: offset+2w exceeds min_len",
+      "info": {}
+    },
+    {
+      "rule": "checksum",
+      "offset": 7,
+      "length": 1,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.02,
+      "detail": "checksum: crc8 over [0:7] (big) matches 1/100",
+      "info": {}
+    },
+    {
+      "rule": "checksum",
+      "offset": 7,
+      "length": 2,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "checksum: no algorithm matches over [0:7]",
+      "info": {}
+    },
+    {
+      "rule": "length",
+      "offset": 7,
+      "length": 1,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": null,
+      "fraction_ok": 0.25,
+      "detail": "length: c=9 (total_len, big), 25/100 msgs at modal c",
+      "info": {}
+    },
+    {
+      "rule": "length",
+      "offset": 7,
+      "length": 2,
+      "fires": false,
+      "msg_ok": null,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "length: modal c=-244 outside [-32, 32]",
+      "info": {}
+    },
+    {
+      "rule": "constant",
+      "offset": 8,
+      "length": 1,
+      "fires": false,
+      "msg_ok": true,
+      "blocking": false,
+      "fraction_ok": 0.5,
+      "detail": "constant: 9 distinct values, modal 00 share 50/100",
+      "info": {}
+    },
+    {
+      "rule": "constant",
+      "offset": 8,
+      "length": 2,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.28,
+      "detail": "constant: 23 distinct values, modal 0000 share 28/100",
+      "info": {}
+    },
+    {
+      "rule": "sequence",
+      "offset": 8,
+      "length": 1,
+      "fires": false,
+      "msg_ok": true,
+      "blocking": false,
+      "fraction_ok": 0.35,
+      "detail": "sequence: modal step=0 (big), 34/99 diffs at modal step",
+      "info": {}
+    },
+    {
+      "rule": "sequence",
+      "offset": 8,
+      "length": 2,
+      "fires": false,
+      "msg_ok": true,
+      "blocking": false,
+      "fraction_ok": 0.21,
+      "detail": "sequence: modal step=0 (big), 20/99 diffs at modal step",
+      "info": {}
+    },
+    {
+      "rule": "sparse",
+      "offset": 8,
+      "length": 1,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": null,
+      "fraction_ok": 0.0,
+      "detail": "sparse: unique=9/256 ratio=0.0352 zero present in 50 msgs (50.0%)",
+      "info": {}
+    },
+    {
+      "rule": "sparse",
+      "offset": 8,
+      "length": 2,
+      "fires": false,
+      "msg_ok": null,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "sparse: unique=23/65536 ratio=0.0004 zero present in 28 msgs (28.0%)",
+      "info": {}
+    },
+    {
+      "rule": "address",
+      "offset": 8,
+      "length": 2,
+      "fires": false,
+      "msg_ok": null,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "address: offset+2w exceeds min_len",
+      "info": {}
+    },
+    {
+      "rule": "checksum",
+      "offset": 8,
+      "length": 1,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.01,
+      "detail": "checksum: crc8 over [0:8] (big) matches 1/100",
+      "info": {}
+    },
+    {
+      "rule": "checksum",
+      "offset": 8,
+      "length": 2,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "checksum: no algorithm matches over [0:8]",
+      "info": {}
+    },
+    {
+      "rule": "length",
+      "offset": 8,
+      "length": 1,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": null,
+      "fraction_ok": 0.44,
+      "detail": "length: c=12 (total_len, big), 44/100 msgs at modal c",
+      "info": {}
+    },
+    {
+      "rule": "length",
+      "offset": 8,
+      "length": 2,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": null,
+      "fraction_ok": 0.28,
+      "detail": "length: c=12 (total_len, big), 28/100 msgs at modal c",
+      "info": {}
+    },
+    {
+      "rule": "constant",
+      "offset": 9,
+      "length": 1,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.51,
+      "detail": "constant: 15 distinct values, modal 00 share 51/100",
+      "info": {}
+    },
+    {
+      "rule": "sequence",
+      "offset": 9,
+      "length": 1,
+      "fires": false,
+      "msg_ok": true,
+      "blocking": false,
+      "fraction_ok": 0.52,
+      "detail": "sequence: modal step=0 (big), 51/99 diffs at modal step",
+      "info": {}
+    },
+    {
+      "rule": "sparse",
+      "offset": 9,
+      "length": 1,
+      "fires": false,
+      "msg_ok": null,
+      "blocking": false,
+      "fraction_ok": 0.0,
+      "detail": "sparse: unique=15/256 ratio=0.0586 zero present in 51 msgs (51.0%)",
+      "info": {}
+    },
+    {
+      "rule": "checksum",
+      "offset": 9,
+      "length": 1,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": false,
+      "fraction_ok": 0.01,
+      "detail": "checksum: crc8 over [0:9] (big) matches 1/100",
+      "info": {}
+    },
+    {
+      "rule": "length",
+      "offset": 9,
+      "length": 1,
+      "fires": false,
+      "msg_ok": false,
+      "blocking": null,
+      "fraction_ok": 0.29,
+      "detail": "length: c=12 (total_len, big), 29/100 msgs at modal c",
+      "info": {}
+    }
+  ],
+  "offset_histograms": {
+    "0": [
+      [
+        "6d",
+        16
+      ],
+      [
+        "60",
+        11
+      ],
+      [
+        "63",
+        10
+      ],
+      [
+        "32",
+        10
+      ],
+      [
+        "25",
+        10
+      ],
+      [
+        "5e",
+        8
+      ],
+      [
+        "57",
+        7
+      ],
+      [
+        "31",
+        7
+      ],
+      [
+        "30",
+        7
+      ],
+      [
+        "1f",
+        5
+      ],
+      [
+        "1d",
+        4
+      ],
+      [
+        "0b",
+        4
+      ]
+    ],
+    "1": [
+      [
+        "0a",
+        5
+      ],
+      [
+        "06",
+        4
+      ],
+      [
+        "07",
+        4
+      ],
+      [
+        "08",
+        4
+      ],
+      [
+        "8e",
+        4
+      ],
+      [
+        "80",
+        4
+      ],
+      [
+        "09",
+        4
+      ],
+      [
+        "de",
+        2
+      ],
+      [
+        "8d",
+        2
+      ],
+      [
+        "7c",
+        2
+      ],
+      [
+        "8a",
+        2
+      ],
+      [
+        "6f",
+        2
+      ]
+    ],
+    "2": [
+      [
+        "00",
+        100
+      ]
+    ],
+    "3": [
+      [
+        "00",
+        100
+      ]
+    ],
+    "4": [
+      [
+        "00",
+        100
+      ]
+    ],
+    "5": [
+      [
+        "06",
+        54
+      ],
+      [
+        "04",
+        12
+      ],
+      [
+        "05",
+        11
+      ],
+      [
+        "53",
+        5
+      ],
+      [
+        "e9",
+        5
+      ],
+      [
+        "08",
+        4
+      ],
+      [
+        "07",
+        4
+      ],
+      [
+        "c9",
+        3
+      ],
+      [
+        "09",
+        2
+      ]
+    ],
+    "6": [
+      [
+        "ff",
+        100
+      ]
+    ],
+    "7": [
+      [
+        "04",
+        33
+      ],
+      [
+        "01",
+        31
+      ],
+      [
+        "02",
+        22
+      ],
+      [
+        "0f",
+        14
+      ]
+    ],
+    "8": [
+      [
+        "00",
+        50
+      ],
+      [
+        "01",
+        15
+      ],
+      [
+        "02",
+        11
+      ],
+      [
+        "04",
+        9
+      ],
+      [
+        "50",
+        5
+      ],
+      [
+        "e6",
+        5
+      ],
+      [
+        "c6",
+        3
+      ],
+      [
+        "03",
+        1
+      ],
+      [
+        "08",
+        1
+      ]
+    ],
+    "9": [
+      [
+        "00",
+        51
+      ],
+      [
+        "30",
+        10
+      ],
+      [
+        "05",
+        7
+      ],
+      [
+        "01",
+        5
+      ],
+      [
+        "02",
+        5
+      ],
+      [
+        "4c",
+        5
+      ],
+      [
+        "09",
+        4
+      ],
+      [
+        "03",
+        3
+      ],
+      [
+        "8f",
+        3
+      ],
+      [
+        "08",
+        2
+      ],
+      [
+        "b6",
+        1
+      ],
+      [
+        "63",
+        1
+      ]
+    ],
+    "10": [
+      [
+        "00",
+        75
+      ],
+      [
+        "30",
+        5
+      ],
+      [
+        "32",
+        4
+      ],
+      [
+        "1e",
+        2
+      ],
+      [
+        "ff",
+        1
+      ],
+      [
+        "0f",
+        1
+      ]
+    ],
+    "11": [
+      [
+        "0a",
+        14
+      ],
+      [
+        "01",
+        10
+      ],
+      [
+        "06",
+        9
+      ],
+      [
+        "00",
+        9
+      ],
+      [
+        "28",
+        5
+      ],
+      [
+        "30",
+        5
+      ],
+      [
+        "73",
+        5
+      ],
+      [
+        "07",
+        4
+      ],
+      [
+        "02",
+        4
+      ],
+      [
+        "63",
+        3
+      ],
+      [
+        "13",
+        2
+      ],
+      [
+        "0c",
+        2
+      ]
+    ],
+    "12": [
+      [
+        "01",
+        5
+      ],
+      [
+        "30",
+        5
+      ],
+      [
+        "02",
+        4
+      ],
+      [
+        "00",
+        4
+      ],
+      [
+        "03",
+        2
+      ],
+      [
+        "7f",
+        1
+      ],
+      [
+        "39",
+        1
+      ],
+      [
+        "23",
+        1
+      ]
+    ],
+    "13": [
+      [
+        "00",
+        9
+      ],
+      [
+        "30",
+        7
+      ],
+      [
+        "ff",
+        2
+      ],
+      [
+        "01",
+        1
+      ]
+    ]
+  },
+  "candidate_path": [
+    {
+      "candidate_id": 0,
+      "offset": 0,
+      "length": 1,
+      "region": "FOR",
+      "kind": "window",
+      "tlv_type": null,
+      "value": "57",
+      "cluster_key": "57",
+      "cluster_size": 4,
+      "n_clusters": 13,
+      "similarity": {
+        "inner_mean": 0.5641025641025642,
+        "inter_mean": 0.5169950738916256,
+        "n_inner": 3,
+        "n_inter": 20,
+        "formula": "mean compute_pairwise_similarity of this message vs up to 20 seeded-sampled peers in the same cluster and 20 in other clusters"
+      },
+      "coupling": {
+        "partner_id": 6,
+        "partner_value": "57",
+        "partner_direction": "s2c",
+        "cluster_pr": 0.56,
+        "formula": "mean pairwise sim of up to 5 partner messages"
+      },
+      "structure": {
+        "length": 14,
+        "cluster_median": 12.0,
+        "deviation": 0.14285714285714285,
+        "cluster_ps": 0.9642857142857143,
+        "formula": "1 - mean(|len - median|)/max_len over cluster"
+      },
+      "dimension": {
+        "r_distinct": 0.2549019607843137,
+        "r_single": 0.07692307692307693,
+        "p_d": 0.95
+      },
+      "stage1": {
+        "p_m": 0.6691453330210604,
+        "p_r": 0.46074298450130413,
+        "p_s": 0.9634920634920633,
+        "p_d": 0.95,
+        "p_f": 0.8974907937566461,
+        "rank": 6
+      },
+      "stage2": null,
+      "is_winner": false,
+      "is_true": false
+    },
+    {
+      "candidate_id": 1,
+      "offset": 0,
+      "length": 2,
+      "region": "FOR",
+      "kind": "window",
+      "tlv_type": null,
+      "value": "57de",
+      "cluster_key": "57de",
+      "cluster_size": 1,
+      "n_clusters": 51,
+      "similarity": {
+        "inner_mean": null,
+        "inter_mean": 0.5241379310344827,
+        "n_inner": 0,
+        "n_inter": 20,
+        "formula": "mean compute_pairwise_similarity of this message vs up to 20 seeded-sampled peers in the same cluster and 20 in other clusters"
+      },
+      "coupling": {
+        "partner_id": 6,
+        "partner_value": "57de",
+        "partner_direction": "s2c",
+        "cluster_pr": 0.1,
+        "formula": "singleton partner cluster (c_pr = 0.10)"
+      },
+      "structure": {
+        "length": 14,
+        "cluster_median": 14.0,
+        "deviation": 0.0,
+        "cluster_ps": 0.1,
+        "formula": "singleton cluster (c_ps = 0.10)"
+      },
+      "dimension": {
+        "r_distinct": 1.0,
+        "r_single": 1.0,
+        "p_d": 0.01
+      },
+      "stage1": {
+        "p_m": 0.1,
+        "p_r": 0.10000000000000005,
+        "p_s": 0.09999999999999987,
+        "p_d": 0.01,
+        "p_f": 0.001978463823394924,
+        "rank": 8
+      },
+      "stage2": null,
+      "is_winner": false,
+      "is_true": false
+    },
+    {
+      "candidate_id": 2,
+      "offset": 1,
+      "length": 1,
+      "region": "FOR",
+      "kind": "window",
+      "tlv_type": null,
+      "value": "de",
+      "cluster_key": "de",
+      "cluster_size": 1,
+      "n_clusters": 43,
+      "similarity": {
+        "inner_mean": null,
+        "inter_mean": 0.5241379310344827,
+        "n_inner": 0,
+        "n_inter": 20,
+        "formula": "mean compute_pairwise_similarity of this message vs up to 20 seeded-sampled peers in the same cluster and 20 in other clusters"
+      },
+      "coupling": {
+        "partner_id": 6,
+        "partner_value": "de",
+        "partner_direction": "s2c",
+        "cluster_pr": 0.1,
+        "formula": "singleton partner cluster (c_pr = 0.10)"
+      },
+      "structure": {
+        "length": 14,
+        "cluster_median": 14.0,
+        "deviation": 0.0,
+        "cluster_ps": 0.1,
+        "formula": "singleton cluster (c_ps = 0.10)"
+      },
+      "dimension": {
+        "r_distinct": 0.8431372549019608,
+        "r_single": 0.8372093023255814,
+        "p_d": 0.01
+      },
+      "stage1": {
+        "p_m": 0.2,
+        "p_r": 0.2,
+        "p_s": 0.2,
+        "p_d": 0.01,
+        "p_f": 0.006517710513001968,
+        "rank": 7
+      },
+      "stage2": null,
+      "is_winner": false,
+      "is_true": false
+    },
+    {
+      "candidate_id": 3,
+      "offset": 4,
+      "length": 2,
+      "region": "FOR",
+      "kind": "window",
+      "tlv_type": null,
+      "value": "0008",
+      "cluster_key": "0008",
+      "cluster_size": 4,
+      "n_clusters": 3,
+      "similarity": {
+        "inner_mean": 0.8095238095238094,
+        "inter_mean": 0.5115384615384615,
+        "n_inner": 3,
+        "n_inter": 20,
+        "formula": "mean compute_pairwise_similarity of this message vs up to 20 seeded-sampled peers in the same cluster and 20 in other clusters"
+      },
+      "coupling": {
+        "partner_id": 6,
+        "partner_value": "0006",
+        "partner_direction": "s2c",
+        "cluster_pr": 0.8333333333333334,
+        "formula": "mean pairwise sim of up to 5 partner messages"
+      },
+      "structure": {
+        "length": 14,
+        "cluster_median": 14.0,
+        "deviation": 0.0,
+        "cluster_ps": 1.0,
+        "formula": "1 - mean(|len - median|)/max_len over cluster"
+      },
+      "dimension": {
+        "r_distinct": 0.058823529411764705,
+        "r_single": 0.0,
+        "p_d": 0.95
+      },
+      "stage1": {
+        "p_m": 0.713790652533139,
+        "p_r": 0.5807417409307768,
+        "p_s": 1.0,
+        "p_d": 0.95,
+        "p_f": 0.9401409990578774,
+        "rank": 4
+      },
+      "stage2": {
+        "in_top_k": true,
+        "int_value": 8,
+        "msb": 3,
+        "p_bit": 0.6201832620714344,
+        "p_offset": 0.9099999999999999,
+        "posterior": 0.9961583303347075,
+        "rank": 3,
+        "q_k": [
+          1.0,
+          1.0,
+          1.0,
+          0.11764705882352941
+        ],
+        "p_k": [
+          0.9375,
+          0.875,
+          0.75,
+          0.5
+        ]
+      },
+      "is_winner": false,
+      "is_true": false
+    },
+    {
+      "candidate_id": 4,
+      "offset": 4,
+      "length": 4,
+      "region": "FOR",
+      "kind": "window",
+      "tlv_type": null,
+      "value": "0008ff0f",
+      "cluster_key": "0008ff0f",
+      "cluster_size": 4,
+      "n_clusters": 5,
+      "similarity": {
+        "inner_mean": 0.8095238095238094,
+        "inter_mean": 0.5115384615384615,
+        "n_inner": 3,
+        "n_inter": 20,
+        "formula": "mean compute_pairwise_similarity of this message vs up to 20 seeded-sampled peers in the same cluster and 20 in other clusters"
+      },
+      "coupling": {
+        "partner_id": 6,
+        "partner_value": "0006ff0f",
+        "partner_direction": "s2c",
+        "cluster_pr": 0.8333333333333334,
+        "formula": "mean pairwise sim of up to 5 partner messages"
+      },
+      "structure": {
+        "length": 14,
+        "cluster_median": 14.0,
+        "deviation": 0.0,
+        "cluster_ps": 1.0,
+        "formula": "1 - mean(|len - median|)/max_len over cluster"
+      },
+      "dimension": {
+        "r_distinct": 0.09803921568627451,
+        "r_single": 0.0,
+        "p_d": 0.95
+      },
+      "stage1": {
+        "p_m": 0.7734382457189766,
+        "p_r": 0.5850711522067021,
+        "p_s": 1.0,
+        "p_d": 0.95,
+        "p_f": 0.9489502275540306,
+        "rank": 1
+      },
+      "stage2": {
+        "in_top_k": true,
+        "int_value": 589583,
+        "msb": 19,
+        "p_bit": 0.8849263477212599,
+        "p_offset": 0.9099999999999999,
+        "posterior": 0.9993086150905081,
+        "rank": 1,
+        "q_k": [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.11764705882352941
+        ],
+        "p_k": [
+          0.9999990463256836,
+          0.9999980926513672,
+          0.9999961853027344,
+          0.9999923706054688,
+          0.9999847412109375,
+          0.999969482421875,
+          0.99993896484375,
+          0.9998779296875,
+          0.999755859375,
+          0.99951171875,
+          0.9990234375,
+          0.998046875,
+          0.99609375,
+          0.9921875,
+          0.984375,
+          0.96875,
+          0.9375,
+          0.875,
+          0.75,
+          0.5
+        ]
+      },
+      "is_winner": true,
+      "is_true": false
+    },
+    {
+      "candidate_id": 5,
+      "offset": 5,
+      "length": 1,
+      "region": "FOR",
+      "kind": "window",
+      "tlv_type": null,
+      "value": "08",
+      "cluster_key": "08",
+      "cluster_size": 4,
+      "n_clusters": 3,
+      "similarity": {
+        "inner_mean": 0.8095238095238094,
+        "inter_mean": 0.5115384615384615,
+        "n_inner": 3,
+        "n_inter": 20,
+        "formula": "mean compute_pairwise_similarity of this message vs up to 20 seeded-sampled peers in the same cluster and 20 in other clusters"
+      },
+      "coupling": {
+        "partner_id": 6,
+        "partner_value": "06",
+        "partner_direction": "s2c",
+        "cluster_pr": 0.8333333333333334,
+        "formula": "mean pairwise sim of up to 5 partner messages"
+      },
+      "structure": {
+        "length": 14,
+        "cluster_median": 14.0,
+        "deviation": 0.0,
+        "cluster_ps": 1.0,
+        "formula": "1 - mean(|len - median|)/max_len over cluster"
+      },
+      "dimension": {
+        "r_distinct": 0.058823529411764705,
+        "r_single": 0.0,
+        "p_d": 0.95
+      },
+      "stage1": {
+        "p_m": 0.713790652533139,
+        "p_r": 0.5807417409307768,
+        "p_s": 1.0,
+        "p_d": 0.95,
+        "p_f": 0.9401409990578774,
+        "rank": 5
+      },
+      "stage2": {
+        "in_top_k": true,
+        "int_value": 8,
+        "msb": 3,
+        "p_bit": 0.6201832620714344,
+        "p_offset": 0.8999999999999999,
+        "posterior": 0.995686096128331,
+        "rank": 4,
+        "q_k": [
+          1.0,
+          1.0,
+          1.0,
+          0.11764705882352941
+        ],
+        "p_k": [
+          0.9375,
+          0.875,
+          0.75,
+          0.5
+        ]
+      },
+      "is_winner": false,
+      "is_true": false
+    },
+    {
+      "candidate_id": 6,
+      "offset": 6,
+      "length": 2,
+      "region": "FOR",
+      "kind": "window",
+      "tlv_type": null,
+      "value": "ff0f",
+      "cluster_key": "ff0f",
+      "cluster_size": 6,
+      "n_clusters": 4,
+      "similarity": {
+        "inner_mean": 0.6788177339901478,
+        "inter_mean": 0.5038461538461538,
+        "n_inner": 5,
+        "n_inter": 20,
+        "formula": "mean compute_pairwise_similarity of this message vs up to 20 seeded-sampled peers in the same cluster and 20 in other clusters"
+      },
+      "coupling": {
+        "partner_id": 6,
+        "partner_value": "ff0f",
+        "partner_direction": "s2c",
+        "cluster_pr": 0.7333333333333333,
+        "formula": "mean pairwise sim of up to 5 partner messages"
+      },
+      "structure": {
+        "length": 14,
+        "cluster_median": 14.0,
+        "deviation": 0.0,
+        "cluster_ps": 0.9777777777777777,
+        "formula": "1 - mean(|len - median|)/max_len over cluster"
+      },
+      "dimension": {
+        "r_distinct": 0.0784313725490196,
+        "r_single": 0.0,
+        "p_d": 0.95
+      },
+      "stage1": {
+        "p_m": 0.763627987439123,
+        "p_r": 0.5742015869893108,
+        "p_s": 0.9973856209150327,
+        "p_d": 0.95,
+        "p_f": 0.9456431629672505,
+        "rank": 2
+      },
+      "stage2": {
+        "in_top_k": true,
+        "int_value": 65295,
+        "msb": 15,
+        "p_bit": 0.8418864789022436,
+        "p_offset": 0.8899999999999999,
+        "posterior": 0.9986675038488151,
+        "rank": 2,
+        "q_k": [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "p_k": [
+          0.9999847412109375,
+          0.999969482421875,
+          0.99993896484375,
+          0.9998779296875,
+          0.999755859375,
+          0.99951171875,
+          0.9990234375,
+          0.998046875,
+          0.99609375,
+          0.9921875,
+          0.984375,
+          0.96875,
+          0.9375,
+          0.875,
+          0.75,
+          0.5
+        ]
+      },
+      "is_winner": false,
+      "is_true": false
+    },
+    {
+      "candidate_id": 7,
+      "offset": 7,
+      "length": 1,
+      "region": "FOR",
+      "kind": "window",
+      "tlv_type": null,
+      "value": "0f",
+      "cluster_key": "0f",
+      "cluster_size": 6,
+      "n_clusters": 4,
+      "similarity": {
+        "inner_mean": 0.6788177339901478,
+        "inter_mean": 0.5038461538461538,
+        "n_inner": 5,
+        "n_inter": 20,
+        "formula": "mean compute_pairwise_similarity of this message vs up to 20 seeded-sampled peers in the same cluster and 20 in other clusters"
+      },
+      "coupling": {
+        "partner_id": 6,
+        "partner_value": "0f",
+        "partner_direction": "s2c",
+        "cluster_pr": 0.7333333333333333,
+        "formula": "mean pairwise sim of up to 5 partner messages"
+      },
+      "structure": {
+        "length": 14,
+        "cluster_median": 14.0,
+        "deviation": 0.0,
+        "cluster_ps": 0.9777777777777777,
+        "formula": "1 - mean(|len - median|)/max_len over cluster"
+      },
+      "dimension": {
+        "r_distinct": 0.0784313725490196,
+        "r_single": 0.0,
+        "p_d": 0.95
+      },
+      "stage1": {
+        "p_m": 0.763627987439123,
+        "p_r": 0.5742015869893108,
+        "p_s": 0.9973856209150327,
+        "p_d": 0.95,
+        "p_f": 0.9456431629672505,
+        "rank": 3
+      },
+      "stage2": {
+        "in_top_k": true,
+        "int_value": 15,
+        "msb": 3,
+        "p_bit": 0.5771163821448452,
+        "p_offset": 0.8799999999999999,
+        "posterior": 0.9942892170659904,
+        "rank": 5,
+        "q_k": [
+          1.0,
+          0.6666666666666666,
+          0.45098039215686275,
+          0.11764705882352941
+        ],
+        "p_k": [
+          0.9375,
+          0.875,
+          0.75,
+          0.5
+        ]
+      },
+      "is_winner": false,
+      "is_true": false
+    }
+  ],
+  "final": {
+    "cluster": "c2s_0008ff0f",
+    "cluster_size": 4,
+    "keyword": {
+      "offset": 4,
+      "length": 4
+    },
+    "label": "0f",
+    "cluster_pure": true
+  },
+  "status": "ok"
+}

@@ -136,3 +136,27 @@ class Result:
     keywords: Dict[str, Optional[KeywordResult]]
     clusters: Dict[int, str]
     diagnostics: Dict[str, Any] = field(default_factory=dict)
+    trace: Optional["PipelineCapture"] = None
+
+
+@dataclass
+class PipelineCapture:
+    """
+    Read-only capture of pipeline intermediates for the Pipeline Tracker.
+    Built only when run_pipeline(capture=True); attaching it never changes
+    algorithm output (same input + same Config -> identical keywords/clusters).
+    """
+    messages: List[Message]
+    pairs: List[Pair]
+    capture_range: Tuple[float, float]
+    boundary: Optional[BoundaryResult]
+    tag_hits: List[Hit]
+    cand_boundary: Optional[BoundaryResult]
+    candidates: List[Candidate]
+    cand_diagnostics: Dict[str, Any]
+    stage1: Dict[str, Stage1Result]
+    stage2: Dict[str, KeywordResult]
+    clusters: Dict[int, str]
+    metrics: Tuple[Optional[float], Optional[float], Optional[float]]
+    timing: Dict[str, float]
+    errors: Dict[str, str] = field(default_factory=dict)
