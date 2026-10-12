@@ -7,14 +7,14 @@ interface TaggingStageProps {
 }
 
 const RULE_COLORS: Record<string, string> = {
-  constant: 'bg-slate-600 text-slate-100',
-  sequence: 'bg-sky-500/20 text-sky-300',
-  timestamp: 'bg-violet-500/20 text-violet-300',
-  sparse: 'bg-emerald-500/20 text-emerald-300',
-  checksum: 'bg-amber-500/20 text-amber-300',
-  address: 'bg-rose-500/20 text-rose-300',
-  float: 'bg-cyan-500/20 text-cyan-300',
-  length: 'bg-orange-500/20 text-orange-300',
+  constant: 'bg-inset3 text-hi',
+  sequence: 'bg-sky-wash text-sky-soft',
+  timestamp: 'bg-violet-wash-20 text-violet-soft',
+  sparse: 'bg-emerald-wash text-emerald-soft',
+  checksum: 'bg-amber-wash text-amber-soft',
+  address: 'bg-rose-wash text-rose-soft',
+  float: 'bg-cyan-wash text-cyan-soft',
+  length: 'bg-orange-wash-20 text-orange-soft',
 };
 
 export default function TaggingStage({ summary }: TaggingStageProps) {
@@ -24,44 +24,44 @@ export default function TaggingStage({ summary }: TaggingStageProps) {
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-3">
-        <div className="bg-slate-950 rounded-lg border border-slate-800 p-3">
-          <span className="text-[10px] uppercase tracking-wider text-slate-400 block">
+        <div className="stat">
+          <span className="label block">
             Total tags
           </span>
-          <span className="text-xl font-bold text-white font-mono">
+          <span className="text-xl font-bold text-hi font-mono">
             {summary.n_hits}
           </span>
         </div>
-        <div className="bg-slate-950 rounded-lg border border-slate-800 p-3">
-          <span className="text-[10px] uppercase tracking-wider text-slate-400 block">
+        <div className="stat">
+          <span className="label block">
             Multi-tag bytes
           </span>
-          <span className="text-xl font-bold text-amber-400 font-mono">
+          <span className="text-xl font-bold text-amber font-mono">
             {summary.multi_tag_bytes.length}
           </span>
         </div>
       </div>
 
       <div>
-        <h4 className="text-xs font-semibold text-slate-300 mb-1.5 flex items-center gap-1.5">
-          <Tags className="w-3.5 h-3.5 text-indigo-400" />
+        <h4 className="text-xs font-semibold text-mid mb-1.5 flex items-center gap-1.5">
+          <Tags className="w-3.5 h-3.5 text-accent3" />
           Tags per byte
         </h4>
         <div className="overflow-x-auto">
           <table className="w-full text-xs font-mono">
             <thead>
-              <tr className="text-slate-400 text-left border-b border-slate-800">
+              <tr className="text-low text-left border-b border-default">
                 <th className="py-1.5 pr-4">Byte</th>
                 <th className="py-1.5">Rules</th>
               </tr>
             </thead>
             <tbody>
               {bytes.map((b) => (
-                <tr key={b} className="border-b border-slate-800/50">
-                  <td className="py-1.5 pr-4 text-slate-200 font-semibold">
+                <tr key={b} className="border-b border-default-wash">
+                  <td className="py-1.5 pr-4 text-hi font-semibold">
                     {b}
                     {summary.multi_tag_bytes.includes(b) && (
-                      <span className="ml-1.5 text-[9px] px-1 py-0.5 bg-amber-500/15 text-amber-400 rounded border border-amber-500/30">
+                      <span className="ml-1.5 text-[9px] px-1 py-0.5 bg-amber-wash-15 text-amber rounded border border-amber-wash-30">
                         multi
                       </span>
                     )}
@@ -72,7 +72,7 @@ export default function TaggingStage({ summary }: TaggingStageProps) {
                         <span
                           key={r}
                           className={`px-1.5 py-0.5 rounded text-[10px] ${
-                            RULE_COLORS[r] || 'bg-slate-700 text-slate-200'
+                            RULE_COLORS[r] || 'bg-inset2 text-hi'
                           }`}
                         >
                           {r}

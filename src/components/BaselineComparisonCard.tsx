@@ -9,18 +9,18 @@ interface BaselineComparisonCardProps {
 
 export default function BaselineComparisonCard({ rpkAvgV, baselines }: BaselineComparisonCardProps) {
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
-      <h3 className="font-bold text-white text-base flex items-center gap-2">
-        <Zap className="w-5 h-5 text-amber-400" />
+    <div className="panel p-6 space-y-4">
+      <h3 className="font-bold text-hi text-base flex items-center gap-2">
+        <Zap className="w-5 h-5 text-amber" />
         Cross-Method Comparison (RPKClust vs NetPlier vs AutoFormat)
       </h3>
-      <p className="text-xs text-slate-400">
+      <p className="text-xs text-low">
         Summary of algorithmic design differences and execution efficiency.
       </p>
 
       <div className="overflow-x-auto">
-        <table className="w-full text-left text-xs font-mono text-slate-300">
-          <thead className="bg-slate-800/60 uppercase text-slate-400 font-semibold border-b border-slate-800">
+        <table className="w-full text-left text-xs font-mono text-mid">
+          <thead className="thead">
             <tr>
               <th className="px-4 py-3">Reverse Method</th>
               <th className="px-4 py-3">MSA Dependency</th>
@@ -29,13 +29,13 @@ export default function BaselineComparisonCard({ rpkAvgV, baselines }: BaselineC
               <th className="px-4 py-3">Region-Partitioning</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-800/60">
+          <tbody className="tbody">
             {baselines.map((row, i) => (
-              <tr key={i} className={i === 0 ? 'bg-indigo-950/40 text-white font-bold' : ''}>
-                <td className="px-4 py-3 text-cyan-300">{row.method}</td>
+              <tr key={i} className={i === 0 ? 'bg-accent-dark-wash text-hi font-bold' : ''}>
+                <td className="px-4 py-3 text-cyan-soft">{row.method}</td>
                 <td className="px-4 py-3">{row.msa}</td>
-                <td className="px-4 py-3 text-emerald-400 font-semibold">{row.time}</td>
-                <td className="px-4 py-3 text-amber-300 font-semibold">
+                <td className="px-4 py-3 text-emerald font-semibold">{row.time}</td>
+                <td className="px-4 py-3 text-amber-soft font-semibold">
                   {i === 0 ? (rpkAvgV ?? row.avgV) : row.avgV}
                 </td>
                 <td className="px-4 py-3">{row.forAware}</td>

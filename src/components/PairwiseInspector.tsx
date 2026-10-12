@@ -621,20 +621,20 @@ export const PairwiseInspector: React.FC<PairwiseInspectorProps> = ({
   return (
     <div className="space-y-6">
       {/* Top Header & Presets Toolbar */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-4">
+      <div className="panel p-5 space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-indigo-600/20 border border-indigo-500/30 text-indigo-400">
+            <div className="p-2.5 rounded bg-accent-wash border border-accent2-wash-30 text-accent3">
               <GitCompare className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-base font-semibold text-white">Pairwise Message Pipeline Inspector</h2>
-                <span className="text-xs font-mono text-cyan-400 bg-cyan-950/60 border border-cyan-800 px-2 py-0.5 rounded">
+                <h2 className="text-base font-semibold text-hi">Pairwise Message Pipeline Inspector</h2>
+                <span className="text-xs font-mono text-cyan bg-cyan-dark-wash-60 border border-cyan-deep badge">
                   Needleman-Wunsch Dynamic Alignment
                 </span>
               </div>
-              <p className="text-xs text-slate-400 mt-0.5">
+              <p className="text-xs text-low mt-0.5">
                 Align byte streams of any two messages and observe how each byte passes or fails through the 5 pipeline stages.
               </p>
             </div>
@@ -642,34 +642,34 @@ export const PairwiseInspector: React.FC<PairwiseInspectorProps> = ({
 
           {/* Quick Presets Strip */}
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs text-slate-400 font-medium mr-1">Quick Presets:</span>
+            <span className="text-xs text-low font-medium mr-1">Quick Presets:</span>
             <button
               onClick={selectReqRespPreset}
-              className="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 flex items-center gap-1.5 transition"
+              className="px-3 py-1.5 rounded text-xs font-medium btn-ghost text-hi border border-strong flex items-center gap-1.5 transition"
             >
-              <ArrowLeftRight className="w-3.5 h-3.5 text-cyan-400" />
+              <ArrowLeftRight className="w-3.5 h-3.5 text-cyan" />
               Req ↔ Resp Pair
             </button>
             <button
               onClick={selectSameClusterPreset}
-              className="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 flex items-center gap-1.5 transition"
+              className="px-3 py-1.5 rounded text-xs font-medium btn-ghost text-hi border border-strong flex items-center gap-1.5 transition"
             >
-              <CheckCircle className="w-3.5 h-3.5 text-emerald-400" />
+              <CheckCircle className="w-3.5 h-3.5 text-emerald" />
               Same Cluster
             </button>
             <button
               onClick={selectDiffClusterPreset}
-              className="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 flex items-center gap-1.5 transition"
+              className="px-3 py-1.5 rounded text-xs font-medium btn-ghost text-hi border border-strong flex items-center gap-1.5 transition"
             >
-              <XCircle className="w-3.5 h-3.5 text-rose-400" />
+              <XCircle className="w-3.5 h-3.5 text-rose" />
               Diff Cluster
             </button>
             <button
               onClick={() => setCustomHexMode(!customHexMode)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium border flex items-center gap-1.5 transition ${
+              className={`px-3 py-1.5 rounded text-xs font-medium border flex items-center gap-1.5 transition ${
                 customHexMode
-                  ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
-                  : 'bg-slate-800 hover:bg-slate-700 text-slate-300 border-slate-700'
+                  ? 'bg-amber-wash text-amber-soft border-amber-wash-40'
+                  : 'btn-ghost text-mid border-strong'
               }`}
             >
               <FileCode className="w-3.5 h-3.5" />
@@ -678,7 +678,7 @@ export const PairwiseInspector: React.FC<PairwiseInspectorProps> = ({
             <button
               onClick={swapMessages}
               title="Swap Message A and B"
-              className="p-1.5 rounded-lg text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition"
+              className="p-1.5 rounded text-xs btn-ghost text-mid border border-strong transition"
             >
               <RotateCcw className="w-3.5 h-3.5" />
             </button>
@@ -687,53 +687,53 @@ export const PairwiseInspector: React.FC<PairwiseInspectorProps> = ({
 
         {/* Dual Message Selection Cards */}
         {customHexMode ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-slate-800/80">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-default">
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-300 flex items-center justify-between">
+              <label className="text-xs font-semibold text-mid flex items-center justify-between">
                 <span>Message A Raw Hex Packet:</span>
-                <span className="text-slate-500 font-mono text-[11px]">{hexToBytes(customHexA).length} bytes</span>
+                <span className="text-faint font-mono text-[11px]">{hexToBytes(customHexA).length} bytes</span>
               </label>
               <textarea
                 value={customHexA}
                 onChange={(e) => setCustomHexA(e.target.value.replace(/[^0-9a-fA-F]/g, ''))}
-                className="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-xs font-mono text-cyan-300 h-20 resize-none focus:outline-none focus:border-cyan-500"
+                className="w-full bg-base border border-strong rounded p-3 text-xs font-mono text-cyan-soft h-20 resize-none focus:outline-none focus-border-cyan2"
                 placeholder="Paste hex bytes..."
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-300 flex items-center justify-between">
+              <label className="text-xs font-semibold text-mid flex items-center justify-between">
                 <span>Message B Raw Hex Packet:</span>
-                <span className="text-slate-500 font-mono text-[11px]">{hexToBytes(customHexB).length} bytes</span>
+                <span className="text-faint font-mono text-[11px]">{hexToBytes(customHexB).length} bytes</span>
               </label>
               <textarea
                 value={customHexB}
                 onChange={(e) => setCustomHexB(e.target.value.replace(/[^0-9a-fA-F]/g, ''))}
-                className="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-xs font-mono text-purple-300 h-20 resize-none focus:outline-none focus:border-purple-500"
+                className="w-full bg-base border border-strong rounded p-3 text-xs font-mono text-purple-soft h-20 resize-none focus:outline-none focus-border-purple2"
                 placeholder="Paste hex bytes..."
               />
             </div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-slate-800/80">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-default">
             {/* Selector A */}
-            <div className="bg-slate-950/80 border border-slate-800 rounded-xl p-3.5 space-y-2">
+            <div className="panel-inner p-3.5 space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold uppercase tracking-wider text-cyan-400 flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-cyan-400" />
+                <span className="text-xs font-bold uppercase tracking-wider text-cyan flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-cyan" />
                   Message A
                 </span>
                 <div className="flex items-center gap-2 text-xs">
-                  <span className="text-slate-400 font-mono">{msgA.length}B</span>
+                  <span className="text-low font-mono">{msgA.length}B</span>
                   <span
                     className={`px-1.5 py-0.5 rounded text-[10px] font-bold uppercase font-mono ${
                       msgA.direction === 'c2s'
-                        ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
-                        : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                        ? 'bg-blue-wash text-blue-soft border border-blue-wash-30'
+                        : 'bg-emerald-wash text-emerald-soft border border-emerald-wash-30'
                     }`}
                   >
                     {msgA.direction}
                   </span>
-                  <span className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                  <span className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-purple-wash text-purple-soft border border-purple-wash-30">
                     Cluster: {msgA.cluster}
                   </span>
                 </div>
@@ -742,7 +742,7 @@ export const PairwiseInspector: React.FC<PairwiseInspectorProps> = ({
               <select
                 value={indexA}
                 onChange={(e) => setIndexA(Number(e.target.value))}
-                className="w-full bg-slate-900 border border-slate-700 text-xs text-slate-200 rounded-lg p-2 font-mono focus:outline-none focus:border-cyan-500"
+                className="w-full bg-panel border border-strong text-xs text-hi rounded p-2 font-mono focus:outline-none focus-border-cyan2"
               >
                 {messages.map((m, idx) => (
                   <option key={m.id} value={idx}>
@@ -754,24 +754,24 @@ export const PairwiseInspector: React.FC<PairwiseInspectorProps> = ({
             </div>
 
             {/* Selector B */}
-            <div className="bg-slate-950/80 border border-slate-800 rounded-xl p-3.5 space-y-2">
+            <div className="panel-inner p-3.5 space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold uppercase tracking-wider text-purple-400 flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-purple-400" />
+                <span className="text-xs font-bold uppercase tracking-wider text-purple flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-purple" />
                   Message B
                 </span>
                 <div className="flex items-center gap-2 text-xs">
-                  <span className="text-slate-400 font-mono">{msgB.length}B</span>
+                  <span className="text-low font-mono">{msgB.length}B</span>
                   <span
                     className={`px-1.5 py-0.5 rounded text-[10px] font-bold uppercase font-mono ${
                       msgB.direction === 'c2s'
-                        ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
-                        : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                        ? 'bg-blue-wash text-blue-soft border border-blue-wash-30'
+                        : 'bg-emerald-wash text-emerald-soft border border-emerald-wash-30'
                     }`}
                   >
                     {msgB.direction}
                   </span>
-                  <span className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                  <span className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-purple-wash text-purple-soft border border-purple-wash-30">
                     Cluster: {msgB.cluster}
                   </span>
                 </div>
@@ -780,7 +780,7 @@ export const PairwiseInspector: React.FC<PairwiseInspectorProps> = ({
               <select
                 value={indexB}
                 onChange={(e) => setIndexB(Number(e.target.value))}
-                className="w-full bg-slate-900 border border-slate-700 text-xs text-slate-200 rounded-lg p-2 font-mono focus:outline-none focus:border-purple-500"
+                className="w-full bg-panel border border-strong text-xs text-hi rounded p-2 font-mono focus:outline-none focus-border-purple2"
               >
                 {messages.map((m, idx) => (
                   <option key={m.id} value={idx}>
@@ -795,72 +795,72 @@ export const PairwiseInspector: React.FC<PairwiseInspectorProps> = ({
       </div>
 
       {/* Global Sequence Alignment Stats & Color Legend */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-4">
-        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-3">
+      <div className="panel p-5 space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-default pb-3">
           <div className="flex items-center gap-2">
-            <Binary className="w-4 h-4 text-cyan-400" />
-            <h3 className="text-sm font-semibold text-white">Sequence Alignment & Synchronized Hex Stream</h3>
+            <Binary className="w-4 h-4 text-cyan" />
+            <h3 className="text-sm font-semibold text-hi">Sequence Alignment & Synchronized Hex Stream</h3>
           </div>
 
           {/* Color Legend */}
           <div className="flex flex-wrap items-center gap-3 text-xs">
             <span className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded bg-emerald-500/30 border border-emerald-500/50" />
-              <span className="text-emerald-300">Match (=)</span>
+              <span className="w-3 h-3 rounded bg-emerald-wash-30 border border-emerald-wash-50" />
+              <span className="text-emerald-soft">Match (=)</span>
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded bg-rose-500/30 border border-rose-500/50" />
-              <span className="text-rose-300">Mismatch (≠)</span>
+              <span className="w-3 h-3 rounded bg-rose-wash-30 border border-rose-wash-50" />
+              <span className="text-rose-soft">Mismatch (≠)</span>
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded bg-slate-700/50 border border-dashed border-slate-500" />
-              <span className="text-slate-400">Gap (–)</span>
+              <span className="w-3 h-3 rounded bg-inset2-wash-50 border border-dashed border-faint" />
+              <span className="text-low">Gap (–)</span>
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded bg-cyan-500/30 border border-cyan-400" />
-              <span className="text-cyan-300">FOR Region [0..{boundaryB - 1}]</span>
+              <span className="w-3 h-3 rounded bg-cyan-wash-30 border border-cyan" />
+              <span className="text-cyan-soft">FOR Region [0..{boundaryB - 1}]</span>
             </span>
           </div>
         </div>
 
         {/* Alignment Metrics Ribbon */}
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-          <div className="bg-slate-950 border border-slate-800/80 rounded-xl p-3 text-center">
-            <div className="text-[11px] text-slate-400 uppercase tracking-wider">Aligned Positions</div>
-            <div className="text-xl font-bold font-mono text-white mt-0.5">{summary.alignedLength}</div>
+          <div className="panel-inner p-3 text-center">
+            <div className="text-[11px] text-low uppercase tracking-wider">Aligned Positions</div>
+            <div className="text-xl font-bold font-mono text-hi mt-0.5">{summary.alignedLength}</div>
           </div>
-          <div className="bg-slate-950 border border-emerald-900/40 rounded-xl p-3 text-center">
-            <div className="text-[11px] text-emerald-400 uppercase tracking-wider">Exact Matches</div>
-            <div className="text-xl font-bold font-mono text-emerald-300 mt-0.5">
-              {summary.matches} <span className="text-xs text-emerald-500 font-normal">({summary.identityPercent}%)</span>
+          <div className="bg-base border border-emerald-abyss-wash rounded p-3 text-center">
+            <div className="text-[11px] text-emerald uppercase tracking-wider">Exact Matches</div>
+            <div className="text-xl font-bold font-mono text-emerald-soft mt-0.5">
+              {summary.matches} <span className="text-xs text-emerald2 font-normal">({summary.identityPercent}%)</span>
             </div>
           </div>
-          <div className="bg-slate-950 border border-rose-900/40 rounded-xl p-3 text-center">
-            <div className="text-[11px] text-rose-400 uppercase tracking-wider">Mismatches</div>
-            <div className="text-xl font-bold font-mono text-rose-300 mt-0.5">{summary.mismatches}</div>
+          <div className="bg-base border border-rose-abyss-wash-40 rounded p-3 text-center">
+            <div className="text-[11px] text-rose uppercase tracking-wider">Mismatches</div>
+            <div className="text-xl font-bold font-mono text-rose-soft mt-0.5">{summary.mismatches}</div>
           </div>
-          <div className="bg-slate-950 border border-slate-800/80 rounded-xl p-3 text-center">
-            <div className="text-[11px] text-slate-400 uppercase tracking-wider">Gaps / Indels</div>
-            <div className="text-xl font-bold font-mono text-slate-300 mt-0.5">{summary.gaps}</div>
+          <div className="panel-inner p-3 text-center">
+            <div className="text-[11px] text-low uppercase tracking-wider">Gaps / Indels</div>
+            <div className="text-xl font-bold font-mono text-mid mt-0.5">{summary.gaps}</div>
           </div>
-          <div className="bg-slate-950 border border-cyan-900/40 rounded-xl p-3 text-center">
-            <div className="text-[11px] text-cyan-400 uppercase tracking-wider">Alignment Score</div>
-            <div className="text-xl font-bold font-mono text-cyan-300 mt-0.5">{summary.score}</div>
+          <div className="bg-base border border-cyan-abyss-wash rounded p-3 text-center">
+            <div className="text-[11px] text-cyan uppercase tracking-wider">Alignment Score</div>
+            <div className="text-xl font-bold font-mono text-cyan-soft mt-0.5">{summary.score}</div>
           </div>
         </div>
 
         {/* Split Aligned Hex Stream */}
-        <div className="bg-slate-950 border border-slate-800 rounded-xl p-4 overflow-x-auto space-y-3">
+        <div className="panel-inner p-4 overflow-x-auto space-y-3">
           <div className="inline-block min-w-full">
             {/* Header: Column offsets & Region demarcation */}
-            <div className="flex items-center gap-1.5 pb-2 border-b border-slate-800 text-[11px] font-mono text-slate-500">
+            <div className="flex items-center gap-1.5 pb-2 border-b border-default text-[11px] font-mono text-faint">
               <span className="w-16 shrink-0 text-right pr-2">Offset:</span>
               <div className="flex gap-1">
                 {aligned.map((col, idx) => (
                   <span
                     key={idx}
                     className={`w-8 text-center shrink-0 ${
-                      col.offsetA !== null && col.offsetA < boundaryB ? 'text-cyan-400 font-bold' : 'text-slate-500'
+                      col.offsetA !== null && col.offsetA < boundaryB ? 'text-cyan font-bold' : 'text-faint'
                     }`}
                   >
                     {idx < 100 ? idx.toString().padStart(2, '0') : idx}
@@ -871,7 +871,7 @@ export const PairwiseInspector: React.FC<PairwiseInspectorProps> = ({
 
             {/* Region Label Bar */}
             <div className="flex items-center gap-1.5 py-1 text-[10px] font-mono">
-              <span className="w-16 shrink-0 text-right pr-2 text-slate-500">Region:</span>
+              <span className="w-16 shrink-0 text-right pr-2 text-faint">Region:</span>
               <div className="flex gap-1">
                 {aligned.map((col, idx) => {
                   const isFor = (col.offsetA !== null && col.offsetA < boundaryB) || (col.offsetB !== null && col.offsetB < boundaryB);
@@ -879,7 +879,7 @@ export const PairwiseInspector: React.FC<PairwiseInspectorProps> = ({
                     <span
                       key={idx}
                       className={`w-8 text-center shrink-0 rounded-[2px] py-0.5 ${
-                        isFor ? 'bg-cyan-950/70 text-cyan-300 font-semibold border-b border-cyan-500' : 'bg-slate-900 text-slate-500'
+                        isFor ? 'bg-cyan-dark-wash text-cyan-soft font-semibold border-b border-cyan2' : 'bg-panel text-faint'
                       }`}
                     >
                       {isFor ? 'FOR' : 'NFOR'}
@@ -891,7 +891,7 @@ export const PairwiseInspector: React.FC<PairwiseInspectorProps> = ({
 
             {/* Message A Bytes */}
             <div className="flex items-center gap-1.5 py-1 text-xs font-mono">
-              <span className="w-16 shrink-0 text-right pr-2 text-cyan-400 font-semibold">Msg A:</span>
+              <span className="w-16 shrink-0 text-right pr-2 text-cyan font-semibold">Msg A:</span>
               <div className="flex gap-1">
                 {aligned.map((col, idx) => {
                   const isHovered = hoveredAlignedIdx === idx;
@@ -899,21 +899,21 @@ export const PairwiseInspector: React.FC<PairwiseInspectorProps> = ({
                     (col.offsetA !== null && currentGate.highlights.relevantOffsetsA.includes(col.offsetA)) ||
                     (col.offsetB !== null && currentGate.highlights.relevantOffsetsB.includes(col.offsetB));
 
-                  let bgClass = 'bg-slate-900 text-slate-400 border border-slate-800';
+                  let bgClass = 'bg-panel text-low border border-default';
                   if (col.type === 'match') {
-                    bgClass = 'bg-emerald-950/70 text-emerald-300 border border-emerald-500/40 font-bold';
+                    bgClass = 'bg-emerald-dark-wash text-emerald-soft border border-emerald-wash-40 font-bold';
                   } else if (col.type === 'mismatch') {
-                    bgClass = 'bg-rose-950/70 text-rose-300 border border-rose-500/40 font-bold';
+                    bgClass = 'bg-rose-dark-wash-70 text-rose-soft border border-rose-wash-40 font-bold';
                   } else {
-                    bgClass = 'bg-slate-900/40 text-slate-600 border border-dashed border-slate-800';
+                    bgClass = 'bg-panel-wash-40 text-fainter border border-dashed border-default';
                   }
 
                   if (isHighlightedInStage) {
-                    bgClass += ' ring-2 ring-cyan-400 ring-offset-1 ring-offset-slate-950';
+                    bgClass += ' outline outline-1 outline-cyan';
                   }
 
                   if (isHovered) {
-                    bgClass += ' brightness-150 scale-105 z-10 transition-transform';
+                    bgClass += ' brightness-150 z-10';
                   }
 
                   return (
@@ -921,7 +921,7 @@ export const PairwiseInspector: React.FC<PairwiseInspectorProps> = ({
                       key={idx}
                       onMouseEnter={() => setHoveredAlignedIdx(idx)}
                       onMouseLeave={() => setHoveredAlignedIdx(null)}
-                      className={`w-8 h-8 rounded flex items-center justify-center shrink-0 cursor-pointer select-none transition-all ${bgClass}`}
+                      className={`w-8 h-8 rounded flex items-center justify-center shrink-0 cursor-pointer select-none transition ${bgClass}`}
                       title={`Aligned #${idx} | Msg A: ${col.hexA} (Offset ${col.offsetA ?? 'Gap'})`}
                     >
                       {col.hexA}
@@ -933,20 +933,20 @@ export const PairwiseInspector: React.FC<PairwiseInspectorProps> = ({
 
             {/* Connector Line */}
             <div className="flex items-center gap-1.5 py-0.5 text-xs font-mono">
-              <span className="w-16 shrink-0 text-right pr-2 text-slate-600">Match:</span>
+              <span className="w-16 shrink-0 text-right pr-2 text-fainter">Match:</span>
               <div className="flex gap-1">
                 {aligned.map((col, idx) => {
                   let char = ' ';
-                  let color = 'text-slate-600';
+                  let color = 'text-fainter';
                   if (col.type === 'match') {
                     char = '|';
-                    color = 'text-emerald-400 font-bold';
+                    color = 'text-emerald font-bold';
                   } else if (col.type === 'mismatch') {
                     char = '≠';
-                    color = 'text-rose-400 font-bold';
+                    color = 'text-rose font-bold';
                   } else {
                     char = '·';
-                    color = 'text-slate-700';
+                    color = 'text-fainter';
                   }
                   return (
                     <span key={idx} className={`w-8 text-center shrink-0 ${color}`}>
@@ -959,7 +959,7 @@ export const PairwiseInspector: React.FC<PairwiseInspectorProps> = ({
 
             {/* Message B Bytes */}
             <div className="flex items-center gap-1.5 py-1 text-xs font-mono">
-              <span className="w-16 shrink-0 text-right pr-2 text-purple-400 font-semibold">Msg B:</span>
+              <span className="w-16 shrink-0 text-right pr-2 text-purple font-semibold">Msg B:</span>
               <div className="flex gap-1">
                 {aligned.map((col, idx) => {
                   const isHovered = hoveredAlignedIdx === idx;
@@ -967,21 +967,21 @@ export const PairwiseInspector: React.FC<PairwiseInspectorProps> = ({
                     (col.offsetA !== null && currentGate.highlights.relevantOffsetsA.includes(col.offsetA)) ||
                     (col.offsetB !== null && currentGate.highlights.relevantOffsetsB.includes(col.offsetB));
 
-                  let bgClass = 'bg-slate-900 text-slate-400 border border-slate-800';
+                  let bgClass = 'bg-panel text-low border border-default';
                   if (col.type === 'match') {
-                    bgClass = 'bg-emerald-950/70 text-emerald-300 border border-emerald-500/40 font-bold';
+                    bgClass = 'bg-emerald-dark-wash text-emerald-soft border border-emerald-wash-40 font-bold';
                   } else if (col.type === 'mismatch') {
-                    bgClass = 'bg-rose-950/70 text-rose-300 border border-rose-500/40 font-bold';
+                    bgClass = 'bg-rose-dark-wash-70 text-rose-soft border border-rose-wash-40 font-bold';
                   } else {
-                    bgClass = 'bg-slate-900/40 text-slate-600 border border-dashed border-slate-800';
+                    bgClass = 'bg-panel-wash-40 text-fainter border border-dashed border-default';
                   }
 
                   if (isHighlightedInStage) {
-                    bgClass += ' ring-2 ring-purple-400 ring-offset-1 ring-offset-slate-950';
+                    bgClass += ' outline outline-1 outline-purple';
                   }
 
                   if (isHovered) {
-                    bgClass += ' brightness-150 scale-105 z-10 transition-transform';
+                    bgClass += ' brightness-150 z-10';
                   }
 
                   return (
@@ -989,7 +989,7 @@ export const PairwiseInspector: React.FC<PairwiseInspectorProps> = ({
                       key={idx}
                       onMouseEnter={() => setHoveredAlignedIdx(idx)}
                       onMouseLeave={() => setHoveredAlignedIdx(null)}
-                      className={`w-8 h-8 rounded flex items-center justify-center shrink-0 cursor-pointer select-none transition-all ${bgClass}`}
+                      className={`w-8 h-8 rounded flex items-center justify-center shrink-0 cursor-pointer select-none transition ${bgClass}`}
                       title={`Aligned #${idx} | Msg B: ${col.hexB} (Offset ${col.offsetB ?? 'Gap'})`}
                     >
                       {col.hexB}
@@ -1000,13 +1000,13 @@ export const PairwiseInspector: React.FC<PairwiseInspectorProps> = ({
             </div>
 
             {/* ASCII Preview */}
-            <div className="flex items-center gap-1.5 pt-1.5 border-t border-slate-900 text-[11px] font-mono text-slate-500">
+            <div className="flex items-center gap-1.5 pt-1.5 border-t border-dark text-[11px] font-mono text-faint">
               <span className="w-16 shrink-0 text-right pr-2">ASCII:</span>
               <div className="flex gap-1">
                 {aligned.map((col, idx) => (
-                  <span key={idx} className="w-8 text-center shrink-0 text-slate-400">
+                  <span key={idx} className="w-8 text-center shrink-0 text-low">
                     {col.asciiA === col.asciiB && col.asciiA !== '·' ? (
-                      <span className="text-emerald-400 font-bold">{col.asciiA}</span>
+                      <span className="text-emerald font-bold">{col.asciiA}</span>
                     ) : (
                       <span>
                         {col.asciiA}
@@ -1021,38 +1021,38 @@ export const PairwiseInspector: React.FC<PairwiseInspectorProps> = ({
         </div>
 
         {/* Hover Inspector Tooltip Strip */}
-        <div className="bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs font-mono flex flex-wrap items-center justify-between gap-2 min-h-10">
+        <div className="panel-inner px-4 py-2.5 text-xs font-mono flex flex-wrap items-center justify-between gap-2 min-h-10">
           {hoveredAlignedIdx !== null && aligned[hoveredAlignedIdx] ? (
             (() => {
               const col = aligned[hoveredAlignedIdx];
               return (
                 <div className="flex flex-wrap items-center gap-3">
-                  <span className="text-slate-300 font-semibold">Position #{hoveredAlignedIdx}:</span>
-                  <span className="text-cyan-400">
+                  <span className="text-mid font-semibold">Position #{hoveredAlignedIdx}:</span>
+                  <span className="text-cyan">
                     Msg A: 0x{col.hexA} (Offset {col.offsetA !== null ? col.offsetA : 'Gap'})
                   </span>
-                  <span className="text-slate-500">↔</span>
-                  <span className="text-purple-400">
+                  <span className="text-faint">↔</span>
+                  <span className="text-purple">
                     Msg B: 0x{col.hexB} (Offset {col.offsetB !== null ? col.offsetB : 'Gap'})
                   </span>
-                  <span className="text-slate-500">·</span>
+                  <span className="text-faint">·</span>
                   <span
                     className={`font-bold ${
                       col.type === 'match'
-                        ? 'text-emerald-400'
+                        ? 'text-emerald'
                         : col.type === 'mismatch'
-                        ? 'text-rose-400'
-                        : 'text-slate-400'
+                        ? 'text-rose'
+                        : 'text-low'
                     }`}
                   >
                     {col.type.toUpperCase()}
                   </span>
-                  <span className="text-slate-500">·</span>
-                  <span className="text-slate-400">
+                  <span className="text-faint">·</span>
+                  <span className="text-low">
                     Region: {col.isForA || col.isForB ? 'Fixed-Offset (FOR)' : 'Non-Fixed (NFOR)'}
                   </span>
                   {col.hitA && (
-                    <span className="text-amber-400 bg-amber-950/60 border border-amber-800 px-1.5 py-0.5 rounded text-[11px]">
+                    <span className="text-amber bg-amber-dark-wash-60 border border-amber-deep px-1.5 py-0.5 rounded text-[11px]">
                       Detector Rule: {col.hitA}
                     </span>
                   )}
@@ -1060,7 +1060,7 @@ export const PairwiseInspector: React.FC<PairwiseInspectorProps> = ({
               );
             })()
           ) : (
-            <div className="text-slate-500 flex items-center gap-2">
+            <div className="text-faint flex items-center gap-2">
               <Info className="w-3.5 h-3.5" />
               <span>Hover any aligned byte cell above to inspect offset positions, detector hits, and exact hex values.</span>
             </div>
@@ -1069,31 +1069,31 @@ export const PairwiseInspector: React.FC<PairwiseInspectorProps> = ({
       </div>
 
       {/* Interactive 5-Stage Pipeline Stepper & Pass/Fail Evaluation Gates */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-6">
+      <div className="panel p-6 space-y-6">
         <div>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Layers className="w-5 h-5 text-indigo-400" />
-              <h3 className="font-semibold text-white">5-Stage Pipeline Evaluation Gates</h3>
+              <Layers className="w-5 h-5 text-accent3" />
+              <h3 className="font-semibold text-hi">5-Stage Pipeline Evaluation Gates</h3>
             </div>
             <div className="flex items-center gap-2">
               <button
                 disabled={activeStage === 0}
                 onClick={() => setActiveStage(Math.max(0, activeStage - 1))}
-                className="px-3 py-1 bg-slate-800 hover:bg-slate-700 disabled:opacity-40 text-slate-300 text-xs rounded-lg flex items-center gap-1 transition"
+                className="px-3 py-1 btn-ghost disabled:opacity-40 text-mid text-xs rounded flex items-center gap-1 transition"
               >
                 <ChevronLeft className="w-3.5 h-3.5" /> Prev Stage
               </button>
               <button
                 disabled={activeStage === stageGates.length - 1}
                 onClick={() => setActiveStage(Math.min(stageGates.length - 1, activeStage + 1))}
-                className="px-3 py-1 bg-slate-800 hover:bg-slate-700 disabled:opacity-40 text-slate-300 text-xs rounded-lg flex items-center gap-1 transition"
+                className="px-3 py-1 btn-ghost disabled:opacity-40 text-mid text-xs rounded flex items-center gap-1 transition"
               >
                 Next Stage <ChevronRight className="w-3.5 h-3.5" />
               </button>
             </div>
           </div>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-low mt-1">
             Step through each mathematical phase of RPKClust to see why the two messages passed or failed clustering criteria.
           </p>
         </div>
@@ -1102,106 +1102,106 @@ export const PairwiseInspector: React.FC<PairwiseInspectorProps> = ({
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
           {stageGates.map((gate, sIdx) => {
             const isActive = activeStage === sIdx;
-            let statusIcon = <CheckCircle className="w-3.5 h-3.5 text-emerald-400" />;
-            if (gate.status === 'fail') statusIcon = <XCircle className="w-3.5 h-3.5 text-rose-400" />;
-            if (gate.status === 'diverged') statusIcon = <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />;
-            if (gate.status === 'neutral') statusIcon = <Info className="w-3.5 h-3.5 text-cyan-400" />;
+            let statusIcon = <CheckCircle className="w-3.5 h-3.5 text-emerald" />;
+            if (gate.status === 'fail') statusIcon = <XCircle className="w-3.5 h-3.5 text-rose" />;
+            if (gate.status === 'diverged') statusIcon = <AlertTriangle className="w-3.5 h-3.5 text-amber" />;
+            if (gate.status === 'neutral') statusIcon = <Info className="w-3.5 h-3.5 text-cyan" />;
 
             return (
               <button
                 key={gate.id}
                 onClick={() => setActiveStage(sIdx)}
-                className={`p-3 rounded-xl border text-left transition-all relative ${
+                className={`p-3 rounded border text-left transition relative ${
                   isActive
-                    ? 'bg-slate-800/90 border-indigo-500 shadow-lg shadow-indigo-950/50'
-                    : 'bg-slate-950/70 border-slate-800 hover:bg-slate-800/60'
+                    ? 'bg-inset border-accent2'
+                    : 'bg-base border-default hover-bg-inset'
                 }`}
               >
                 <div className="flex items-center justify-between text-xs mb-1.5">
-                  <span className="font-mono text-[10px] text-slate-500 uppercase">Stage 0{gate.stageNumber}</span>
+                  <span className="font-mono text-[10px] text-faint uppercase">Stage 0{gate.stageNumber}</span>
                   {statusIcon}
                 </div>
-                <div className={`text-xs font-semibold truncate ${isActive ? 'text-white' : 'text-slate-300'}`}>
+                <div className={`text-xs font-semibold truncate ${isActive ? 'text-hi' : 'text-mid'}`}>
                   {gate.name}
                 </div>
-                <div className="text-[10px] text-slate-400 truncate mt-1">
+                <div className="text-[10px] text-low truncate mt-1">
                   {gate.badgeText}
                 </div>
-                {isActive && <div className="absolute bottom-0 left-3 right-3 h-0.5 bg-indigo-500 rounded-full" />}
+                {isActive && <div className="absolute bottom-0 left-3 right-3 h-0.5 bg-accent2 rounded-full" />}
               </button>
             );
           })}
         </div>
 
         {/* Active Stage Gate Card */}
-        <div className="bg-slate-950 border border-slate-800/90 rounded-2xl p-6 space-y-5">
-          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-4">
+        <div className="bg-base border border-default rounded-md p-6 space-y-5">
+          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-default pb-4">
             <div>
               <div className="flex items-center gap-2">
-                <span className="px-2 py-0.5 rounded text-[11px] font-mono font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                <span className="badge text-[11px] font-mono font-bold bg-accent2-wash text-accent-soft border border-accent2-wash-30">
                   STAGE 0{currentGate.stageNumber}
                 </span>
-                <h4 className="text-lg font-bold text-white">{currentGate.headline}</h4>
+                <h4 className="text-lg font-bold text-hi">{currentGate.headline}</h4>
               </div>
-              <p className="text-xs text-slate-400 mt-1">{currentGate.explanation}</p>
+              <p className="text-xs text-low mt-1">{currentGate.explanation}</p>
             </div>
 
             {/* Primary Pass/Fail Badge */}
             <div
-              className={`px-3.5 py-1.5 rounded-xl border text-xs font-bold font-mono uppercase tracking-wider flex items-center gap-2 ${
+              className={`px-3.5 py-1.5 rounded border text-xs font-bold font-mono uppercase tracking-wider flex items-center gap-2 ${
                 currentGate.badgeTone === 'emerald'
-                  ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/40'
+                  ? 'bg-emerald-wash-15 text-emerald-soft border-emerald-wash-40'
                   : currentGate.badgeTone === 'rose'
-                  ? 'bg-rose-500/15 text-rose-300 border-rose-500/40'
+                  ? 'bg-rose-wash-15 text-rose-soft border-rose-wash-40'
                   : currentGate.badgeTone === 'amber'
-                  ? 'bg-amber-500/15 text-amber-300 border-amber-500/40'
-                  : 'bg-cyan-500/15 text-cyan-300 border-cyan-500/40'
+                  ? 'bg-amber-wash-15 text-amber-soft border-amber-wash-40'
+                  : 'bg-cyan-wash-15 text-cyan-soft border-cyan-wash-40'
               }`}
             >
-              {currentGate.status === 'pass' && <CheckCircle className="w-4 h-4 text-emerald-400" />}
-              {currentGate.status === 'fail' && <XCircle className="w-4 h-4 text-rose-400" />}
-              {currentGate.status === 'diverged' && <AlertTriangle className="w-4 h-4 text-amber-400" />}
-              {currentGate.status === 'neutral' && <Info className="w-4 h-4 text-cyan-400" />}
+              {currentGate.status === 'pass' && <CheckCircle className="w-4 h-4 text-emerald" />}
+              {currentGate.status === 'fail' && <XCircle className="w-4 h-4 text-rose" />}
+              {currentGate.status === 'diverged' && <AlertTriangle className="w-4 h-4 text-amber" />}
+              {currentGate.status === 'neutral' && <Info className="w-4 h-4 text-cyan" />}
               {currentGate.badgeText}
             </div>
           </div>
 
           {/* Metrics HUD & Evaluation Math */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-slate-900 border border-slate-800 rounded-xl p-4">
-              <span className="text-[11px] text-slate-400 uppercase tracking-wider block">
+            <div className="bg-panel border border-default rounded p-4">
+              <span className="text-[11px] text-low uppercase tracking-wider block">
                 {currentGate.metricPrimary.label}
               </span>
-              <div className="text-2xl font-bold font-mono text-cyan-400 mt-1">
+              <div className="text-2xl font-bold font-mono text-cyan mt-1">
                 {currentGate.metricPrimary.value}
               </div>
               {currentGate.formula && (
-                <div className="text-[10px] font-mono text-slate-500 mt-2 truncate" title={currentGate.formula}>
+                <div className="text-[10px] font-mono text-faint mt-2 truncate" title={currentGate.formula}>
                   Formula: {currentGate.formula}
                 </div>
               )}
             </div>
 
             {currentGate.metricSecondary && (
-              <div className="bg-slate-900 border border-slate-800 rounded-xl p-4">
-                <span className="text-[11px] text-slate-400 uppercase tracking-wider block">
+              <div className="bg-panel border border-default rounded p-4">
+                <span className="text-[11px] text-low uppercase tracking-wider block">
                   {currentGate.metricSecondary.label}
                 </span>
-                <div className="text-2xl font-bold font-mono text-purple-400 mt-1">
+                <div className="text-2xl font-bold font-mono text-purple mt-1">
                   {currentGate.metricSecondary.value}
                 </div>
-                <div className="text-[10px] font-mono text-slate-500 mt-2">
+                <div className="text-[10px] font-mono text-faint mt-2">
                   Paper benchmark comparative baseline
                 </div>
               </div>
             )}
 
-            <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-2">
-              <span className="text-[11px] text-slate-400 uppercase tracking-wider block">Diagnostic Summary</span>
+            <div className="bg-panel border border-default rounded p-4 space-y-2">
+              <span className="text-[11px] text-low uppercase tracking-wider block">Diagnostic Summary</span>
               {currentGate.detailsList.map((item, idx) => (
                 <div key={idx} className="flex items-center justify-between text-xs">
-                  <span className="text-slate-400">{item.label}:</span>
-                  <span className="font-mono font-medium text-slate-200">{item.val}</span>
+                  <span className="text-low">{item.label}:</span>
+                  <span className="font-mono font-medium text-hi">{item.val}</span>
                 </div>
               ))}
             </div>

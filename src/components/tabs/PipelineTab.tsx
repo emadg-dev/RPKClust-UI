@@ -67,13 +67,13 @@ export default function PipelineTab({
 
   return (
     <div className="space-y-6">
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-wrap items-center justify-between gap-4">
+      <div className="panel p-5 flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h2 className="font-bold text-white text-lg flex items-center gap-2">
-            <Activity className="w-5 h-5 text-indigo-400" />
+          <h2 className="font-bold text-hi text-lg flex items-center gap-2">
+            <Activity className="w-5 h-5 text-accent3" />
             Pipeline Tracker
           </h2>
-          <p className="text-xs text-slate-400 mt-0.5">
+          <p className="text-xs text-low mt-0.5">
             Stage-by-stage trace of the RPKClust analysis
             {mode === 'dataset'
               ? ` — ${sourceId}/${datasetId} (max ${maxMessages} msgs)`
@@ -81,7 +81,7 @@ export default function PipelineTab({
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <div className="flex bg-slate-950 p-0.5 rounded-lg border border-slate-800 text-xs">
+          <div className="flex bg-base p-0.5 rounded border border-default text-xs">
             {(
               [
                 ['dataset', 'Dataset'],
@@ -93,8 +93,8 @@ export default function PipelineTab({
                 onClick={() => setMode(m)}
                 className={`px-2.5 py-1 rounded-md font-medium transition ${
                   mode === m
-                    ? 'bg-indigo-600 text-white shadow'
-                    : 'text-slate-400 hover:text-slate-200'
+                    ? 'bg-accent text-hi'
+                    : 'text-low hover-text-hi'
                 }`}
               >
                 {label}
@@ -107,7 +107,7 @@ export default function PipelineTab({
               void runOverview();
             }}
             disabled={overviewState === 'loading'}
-            className="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-semibold flex items-center gap-2 shadow-lg shadow-indigo-500/20 transition"
+            className="px-4 py-2 rounded btn-primary disabled:opacity-50 disabled:cursor-not-allowed text-hi text-xs font-semibold flex items-center gap-2 transition"
           >
             <Play className="w-4 h-4" />
             {overviewState === 'loading' ? 'Running…' : 'Run Pipeline Trace'}
@@ -116,8 +116,8 @@ export default function PipelineTab({
       </div>
 
       {mode === 'custom' && (
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4">
-          <label className="text-xs font-semibold text-slate-300 block mb-1.5">
+        <div className="panel p-4">
+          <label className="text-xs font-semibold text-mid block mb-1.5">
             Custom hex trace (one message per line, hex bytes)
           </label>
           <textarea
@@ -125,25 +125,25 @@ export default function PipelineTab({
             onChange={(e) => setCustomText(e.target.value)}
             rows={4}
             spellCheck={false}
-            className="w-full bg-slate-950 border border-slate-700 rounded-lg text-xs font-mono text-slate-200 p-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+            className="w-full input p-2.5 focus:outline-none focus-border-stronger"
           />
         </div>
       )}
 
       {overviewState === 'idle' && (
-        <div className="bg-slate-900 border border-dashed border-slate-700 rounded-2xl p-12 text-center">
-          <Activity className="w-10 h-10 text-slate-600 mx-auto mb-3" />
-          <h3 className="font-bold text-white text-base mb-1">
+        <div className="bg-panel border border-dashed border-strong rounded-md p-12 text-center">
+          <Activity className="w-10 h-10 text-fainter mx-auto mb-3" />
+          <h3 className="font-bold text-hi text-base mb-1">
             No pipeline trace yet
           </h3>
-          <p className="text-xs text-slate-400 max-w-md mx-auto">
+          <p className="text-xs text-low max-w-md mx-auto">
             Run the pipeline trace to inspect every stage — boundary detection,
             semantic tagging, candidate generation, stage 1/2 constraints,
             clustering and evaluation — plus a per-message byte-level tracker.
           </p>
           <button
             onClick={() => void runOverview()}
-            className="mt-4 px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold flex items-center gap-2 mx-auto"
+            className="mt-4 px-4 py-2 rounded btn-primary text-xs font-semibold flex items-center gap-2 mx-auto"
           >
             <Play className="w-4 h-4" />
             Run Pipeline Trace
@@ -152,11 +152,11 @@ export default function PipelineTab({
       )}
 
       {overviewState === 'error' && (
-        <div className="bg-red-950/40 border border-red-900/50 rounded-2xl p-5 flex items-start gap-3">
-          <AlertCircle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
+        <div className="bg-red-dark-wash border border-red-abyss-wash-50 rounded-md p-5 flex items-start gap-3">
+          <AlertCircle className="w-5 h-5 text-red shrink-0 mt-0.5" />
           <div>
-            <h3 className="font-bold text-red-300 text-sm">Pipeline trace failed</h3>
-            <p className="text-xs text-red-200/80 font-mono mt-1 whitespace-pre-wrap max-h-40 overflow-y-auto">
+            <h3 className="font-bold text-red-soft text-sm">Pipeline trace failed</h3>
+            <p className="text-xs text-red-hi-80 font-mono mt-1 whitespace-pre-wrap max-h-40 overflow-y-auto">
               {overviewError}
             </p>
           </div>
@@ -169,11 +169,11 @@ export default function PipelineTab({
             (id) => (
               <div
                 key={id}
-                className="min-w-[132px] px-3 py-2.5 rounded-xl border border-slate-800 bg-slate-900 animate-pulse"
+                className="min-w-[132px] px-3 py-2.5 rounded border border-default bg-panel animate-pulse"
               >
-                <div className="h-2.5 w-16 bg-slate-800 rounded mb-2" />
-                <div className="h-3.5 w-24 bg-slate-800 rounded mb-1.5" />
-                <div className="h-2.5 w-20 bg-slate-800 rounded" />
+                <div className="h-2.5 w-16 bg-inset rounded mb-2" />
+                <div className="h-3.5 w-24 bg-inset rounded mb-1.5" />
+                <div className="h-2.5 w-20 bg-inset rounded" />
               </div>
             ),
           )}
@@ -197,29 +197,29 @@ export default function PipelineTab({
             <div className="xl:col-span-2">
               <HealthChecks items={overview.health} />
             </div>
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
-              <h3 className="font-bold text-white text-base mb-3">
+            <div className="panel p-5">
+              <h3 className="font-bold text-hi text-base mb-3">
                 Consistency check
               </h3>
               <div className="flex items-center gap-2 mb-2">
                 {overview.consistency.ok ? (
                   <>
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                    <span className="text-xs text-emerald-400 font-semibold">
+                    <CheckCircle2 className="w-4 h-4 text-emerald" />
+                    <span className="text-xs text-emerald font-semibold">
                       Recomputed posteriors match the pipeline (abs tol 1e-9)
                     </span>
                   </>
                 ) : (
                   <>
-                    <AlertCircle className="w-4 h-4 text-amber-400" />
-                    <span className="text-xs text-amber-400 font-semibold">
+                    <AlertCircle className="w-4 h-4 text-amber" />
+                    <span className="text-xs text-amber font-semibold">
                       {overview.consistency.mismatches.length} mismatch(es)
                     </span>
                   </>
                 )}
               </div>
               {overview.consistency.skipped.length > 0 && (
-                <p className="text-[11px] text-slate-400">
+                <p className="text-[11px] text-low">
                   Skipped (cannot recompute exactly):{' '}
                   <span className="font-mono">
                     {overview.consistency.skipped.join(', ')}
@@ -230,7 +230,7 @@ export default function PipelineTab({
                 <div className="overflow-x-auto mt-2">
                   <table className="w-full text-xs font-mono">
                     <thead>
-                      <tr className="text-slate-400 text-left border-b border-slate-800">
+                      <tr className="text-low text-left border-b border-default">
                         <th className="py-1 pr-2">Direction</th>
                         <th className="py-1 pr-2">Candidate</th>
                         <th className="py-1 pr-2">Field</th>
@@ -240,7 +240,7 @@ export default function PipelineTab({
                     </thead>
                     <tbody>
                       {overview.consistency.mismatches.map((m, i) => (
-                        <tr key={i} className="border-b border-slate-800/50 text-slate-200">
+                        <tr key={i} className="border-b border-default-wash text-hi">
                           <td className="py-1 pr-2">{m.direction}</td>
                           <td className="py-1 pr-2">{m.candidate}</td>
                           <td className="py-1 pr-2">{m.field}</td>
@@ -252,17 +252,17 @@ export default function PipelineTab({
                   </table>
                 </div>
               )}
-              <div className="mt-3 text-[11px] text-slate-500">
+              <div className="mt-3 text-[11px] text-faint">
                 <div>
                   config fingerprint:{' '}
-                  <span className="font-mono text-slate-400">
+                  <span className="font-mono text-low">
                     {overview.meta.config_fingerprint}
                   </span>
                 </div>
                 {Object.keys(overview.meta.config_nondefault).length > 0 && (
                   <div className="mt-1">
                     non-default config:{' '}
-                    <span className="font-mono text-slate-400">
+                    <span className="font-mono text-low">
                       {JSON.stringify(overview.meta.config_nondefault)}
                     </span>
                   </div>
@@ -281,13 +281,13 @@ export default function PipelineTab({
           />
 
           {traceState === 'error' && (
-            <div className="bg-red-950/40 border border-red-900/50 rounded-2xl p-5 flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
+            <div className="bg-red-dark-wash border border-red-abyss-wash-50 rounded-md p-5 flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-red shrink-0 mt-0.5" />
               <div>
-                <h3 className="font-bold text-red-300 text-sm">
+                <h3 className="font-bold text-red-soft text-sm">
                   Message trace failed
                 </h3>
-                <p className="text-xs text-red-200/80 font-mono mt-1 whitespace-pre-wrap max-h-40 overflow-y-auto">
+                <p className="text-xs text-red-hi-80 font-mono mt-1 whitespace-pre-wrap max-h-40 overflow-y-auto">
                   {traceError}
                 </p>
               </div>

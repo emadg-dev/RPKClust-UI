@@ -81,6 +81,7 @@ def clean_protocol_messages(
     Returns (cleaned_messages, dropped_count, info) where info breaks the
     drops/truncations down by cause (display only).
     """
+
     p = protocol.lower()
     cleaned_msgs: List[Message] = []
     dropped = 0

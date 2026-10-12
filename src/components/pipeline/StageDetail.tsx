@@ -17,52 +17,52 @@ interface StageDetailProps {
 
 const STATUS_META: Record<string, { icon: React.ReactNode; label: string; classes: string }> = {
   ok: {
-    icon: <CheckCircle2 className="w-4 h-4 text-emerald-400" />,
+    icon: <CheckCircle2 className="w-4 h-4 text-emerald" />,
     label: 'OK',
-    classes: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30',
+    classes: 'bg-emerald-wash-10 text-emerald border-emerald-wash-30',
   },
   warn: {
-    icon: <AlertTriangle className="w-4 h-4 text-amber-400" />,
+    icon: <AlertTriangle className="w-4 h-4 text-amber" />,
     label: 'WARN',
-    classes: 'bg-amber-500/10 text-amber-400 border-amber-500/30',
+    classes: 'bg-amber-wash-10 text-amber border-amber-wash-30',
   },
   error: {
-    icon: <XCircle className="w-4 h-4 text-red-400" />,
+    icon: <XCircle className="w-4 h-4 text-red" />,
     label: 'ERROR',
-    classes: 'bg-red-500/10 text-red-400 border-red-500/30',
+    classes: 'bg-red-wash-10 text-red border-red-wash-30',
   },
   skipped: {
-    icon: <SkipForward className="w-4 h-4 text-slate-400" />,
+    icon: <SkipForward className="w-4 h-4 text-low" />,
     label: 'SKIPPED',
-    classes: 'bg-slate-500/10 text-slate-400 border-slate-500/30',
+    classes: 'bg-faint-wash text-low border-faint-wash',
   },
 };
 
 export default function StageDetail({ stage, overview }: StageDetailProps) {
   const meta = STATUS_META[stage.status] || STATUS_META.ok;
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-2xl shadow-xl overflow-hidden">
-      <div className="px-5 py-4 border-b border-slate-800 flex flex-wrap items-center justify-between gap-3">
-        <h3 className="font-bold text-white text-base">{stage.name}</h3>
+    <div className="panel overflow-hidden">
+      <div className="px-5 py-4 border-b border-default flex flex-wrap items-center justify-between gap-3">
+        <h3 className="font-bold text-hi text-base">{stage.name}</h3>
         <div className="flex items-center gap-2">
           {stage.attention.length > 0 && (
-            <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/30">
+            <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-wash-10 text-amber border border-amber-wash-30">
               ⚠ {stage.attention.join(', ')}
             </span>
           )}
           <span className={`text-[10px] px-1.5 py-0.5 rounded border font-semibold ${meta.classes}`}>
             {meta.label}
           </span>
-          <span className="text-xs font-mono text-slate-400">{stage.ms.toFixed(1)} ms</span>
+          <span className="text-xs font-mono text-low">{stage.ms.toFixed(1)} ms</span>
         </div>
       </div>
 
       {stage.status === 'error' && stage.error && (
-        <div className="px-5 py-3 bg-red-950/40 border-b border-red-900/40">
-          <div className="text-[10px] uppercase tracking-wider text-red-400 font-semibold mb-1">
+        <div className="px-5 py-3 bg-red-dark-wash border-b border-red-abyss-wash-40">
+          <div className="text-[10px] uppercase tracking-wider text-red font-semibold mb-1">
             Traceback
           </div>
-          <pre className="text-[11px] font-mono text-red-200 whitespace-pre-wrap max-h-48 overflow-y-auto">
+          <pre className="text-[11px] font-mono text-red-hi whitespace-pre-wrap max-h-48 overflow-y-auto">
             {stage.error}
           </pre>
         </div>

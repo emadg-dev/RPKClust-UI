@@ -8,31 +8,31 @@ interface HealthChecksProps {
 
 const SEVERITY_META: Record<string, { icon: React.ReactNode; classes: string }> = {
   info: {
-    icon: <Info className="w-4 h-4 text-sky-400" />,
-    classes: 'bg-sky-500/10 text-sky-300 border-sky-500/30',
+    icon: <Info className="w-4 h-4 text-sky" />,
+    classes: 'bg-sky-wash-10 text-sky-soft border-sky-wash-30',
   },
   warn: {
-    icon: <AlertTriangle className="w-4 h-4 text-amber-400" />,
-    classes: 'bg-amber-500/10 text-amber-300 border-amber-500/30',
+    icon: <AlertTriangle className="w-4 h-4 text-amber" />,
+    classes: 'bg-amber-wash-10 text-amber-soft border-amber-wash-30',
   },
   error: {
-    icon: <XCircle className="w-4 h-4 text-red-400" />,
-    classes: 'bg-red-500/10 text-red-300 border-red-500/30',
+    icon: <XCircle className="w-4 h-4 text-red" />,
+    classes: 'bg-red-wash-10 text-red-soft border-red-wash-30',
   },
 };
 
 export default function HealthChecks({ items }: HealthChecksProps) {
   if (items.length === 0) {
     return (
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
-        <h3 className="font-bold text-white text-base mb-2">Health checks</h3>
-        <p className="text-xs text-slate-500">All checks passed.</p>
+      <div className="panel p-5">
+        <h3 className="font-bold text-hi text-base mb-2">Health checks</h3>
+        <p className="text-xs text-faint">All checks passed.</p>
       </div>
     );
   }
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
-      <h3 className="font-bold text-white text-base mb-3">
+    <div className="panel p-5">
+      <h3 className="font-bold text-hi text-base mb-3">
         Health checks ({items.length})
       </h3>
       <div className="space-y-2">
@@ -41,13 +41,13 @@ export default function HealthChecks({ items }: HealthChecksProps) {
           return (
             <div
               key={`${h.id}-${i}`}
-              className={`flex items-start gap-3 px-3 py-2.5 rounded-lg border ${meta.classes}`}
+              className={`flex items-start gap-3 px-3 py-2.5 rounded border ${meta.classes}`}
             >
               <span className="mt-0.5 shrink-0">{meta.icon}</span>
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="text-xs font-semibold font-mono">{h.id}</span>
-                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-950/60 text-slate-400 font-mono">
+                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-base text-low font-mono">
                     {h.stage}
                   </span>
                 </div>

@@ -34,24 +34,24 @@ export default function InspectorTab({
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between bg-slate-900 border border-slate-800 p-4 rounded-xl gap-4">
+      <div className="flex flex-wrap items-center justify-between bg-panel border border-default p-4 rounded gap-4">
         <div className="flex items-center gap-3">
-          <Sliders className="w-5 h-5 text-indigo-400" />
-          <span className="text-sm font-semibold text-slate-300">Active Trace:</span>
-          <span className="px-3 py-1 rounded bg-indigo-600 text-white text-xs font-bold font-mono">
+          <Sliders className="w-5 h-5 text-accent3" />
+          <span className="text-sm font-semibold text-mid">Active Trace:</span>
+          <span className="px-3 py-1 rounded bg-accent text-hi text-xs font-bold font-mono">
             {currentDatasetMeta?.name}
           </span>
-          <span className="text-xs text-slate-400">
-            Source: <strong className="text-slate-200">{currentSource.name}</strong>
+          <span className="text-xs text-low">
+            Source: <strong className="text-hi">{currentSource.name}</strong>
           </span>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={onReParseTrace}
             disabled={loading}
-            className="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium rounded-lg flex items-center gap-1.5 transition"
+            className="px-3 py-1 btn-ghost text-hi text-xs font-medium rounded flex items-center gap-1.5 transition"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-cyan-400' : ''}`} />
+            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-cyan' : ''}`} />
             Re-parse Trace
           </button>
         </div>

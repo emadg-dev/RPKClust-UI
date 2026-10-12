@@ -9,29 +9,29 @@ interface Stage2TabProps {
 export default function Stage2Tab({ topCandidate }: Stage2TabProps) {
   return (
     <div className="space-y-6">
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
-        <h3 className="font-bold text-white text-base flex items-center gap-2">
-          <Cpu className="w-5 h-5 text-indigo-400" />
+      <div className="panel p-6 space-y-4">
+        <h3 className="font-bold text-hi text-base flex items-center gap-2">
+          <Cpu className="w-5 h-5 text-accent3" />
           Stage 2 Self-Constraint: Bit-Usage Euclidean Distance Analysis
         </h3>
-        <p className="text-xs text-slate-400">
+        <p className="text-xs text-low">
           Visualizing empirical bit-position activation $Q(k)$ against theoretical geometric distribution $P(k)$ for top keyword candidate at offset {topCandidate?.offset ?? 0}.
         </p>
 
         {topCandidate?.q_k && topCandidate.q_k.length > 0 ? (
-          <div className="bg-slate-950 p-6 rounded-xl border border-slate-800 space-y-4">
+          <div className="bg-base p-6 rounded border border-default space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 font-mono text-xs">
-              <div className="p-3 bg-slate-900 rounded-lg border border-slate-800">
-                <span className="text-slate-400 block">MSB Position (m):</span>
-                <span className="text-lg font-bold text-cyan-400">{topCandidate.msb}</span>
+              <div className="p-3 bg-panel rounded border border-default">
+                <span className="text-low block">MSB Position (m):</span>
+                <span className="text-lg font-bold text-cyan">{topCandidate.msb}</span>
               </div>
-              <div className="p-3 bg-slate-900 rounded-lg border border-slate-800">
-                <span className="text-slate-400 block">Euclidean Distance D:</span>
-                <span className="text-lg font-bold text-amber-400">{topCandidate.D?.toFixed(4)}</span>
+              <div className="p-3 bg-panel rounded border border-default">
+                <span className="text-low block">Euclidean Distance D:</span>
+                <span className="text-lg font-bold text-amber">{topCandidate.D?.toFixed(4)}</span>
               </div>
-              <div className="p-3 bg-slate-900 rounded-lg border border-slate-800">
-                <span className="text-slate-400 block">Bit-Use Probability P_bit:</span>
-                <span className="text-lg font-bold text-emerald-400">
+              <div className="p-3 bg-panel rounded border border-default">
+                <span className="text-low block">Bit-Use Probability P_bit:</span>
+                <span className="text-lg font-bold text-emerald">
                   {((topCandidate.p_bit || 0) * 100).toFixed(2)}%
                 </span>
               </div>
@@ -39,14 +39,14 @@ export default function Stage2Tab({ topCandidate }: Stage2TabProps) {
 
             <div className="pt-4">
               <div className="flex justify-between items-center text-xs mb-2">
-                <span className="text-slate-400 font-mono">Bit Position k (0..{topCandidate.q_k.length - 1}):</span>
+                <span className="text-low font-mono">Bit Position k (0..{topCandidate.q_k.length - 1}):</span>
                 <div className="flex items-center gap-4 font-mono">
-                  <span className="flex items-center gap-1.5 text-cyan-400">
-                    <span className="w-3 h-3 rounded bg-cyan-500" />
+                  <span className="flex items-center gap-1.5 text-cyan">
+                    <span className="w-3 h-3 rounded bg-cyan2" />
                     <span>Empirical Q(k)</span>
                   </span>
-                  <span className="flex items-center gap-1.5 text-amber-400">
-                    <span className="w-3 h-3 rounded bg-amber-500" />
+                  <span className="flex items-center gap-1.5 text-amber">
+                    <span className="w-3 h-3 rounded bg-amber2" />
                     <span>Theoretical P(k)</span>
                   </span>
                 </div>
@@ -85,7 +85,7 @@ export default function Stage2Tab({ topCandidate }: Stage2TabProps) {
             </div>
           </div>
         ) : (
-          <div className="bg-slate-950 p-8 rounded-xl border border-slate-800 text-center text-slate-500 text-xs font-mono">
+          <div className="bg-base p-8 rounded border border-default text-center text-faint text-xs font-mono">
             No bit-use evaluation data available for the selected candidate.
           </div>
         )}

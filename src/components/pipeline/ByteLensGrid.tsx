@@ -91,36 +91,36 @@ export default function ByteLensGrid({
     switch (lens) {
       case 'region':
         return b.region === 'FOR'
-          ? 'bg-cyan-500/20 text-cyan-200 border-cyan-500/40'
-          : 'bg-violet-500/20 text-violet-200 border-violet-500/40';
+          ? 'bg-cyan-wash text-cyan-hi border-cyan-wash-40'
+          : 'bg-violet-wash-20 text-violet-hi border-violet-wash-40';
       case 'status':
         if (b.status === 'excluded')
-          return 'bg-red-500/20 text-red-200 border-red-500/40';
+          return 'bg-red-wash text-red-hi border-red-wash-40';
         if (b.status === 'rescued')
-          return 'bg-emerald-500/20 text-emerald-200 border-emerald-500/40';
+          return 'bg-emerald-wash text-emerald-hi border-emerald-wash-40';
         if (b.status === 'not_evaluated')
-          return 'bg-slate-700/40 text-slate-500 border-slate-700';
-        return 'bg-slate-800 text-slate-200 border-slate-700';
+          return 'bg-inset2-wash-40 text-faint border-strong';
+        return 'bg-inset text-hi border-strong';
       case 'tags':
         if (b.tags.length >= 2)
-          return 'bg-amber-500/25 text-amber-200 border-amber-500/40';
+          return 'bg-amber-wash-25 text-amber-hi border-amber-wash-40';
         if (b.tags.length === 1)
-          return 'bg-indigo-500/20 text-indigo-200 border-indigo-500/40';
-        return 'bg-slate-800 text-slate-400 border-slate-700';
+          return 'bg-accent2-wash text-accent-faint border-accent2-wash-40';
+        return 'bg-inset text-low border-strong';
       case 'in_S':
         return b.in_S
-          ? 'bg-emerald-500/20 text-emerald-200 border-emerald-500/40'
-          : 'bg-slate-800 text-slate-400 border-slate-700';
+          ? 'bg-emerald-wash text-emerald-hi border-emerald-wash-40'
+          : 'bg-inset text-low border-strong';
       case 'satisfaction': {
         const sat = satisfactionFor(rules, b.offset, satRule, satLength);
         if (sat.msgOk === true)
-          return 'bg-emerald-500/25 text-emerald-200 border-emerald-500/50';
+          return 'bg-emerald-wash-25 text-emerald-hi border-emerald-wash-50';
         if (sat.msgOk === false)
-          return 'bg-red-500/25 text-red-200 border-red-500/50';
-        return 'bg-slate-800 text-slate-500 border-slate-700';
+          return 'bg-red-wash-25 text-red-hi border-red-wash-50';
+        return 'bg-inset text-faint border-strong';
       }
       default:
-        return 'bg-slate-800 text-slate-200 border-slate-700';
+        return 'bg-inset text-hi border-strong';
     }
   };
 
@@ -155,7 +155,7 @@ export default function ByteLensGrid({
   return (
     <div>
       <div
-        className="bg-slate-950 rounded-xl border border-slate-800 p-3 overflow-x-auto outline-none focus:ring-2 focus:ring-indigo-500/50"
+        className="stat overflow-x-auto focus-border-stronger"
         tabIndex={0}
         onKeyDown={(e) => {
           if (e.key === 'ArrowLeft') {
@@ -197,19 +197,19 @@ export default function ByteLensGrid({
                         b,
                       )} ${
                         selected
-                          ? 'ring-2 ring-white/80 z-10'
-                          : 'hover:ring-1 hover:ring-slate-500'
+                          ? 'border-mid z-10'
+                          : 'hover-border-faint'
                       }`}
                     >
                       <span>{b.hex}</span>
                       <span className="text-[8px] opacity-60">{b.offset}</span>
                       {sat && !sat.exact && sat.msgOk !== null && (
-                        <span className="absolute -top-1 -right-1 text-[7px] px-0.5 bg-slate-900 text-amber-400 rounded border border-amber-500/40">
+                        <span className="absolute -top-1 -right-1 text-[7px] px-0.5 bg-panel text-amber rounded border border-amber-wash-40">
                           w{sat.width}
                         </span>
                       )}
                       {trueByte && (
-                        <span className="absolute -top-1 -left-1 text-[7px] px-0.5 bg-amber-500 text-slate-950 rounded font-bold">
+                        <span className="absolute -top-1 -left-1 text-[7px] px-0.5 bg-amber2 text-base rounded font-bold">
                           T
                         </span>
                       )}
@@ -221,15 +221,15 @@ export default function ByteLensGrid({
         )}
       </div>
 
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-[10px] text-slate-400">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-[10px] text-low">
         {lens === 'region' && (
           <>
             <span className="flex items-center gap-1">
-              <span className="w-2.5 h-2.5 rounded bg-cyan-500/40 border border-cyan-500/60" />
+              <span className="w-2.5 h-2.5 rounded bg-cyan-wash-40 border border-cyan-wash-60" />
               FOR (keyword region)
             </span>
             <span className="flex items-center gap-1">
-              <span className="w-2.5 h-2.5 rounded bg-violet-500/40 border border-violet-500/60" />
+              <span className="w-2.5 h-2.5 rounded bg-violet-wash-40 border border-violet-wash-60" />
               NFOR
             </span>
           </>
@@ -237,19 +237,19 @@ export default function ByteLensGrid({
         {lens === 'status' && (
           <>
             <span className="flex items-center gap-1">
-              <span className="w-2.5 h-2.5 rounded bg-red-500/40 border border-red-500/60" />
+              <span className="w-2.5 h-2.5 rounded bg-red-wash-40 border border-red-wash-60" />
               excluded
             </span>
             <span className="flex items-center gap-1">
-              <span className="w-2.5 h-2.5 rounded bg-emerald-500/40 border border-emerald-500/60" />
+              <span className="w-2.5 h-2.5 rounded bg-emerald-wash-40 border border-emerald-wash-60" />
               rescued
             </span>
             <span className="flex items-center gap-1">
-              <span className="w-2.5 h-2.5 rounded bg-slate-700/60 border border-slate-600" />
+              <span className="w-2.5 h-2.5 rounded bg-inset2-wash-60 border border-stronger" />
               available
             </span>
             <span className="flex items-center gap-1">
-              <span className="w-2.5 h-2.5 rounded bg-slate-800 border border-slate-700" />
+              <span className="w-2.5 h-2.5 rounded bg-inset border border-strong" />
               not evaluated
             </span>
           </>
@@ -257,15 +257,15 @@ export default function ByteLensGrid({
         {lens === 'tags' && (
           <>
             <span className="flex items-center gap-1">
-              <span className="w-2.5 h-2.5 rounded bg-amber-500/40 border border-amber-500/60" />
+              <span className="w-2.5 h-2.5 rounded bg-amber-wash-40 border border-amber-wash-60" />
               2+ tags
             </span>
             <span className="flex items-center gap-1">
-              <span className="w-2.5 h-2.5 rounded bg-indigo-500/40 border border-indigo-500/60" />
+              <span className="w-2.5 h-2.5 rounded bg-accent2-wash-40 border border-accent2-wash-60" />
               1 tag
             </span>
             <span className="flex items-center gap-1">
-              <span className="w-2.5 h-2.5 rounded bg-slate-700/60 border border-slate-600" />
+              <span className="w-2.5 h-2.5 rounded bg-inset2-wash-60 border border-stronger" />
               untagged
             </span>
           </>
@@ -273,11 +273,11 @@ export default function ByteLensGrid({
         {lens === 'in_S' && (
           <>
             <span className="flex items-center gap-1">
-              <span className="w-2.5 h-2.5 rounded bg-emerald-500/40 border border-emerald-500/60" />
+              <span className="w-2.5 h-2.5 rounded bg-emerald-wash-40 border border-emerald-wash-60" />
               in S (available)
             </span>
             <span className="flex items-center gap-1">
-              <span className="w-2.5 h-2.5 rounded bg-slate-700/60 border border-slate-600" />
+              <span className="w-2.5 h-2.5 rounded bg-inset2-wash-60 border border-stronger" />
               not in S
             </span>
           </>
@@ -285,25 +285,25 @@ export default function ByteLensGrid({
         {lens === 'satisfaction' && (
           <>
             <span className="flex items-center gap-1">
-              <span className="w-2.5 h-2.5 rounded bg-emerald-500/40 border border-emerald-500/60" />
+              <span className="w-2.5 h-2.5 rounded bg-emerald-wash-40 border border-emerald-wash-60" />
               satisfied
             </span>
             <span className="flex items-center gap-1">
-              <span className="w-2.5 h-2.5 rounded bg-red-500/40 border border-red-500/60" />
+              <span className="w-2.5 h-2.5 rounded bg-red-wash-40 border border-red-wash-60" />
               violated
             </span>
             <span className="flex items-center gap-1">
-              <span className="w-2.5 h-2.5 rounded bg-slate-700/60 border border-slate-600" />
+              <span className="w-2.5 h-2.5 rounded bg-inset2-wash-60 border border-stronger" />
               not evaluable
             </span>
             <span className="flex items-center gap-1">
-              <span className="text-amber-400 font-bold">w2</span>
+              <span className="text-amber font-bold">w2</span>
               covered by wider window
             </span>
           </>
         )}
         <span className="flex items-center gap-1">
-          <span className="text-amber-400 font-bold">T</span>
+          <span className="text-amber font-bold">T</span>
           TRUE (catalog, eval only)
         </span>
         <span className="ml-auto font-mono">
