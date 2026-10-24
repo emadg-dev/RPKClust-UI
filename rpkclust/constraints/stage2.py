@@ -35,7 +35,7 @@ def compute_bit_use_prob(
     p_k = []
     for k in range(max_msb + 1):
         q_k.append(sum(1 for m in msb_list if m >= k) / total_valid)
-        p_k.append(1.0 - math.exp2(-(max_msb + 1 - k)))
+        p_k.append(1.0 - (2 ** (-(max_msb + 1 - k))))
 
 
     d_sq = sum((q - p) ** 2 for q, p in zip(q_k, p_k))

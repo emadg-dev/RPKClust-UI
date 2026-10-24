@@ -20,14 +20,15 @@ import { PairwiseInspector } from './components/PairwiseInspector';
 export default function App() {
   const [activeTab, setActiveTab] = useState<ActiveTab>('results');
   const [sourcesCatalog, setSourcesCatalog] = useState<Record<string, SourceMeta>>(DEFAULT_SOURCES);
-  const [selectedSource, setSelectedSource] = useState<string>('netplier');
-  const [selectedDataset, setSelectedDataset] = useState<string>('modbus');
+  const [selectedSource, setSelectedSource] = useState<string>('binaryinferno');
+  const [selectedDataset, setSelectedDataset] = useState<string>('bgp_100');
   const [selectedMsgCount, setSelectedMsgCount] = useState<number>(100);
   const [sourceDropdownOpen, setSourceDropdownOpen] = useState<boolean>(false);
   const [benchmarkFilter, setBenchmarkFilter] = useState<string>('all');
 
   const [loading, setLoading] = useState<boolean>(false);
   const [benchLoading, setBenchLoading] = useState<boolean>(false);
+  const [benchProgress, setBenchProgress] = useState<number>(0);
   const [benchmarks, setBenchmarks] = useState<BenchmarkResult[]>([]);
   const [protoDetails, setProtoDetails] = useState<ProtocolDetails | null>(null);
   const [customText, setCustomText] = useState<string>(FIG1_HEX);
@@ -56,13 +57,14 @@ export default function App() {
     }
   };
 
-  const runAllBenchmarks = async (filterSource: string = benchmarkFilter) => {
+  const runAllBenchmarks = async (filterSource: string = benchmarkFilter, msgCount?: number) => {
     setBenchmarkFilter(filterSource);
     setBenchLoading(true);
     try {
       const { data } = await api.executeApiCall({
         cmd: 'benchmark_all',
         source_id: filterSource,
+        msg_count: msgCount,
         config: serializeParams(),
       }, `bench_${filterSource}`);
       if (data?.status === 'ok') {
@@ -143,7 +145,7 @@ export default function App() {
 
   useEffect(() => {
     if (selectedSource === 'binaryinferno') {
-      runAllBenchmarks('binaryinferno');
+      runAllBenchmarks('binaryinferno', selectedMsgCount);
     }
   }, [selectedMsgCount]);
 
@@ -151,7 +153,23 @@ export default function App() {
     loadDataset(selectedSource, selectedDataset);
   }, [selectedDataset]);
 
-  const currentSource = sourcesCatalog[selectedSource] || DEFAULT_SOURCES[selectedSource];
+  // Benchmark progress animation
+  useEffect(() => {
+    if (benchLoading) {
+      let p = 0;
+      const timer = setInterval(() => {
+        p += Math.random() * 15 + 5;
+        if (p >= 95) p = 95;
+        setBenchProgress(Math.round(p));
+      }, 400);
+      return () => clearInterval(timer);
+    } else {
+      setBenchProgress(100);
+      setTimeout(() => setBenchProgress(0), 800);
+    }
+  }, [benchLoading]);
+
+  const currentSource = sourcesCatalog[selectedSource] || DEFAULT_SOURCES[selectedSource] || DEFAULT_SOURCES['netplier'];
   const availableDatasets = currentSource?.datasets || [];
   const currentDatasetMeta = availableDatasets.find((d) => d.id === selectedDataset) || availableDatasets[0];
 
@@ -192,6 +210,10 @@ export default function App() {
         currentSource={currentSource}
         showKnobs={showKnobs}
         setShowKnobs={setShowKnobs}
+        onReRunBenchmarks={runAllBenchmarks}
+        benchLoading={benchLoading}
+        benchProgress={benchProgress}
+        pipelineStage={benchLoading ? 'benchmark_all (BinaryInferno)' : undefined}
       />
 
       {showKnobs && (
@@ -212,24 +234,28 @@ export default function App() {
       )}
 
       <main className="flex-1 p-6 max-w-7xl w-full mx-auto space-y-6 pb-28">
-        <DatasetProvenance
-          currentSource={currentSource}
-          sourcesCatalog={sourcesCatalog}
-          selectedSource={selectedSource}
-          setSelectedSource={setSelectedSource}
-          selectedMsgCount={selectedMsgCount}
-          setSelectedMsgCount={setSelectedMsgCount}
-          availableDatasets={availableDatasets}
-          selectedDataset={selectedDataset}
-          setSelectedDataset={setSelectedDataset}
-          currentDatasetMeta={currentDatasetMeta}
-        />
+        {(
+          <DatasetProvenance
+            currentSource={currentSource}
+            sourcesCatalog={sourcesCatalog}
+            selectedSource={selectedSource}
+            setSelectedSource={setSelectedSource}
+            selectedMsgCount={selectedMsgCount}
+            setSelectedMsgCount={setSelectedMsgCount}
+            availableDatasets={availableDatasets}
+            selectedDataset={selectedDataset}
+            setSelectedDataset={setSelectedDataset}
+            currentDatasetMeta={currentDatasetMeta}
+          />
+        )}
 
         {activeTab === 'results' && (
           <ResultsTab
-            displayedBenchmarks={displayedBenchmarks}
+            benchmarks={displayedBenchmarks}
             sourcesCatalog={sourcesCatalog}
             benchmarkFilter={benchmarkFilter}
+            msgCountFilter={selectedMsgCount}
+            onMsgCountChange={(c) => setSelectedMsgCount(c)}
             onRunAllBenchmarks={runAllBenchmarks}
             benchLoading={benchLoading}
             rpkAvgV={rpkAvgV}
