@@ -130,12 +130,51 @@ export interface Hyperparameters {
   sparse_ratio: number;
   stage1_top_k: number;
   sim_sample_size: number;
+  sim_sample_pairs?: number;
+  pair_min_ratio?: number;
   pos_for_base: number;
   pos_for_slope: number;
   pos_for_floor: number;
   pos_nfor: number;
   bituse_endian: string;
   enabled_detectors: string[];
+  for_exclude_rules?: string[];
+  dmax_mode?: 'max_over_m' | 'm_equals_msb';
+  // Additional config parameters from Python Config
+  candidate_max_distinct_ratio?: number | null;
+  tlv_auto_params?: boolean;
+  tlv_t_len?: number;
+  tlv_l_len?: number;
+  tlv_endian?: string;
+  tlv_t_lens?: number[];
+  tlv_l_lens?: number[];
+  tlv_endians?: string[];
+  tlv_min_repeats?: number;
+  tlv_min_coverage?: number;
+  tlv_min_presence?: number;
+  tlv_max_type_cardinality?: number;
+  const_max_len?: number;
+  seq_match_ratio?: number;
+  timestamp_slack_s?: number;
+  address_corr_threshold?: number;
+  checksum_algorithms?: string[];
+  float_min_distinct?: number;
+  enable_float?: boolean;
+  enable_length?: boolean;
+  boundary_per_direction?: boolean;
+  boundary_require_contiguous?: boolean;
+  boundary_min_msgs?: number;
+  boundary_include_extra_rules?: boolean;
+  stage1_normalize?: boolean;
+  norm_range?: [number, number];
+  struct_mode?: 'length' | 'mafft';
+  predicate_mode?: 'per_cluster' | 'mean';
+  prob_clip?: [number, number] | null;
+  cluster_label_mode?: 'per_direction' | 'global';
+  seed?: number;
+  session_gap_s?: number;
+  direction_mode?: 'port' | 'first_packet' | 'none';
+  max_candidates?: number;
 }
 
 export interface SampleMessage {

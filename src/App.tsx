@@ -24,8 +24,6 @@ export default function App() {
   const [selectedDataset, setSelectedDataset] = useState<string>('modbus');
   const [selectedMsgCount, setSelectedMsgCount] = useState<number>(100);
   const [sourceDropdownOpen, setSourceDropdownOpen] = useState<boolean>(false);
-  const [benchmarkFilter, setBenchmarkFilter] = useState<string>('all');
-
   const [loading, setLoading] = useState<boolean>(false);
   const [benchLoading, setBenchLoading] = useState<boolean>(false);
   const [benchProgress, setBenchProgress] = useState<number>(0);
@@ -47,7 +45,44 @@ export default function App() {
     pos_for: [params.pos_for_base, params.pos_for_slope, params.pos_for_floor],
     pos_nfor: params.pos_nfor,
     bituse_endian: params.bituse_endian,
-    for_exclude_rules: params.enabled_detectors.filter((d) => d !== 'sparse'),
+    dmax_mode: params.dmax_mode,
+    for_exclude_rules: params.for_exclude_rules ?? params.enabled_detectors.filter((d) => d !== 'sparse'),
+    sim_sample_pairs: params.sim_sample_pairs,
+    pair_min_ratio: params.pair_min_ratio,
+    candidate_max_distinct_ratio: params.candidate_max_distinct_ratio,
+    tlv_auto_params: params.tlv_auto_params,
+    tlv_t_len: params.tlv_t_len,
+    tlv_l_len: params.tlv_l_len,
+    tlv_endian: params.tlv_endian,
+    tlv_t_lens: params.tlv_t_lens,
+    tlv_l_lens: params.tlv_l_lens,
+    tlv_endians: params.tlv_endians,
+    tlv_min_repeats: params.tlv_min_repeats,
+    tlv_min_coverage: params.tlv_min_coverage,
+    tlv_min_presence: params.tlv_min_presence,
+    tlv_max_type_cardinality: params.tlv_max_type_cardinality,
+    const_max_len: params.const_max_len,
+    seq_match_ratio: params.seq_match_ratio,
+    timestamp_slack_s: params.timestamp_slack_s,
+    address_corr_threshold: params.address_corr_threshold,
+    checksum_algorithms: params.checksum_algorithms,
+    float_min_distinct: params.float_min_distinct,
+    enable_float: params.enable_float,
+    enable_length: params.enable_length,
+    boundary_per_direction: params.boundary_per_direction,
+    boundary_require_contiguous: params.boundary_require_contiguous,
+    boundary_min_msgs: params.boundary_min_msgs,
+    boundary_include_extra_rules: params.boundary_include_extra_rules,
+    stage1_normalize: params.stage1_normalize,
+    norm_range: params.norm_range,
+    struct_mode: params.struct_mode,
+    predicate_mode: params.predicate_mode,
+    prob_clip: params.prob_clip,
+    cluster_label_mode: params.cluster_label_mode,
+    seed: params.seed,
+    session_gap_s: params.session_gap_s,
+    direction_mode: params.direction_mode,
+    max_candidates: params.max_candidates,
   });
 
   const fetchSources = async () => {
@@ -57,16 +92,15 @@ export default function App() {
     }
   };
 
-  const runAllBenchmarks = async (filterSource: string = benchmarkFilter, msgCount?: number) => {
-    setBenchmarkFilter(filterSource);
+  const runAllBenchmarks = async (msgCount?: number) => {
     setBenchLoading(true);
     try {
       const { data } = await api.executeApiCall({
         cmd: 'benchmark_all',
-        source_id: filterSource,
+        source_id: selectedSource === 'all' ? 'all' : selectedSource,
         msg_count: msgCount,
         config: serializeParams(),
-      }, `bench_${filterSource}`);
+      }, `bench_${selectedSource}`);
       if (data?.status === 'ok') {
         setBenchmarks(data.benchmarks);
       }
@@ -122,8 +156,13 @@ export default function App() {
 
   useEffect(() => {
     fetchSources();
-    runAllBenchmarks('all');
+    runAllBenchmarks();
   }, []);
+
+  useEffect(() => {
+    runAllBenchmarks(selectedMsgCount);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedSource]);
 
   useEffect(() => {
     const curSource = sourcesCatalog[selectedSource] || DEFAULT_SOURCES[selectedSource];
@@ -145,7 +184,7 @@ export default function App() {
 
   useEffect(() => {
     if (selectedSource === 'binaryinferno') {
-      runAllBenchmarks('binaryinferno', selectedMsgCount);
+      runAllBenchmarks(selectedMsgCount);
     }
   }, [selectedMsgCount]);
 
@@ -181,15 +220,6 @@ export default function App() {
     currentDetails?.keywords?.['both']?.ranking?.[0] ??
     null;
 
-  const displayedBenchmarks = benchmarks.filter((b) => {
-    if (benchmarkFilter === 'all') return true;
-    if (b.source_id !== benchmarkFilter) return false;
-    if (b.source_id === 'binaryinferno' && b.total_messages !== undefined) {
-      return b.total_messages === selectedMsgCount;
-    }
-    return true;
-  });
-
   const rpkAvgV = useMemo(() => {
     const netplerResults = benchmarks.filter((b) => !b.error && b.v_measure !== undefined);
     if (netplerResults.length === 0) return null;
@@ -216,22 +246,21 @@ export default function App() {
         pipelineStage={benchLoading ? 'benchmark_all (BinaryInferno)' : undefined}
       />
 
-      {showKnobs && (
-        <HyperparameterKnobs
-          params={params}
-          setParams={setParams}
-          onReset={resetParams}
-          onApply={() => {
-            loadDataset(selectedSource, selectedDataset);
-            runAllBenchmarks(benchmarkFilter);
-          }}
-          selectedSource={selectedSource}
-          selectedDataset={selectedDataset}
-          benchmarkFilter={benchmarkFilter}
-          onRunAllBenchmarks={runAllBenchmarks}
-          onLoadDataset={loadDataset}
-        />
-      )}
+      <HyperparameterKnobs
+        params={params}
+        setParams={setParams}
+        onReset={resetParams}
+        onApply={() => {
+          loadDataset(selectedSource, selectedDataset);
+          runAllBenchmarks();
+        }}
+        selectedSource={selectedSource}
+        selectedDataset={selectedDataset}
+        onRunAllBenchmarks={runAllBenchmarks}
+        onLoadDataset={loadDataset}
+        open={showKnobs}
+        onToggle={() => setShowKnobs(!showKnobs)}
+      />
 
       <main className="flex-1 p-6 max-w-7xl w-full mx-auto space-y-6 pb-28">
         {(
@@ -251,17 +280,12 @@ export default function App() {
 
         {activeTab === 'results' && (
           <ResultsTab
-            benchmarks={displayedBenchmarks}
-            sourcesCatalog={sourcesCatalog}
-            benchmarkFilter={benchmarkFilter}
-            msgCountFilter={selectedMsgCount}
-            onMsgCountChange={(c) => setSelectedMsgCount(c)}
-            onRunAllBenchmarks={runAllBenchmarks}
+            benchmarks={benchmarks}
             benchLoading={benchLoading}
+            onReEvaluate={runAllBenchmarks}
             rpkAvgV={rpkAvgV}
             baselines={BASELINE_COMPARISONS}
             onBenchmarkClick={handleBenchmarkClick}
-            onTabChange={setActiveTab}
           />
         )}
 

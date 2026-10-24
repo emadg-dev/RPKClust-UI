@@ -121,7 +121,7 @@ export default function Header({
 </button>
         <button
           onClick={() => setShowKnobs(!showKnobs)}
-          className={`px-3 py-2 rounded text-xs font-semibold flex items-center gap-2 border transition ${
+          className={`px-3 py-2 rounded text-xs font-semibold flex items-center gap-2 border transition ml-auto ${
             showKnobs
               ? 'bg-amber-wash text-amber-soft border-amber-wash-40'
               : 'btn-ghost text-mid border-strong'

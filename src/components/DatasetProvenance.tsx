@@ -45,6 +45,18 @@ export default function DatasetProvenance({
         </div>
 
         <div className="flex flex-wrap gap-1.5 shrink-0 bg-base p-1 rounded border border-default">
+          <button
+            key="all"
+            onClick={() => setSelectedSource('all')}
+            className={`px-3 py-1.5 btn flex items-center gap-1.5 ${
+              selectedSource === 'all'
+                ? 'bg-accent text-hi'
+                : 'text-low hover-text-hi hover-bg-panel'
+            }`}
+          >
+            <span>All Sources</span>
+            <span className="text-[10px] opacity-75 font-mono">(all)</span>
+          </button>
           {Object.values(sourcesCatalog).map((src) => (
             <button
               key={src.id}
