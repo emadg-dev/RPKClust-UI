@@ -1,25 +1,27 @@
-import React from 'react';
-import BoundaryDisplay from '../BoundaryDisplay';
 import ClusteringMetricsView from '../ClusteringMetricsView';
 import BaselineComparisonCard from '../BaselineComparisonCard';
-import { BenchmarkResult, SourceMeta, BaselineComparison, ActiveTab } from '../../types';
+import { ActiveTab } from '../../types';
 
 interface ResultsTabProps {
-  displayedBenchmarks: BenchmarkResult[];
-  sourcesCatalog: Record<string, SourceMeta>;
+  benchmarks: any[];
+  sourcesCatalog: Record<string, any>;
   benchmarkFilter: string;
-  onRunAllBenchmarks: (filter: string) => void;
+  msgCountFilter?: number;
+  onRunAllBenchmarks: (filter: string, msgCount?: number) => void;
+  onMsgCountChange?: (count: number) => void;
   benchLoading: boolean;
   rpkAvgV: string | null;
-  baselines: BaselineComparison[];
+  baselines: any[];
   onBenchmarkClick: (sourceId?: string, datasetId?: string) => void;
   onTabChange: (tab: ActiveTab) => void;
 }
 
 export default function ResultsTab({
-  displayedBenchmarks,
+  benchmarks,
   sourcesCatalog,
   benchmarkFilter,
+  msgCountFilter,
+  onMsgCountChange,
   onRunAllBenchmarks,
   benchLoading,
   rpkAvgV,
@@ -29,21 +31,16 @@ export default function ResultsTab({
 }: ResultsTabProps) {
   return (
     <div className="space-y-6">
-      <BoundaryDisplay
-        variant="benchmark"
-        benchmarks={displayedBenchmarks}
-        sourcesCatalog={sourcesCatalog}
-        benchmarkFilter={benchmarkFilter}
-        onRunAllBenchmarks={onRunAllBenchmarks}
-        onBenchmarkClick={onBenchmarkClick}
-        onTabChange={onTabChange}
-      />
-
       <ClusteringMetricsView
         variant="table"
-        benchmarks={displayedBenchmarks}
+        benchmarks={benchmarks}
         benchLoading={benchLoading}
-        onReEvaluate={() => onRunAllBenchmarks(benchmarkFilter)}
+        sourceFilter={benchmarkFilter}
+        sourcesCatalog={sourcesCatalog}
+        msgCountFilter={msgCountFilter}
+        onFilterChange={(f) => onRunAllBenchmarks(f, msgCountFilter)}
+        onMsgCountChange={(c) => onMsgCountChange?.(c)}
+        onReEvaluate={() => onRunAllBenchmarks(benchmarkFilter, msgCountFilter)}
       />
 
       <BaselineComparisonCard rpkAvgV={rpkAvgV} baselines={baselines} />

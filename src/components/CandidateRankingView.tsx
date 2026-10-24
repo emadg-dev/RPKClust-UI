@@ -61,12 +61,9 @@ function TableMode({ ranking }: TableModeProps) {
       <div className="flex items-center justify-between">
         <div>
           <h3 className="font-bold text-hi text-base flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-cyan" />
+           
             Factor Graph Candidate Rankings (Stage 1 &amp; Stage 2 Multi-Constraint Probabilities)
           </h3>
-          <p className="text-xs text-low mt-0.5">
-            Step-by-step posterior probabilities across Message Similarity, Remote Coupling, Structural Coherence, Dimension, Bit-Use, and Position constraints.
-          </p>
         </div>
       </div>
 

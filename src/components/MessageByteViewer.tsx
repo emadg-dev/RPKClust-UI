@@ -87,7 +87,6 @@ function SingleMode({
     <div className="lg:col-span-2 panel p-6 space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Binary className="w-5 h-5 text-accent3" />
           <h3 className="font-semibold text-hi">Byte-Level Message Region Highlighting</h3>
         </div>
 
@@ -457,7 +456,6 @@ function AlignedMode({
     <div className="panel p-5 space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-default pb-3">
         <div className="flex items-center gap-2">
-          <Binary className="w-4 h-4 text-cyan" />
           <h3 className="text-sm font-semibold text-hi">Sequence Alignment & Synchronized Hex Stream</h3>
         </div>
 

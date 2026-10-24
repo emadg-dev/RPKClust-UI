@@ -212,6 +212,7 @@ def process_request(data: dict) -> dict:
 
     elif cmd == "benchmark_all":
         source_id = data.get("source_id", "all")
+        msg_count_filter = data.get("msg_count")
         results = []
 
         catalog = get_catalog()
@@ -223,6 +224,9 @@ def process_request(data: dict) -> dict:
 
         for src in sources_to_bench:
             for d in src["datasets"]:
+                if source_id == "binaryinferno" and msg_count_filter is not None:
+                    if d.get("packets") != msg_count_filter:
+                        continue
                 data_path = d["file"]
                 if not os.path.exists(data_path):
                     continue

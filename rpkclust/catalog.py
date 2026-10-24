@@ -320,12 +320,12 @@ SOURCES = {
             # BinaryInferno SMB has no NetBIOS header
             # BinaryInferno SMB has no NetBIOS header
             {
-                "id": "smb2_1000",
-                "name": "SMBv2 (1000 msgs)",
+                "id": "smb2_100",
+                "name": "SMBv2 (100 msgs)",
                 "protocol": "smb2",
-                "file": "data/binaryinferno/1000/smb2.txt.input",
+                "file": "data/binaryinferno/100/smb2.txt.input",
                 "category": "Storage / File Sharing",
-                "packets": 1000,
+                "packets": 100,
                 "header_len": 60,
                 "keyword_field": "SMB2 Command (offset 12, 2B)",
                 "true_keyword": {"offset": 12, "length": 2, "region": "FOR", "name": "SMB2 Command"},

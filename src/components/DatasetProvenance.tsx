@@ -9,10 +9,10 @@ interface DatasetProvenanceProps {
   setSelectedSource: (source: string) => void;
   selectedMsgCount: number;
   setSelectedMsgCount: (count: number) => void;
-  availableDatasets: DatasetMeta[];
-  selectedDataset: string;
-  setSelectedDataset: (dataset: string) => void;
-  currentDatasetMeta: DatasetMeta | undefined;
+  availableDatasets?: DatasetMeta[];
+  selectedDataset?: string;
+  setSelectedDataset?: (dataset: string) => void;
+  currentDatasetMeta?: DatasetMeta | undefined;
 }
 
 export default function DatasetProvenance({
@@ -29,11 +29,8 @@ export default function DatasetProvenance({
 }: DatasetProvenanceProps) {
   return (
     <div className="panel p-5 relative overflow-hidden">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
         <div className="flex items-start gap-3.5">
-          <div className="w-10 h-10 rounded bg-inset border border-strong flex items-center justify-center text-cyan shrink-0">
-            <FolderArchive className="w-5 h-5" />
-          </div>
           <div>
             <div className="flex items-center gap-2 flex-wrap">
               <span className="text-xs font-semibold uppercase tracking-wider text-low">
@@ -42,19 +39,8 @@ export default function DatasetProvenance({
               <span className="px-2.5 py-0.5 rounded-md text-xs font-bold bg-accent2-wash-10 text-accent-soft border border-accent2-wash-30">
                 {currentSource.name}
               </span>
-              <a
-                href={currentSource.url}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-1 text-[11px] text-cyan hover-text-cyan-soft underline font-mono"
-              >
-                <span>{currentSource.citation}</span>
-                <ExternalLink className="w-3 h-3" />
-              </a>
+             
             </div>
-            <p className="text-xs text-mid mt-1 max-w-3xl leading-relaxed">
-              {currentSource.description}
-            </p>
           </div>
         </div>
 
@@ -80,7 +66,6 @@ export default function DatasetProvenance({
         <div className="mt-4 pt-4 border-t border-default mb-3">
           <div className="mb-3">
             <label className="text-xs font-bold text-mid flex items-center gap-1.5 mb-2">
-              <RotateCcw className="w-3.5 h-3.5 text-emerald" />
               Message Count
             </label>
             <div className="flex flex-wrap gap-2">
@@ -102,43 +87,44 @@ export default function DatasetProvenance({
         </div>
       )}
 
-      <div className="mt-4 pt-4 border-t border-default">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-bold text-mid flex items-center gap-1.5">
-            <Database className="w-3.5 h-3.5 text-cyan" />
-            Available PCAP Traces in {currentSource.short_name}:
-          </span>
-          <span className="text-[11px] text-low font-mono">
-            Selected: <strong className="text-cyan-soft">{currentDatasetMeta?.name}</strong> ({currentDatasetMeta?.packets} msgs)
-          </span>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {availableDatasets.map((d) => {
-            const isSelected = selectedDataset === d.id;
-            return (
-              <button
-                key={d.id}
-                onClick={() => setSelectedDataset(d.id)}
-                className={`px-3 py-1.5 btn border flex items-center gap-2 ${
-                  isSelected
-                    ? 'bg-inset border-faint text-hi'
-                    : 'bg-base border-default text-low hover-text-hi hover-border-strong'
-                }`}
-              >
-                <span
-                  className={`w-2 h-2 rounded-full ${
-                    isSelected ? 'bg-cyan animate-pulse' : 'bg-inset3'
+      {(availableDatasets && availableDatasets.length > 0 && (selectedSource === 'binaryinferno' || selectedSource === 'netplier' || selectedSource === 'icsreal')) && (
+        <div className="mt-4 pt-4 border-t border-default">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-bold text-mid flex items-center gap-1.5">
+              Available PCAP Traces in {currentSource.short_name}:
+            </span>
+            <span className="text-[11px] text-low font-mono">
+              Selected: <strong className="text-cyan-soft">{currentDatasetMeta?.name ?? availableDatasets[0]?.name ?? 'None'}</strong> ({currentDatasetMeta?.packets ?? availableDatasets[0]?.packets ?? 0} msgs)
+            </span>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {availableDatasets.map((d) => {
+              const isSelected = selectedDataset === d.id;
+              return (
+                <button
+                  key={d.id}
+                  onClick={() => setSelectedDataset?.(d.id)}
+                  className={`px-3 py-1.5 btn border flex items-center gap-2 ${
+                    isSelected
+                      ? 'bg-inset border-faint text-hi'
+                      : 'bg-base border-default text-low hover-text-hi hover-border-strong'
                   }`}
-                />
-                <span>{d.name}</span>
-                <span className="text-[10px] font-mono px-1 rounded bg-panel text-low">
-                  {d.packets}p
-                </span>
-              </button>
-            );
-          })}
+                >
+                  <span
+                    className={`w-2 h-2 rounded-full ${
+                      isSelected ? 'bg-cyan animate-pulse' : 'bg-inset3'
+                    }`}
+                  />
+                  <span>{d.name}</span>
+                  <span className="text-[10px] font-mono px-1 rounded bg-panel text-low">
+                    {d.packets}p
+                  </span>
+                </button>
+              );
+            })}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
