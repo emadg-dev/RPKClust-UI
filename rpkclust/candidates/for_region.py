@@ -41,8 +41,6 @@ def generate_for_candidates(
             continue
 
         if h.rule == "checksum":
-            # NOT in the paper: a checksum byte must never become a keyword,
-            # even if the same bytes were also tagged sparse.
             checksum_bytes.update(range(h_start, h_end))
         if h.rule == "sparse":
             sparse_bytes.update(range(h_start, h_end))
@@ -76,12 +74,12 @@ def generate_for_candidates(
             values = [m.data[s:s + L] for m in target_msgs if len(m.data) >= s + L]
             if len(values) != num_msgs:
                 continue
-            distinct_cnt = len(set(values))
-            if distinct_cnt <= 1:      # not in paper: drops constant sparse bytes
-                continue
-            max_ratio = config.candidate_max_distinct_ratio
-            if max_ratio is not None and num_msgs >= 10 and distinct_cnt / num_msgs > max_ratio:
-                continue
+            # distinct_cnt = len(set(values))
+            # if distinct_cnt <= 1:      # not in paper: drops constant sparse bytes
+            #     continue
+            # max_ratio = config.candidate_max_distinct_ratio
+            # if max_ratio is not None and num_msgs >= 10 and distinct_cnt / num_msgs > max_ratio:
+            #     continue
 
             candidates.append(Candidate(region="FOR", offset=s, length=L,
                                         kind="window", direction=direction))

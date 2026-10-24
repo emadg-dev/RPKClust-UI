@@ -18,7 +18,7 @@ class Config:
     # NFOR TLV parameters
     # When tlv_auto_params=False (default), use fixed tlv_t_len / tlv_l_len / tlv_endian
     # When True, grid search over tlv_t_lens / tlv_l_lens / tlv_endians
-    tlv_auto_params: bool = False
+    tlv_auto_params: bool = True
     tlv_t_len: int = 1
     tlv_l_len: int = 1
     tlv_endian: str = "big"
