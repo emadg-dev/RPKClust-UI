@@ -11,12 +11,9 @@ export default function BaselineComparisonCard({ rpkAvgV, baselines }: BaselineC
   return (
     <div className="panel p-6 space-y-4">
       <h3 className="font-bold text-hi text-base flex items-center gap-2">
-        <Zap className="w-5 h-5 text-amber" />
-        Cross-Method Comparison (RPKClust vs NetPlier vs AutoFormat)
+        
+        Cross-Method Comparison
       </h3>
-      <p className="text-xs text-low">
-        Summary of algorithmic design differences and execution efficiency.
-      </p>
 
       <div className="overflow-x-auto">
         <table className="w-full text-left text-xs font-mono text-mid">

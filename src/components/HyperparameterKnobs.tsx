@@ -35,7 +35,6 @@ export default function HyperparameterKnobs({
       <div className="max-w-7xl mx-auto space-y-4">
         <div className="flex items-center justify-between border-b border-default pb-3">
           <div className="flex items-center gap-2">
-            <SlidersHorizontal className="w-5 h-5 text-amber" />
             <h3 className="font-bold text-hi text-base">Algorithm Hyperparameter Controls &amp; Tuning</h3>
             <span className="text-xs text-low ml-2">Adjust knobs to re-run probability inference and boundary scanning</span>
           </div>

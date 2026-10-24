@@ -24,7 +24,7 @@ function DiagnosticMode({ B, minLen, candidateCount, hits }: DiagnosticModeProps
     <div className="space-y-6">
       <div className="panel p-6 space-y-4">
         <h3 className="font-semibold text-hi flex items-center gap-2">
-          <Shield className="w-5 h-5 text-amber" />
+          
           Boundary Detection Diagnostics
         </h3>
 

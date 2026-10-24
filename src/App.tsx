@@ -20,8 +20,8 @@ import { PairwiseInspector } from './components/PairwiseInspector';
 export default function App() {
   const [activeTab, setActiveTab] = useState<ActiveTab>('results');
   const [sourcesCatalog, setSourcesCatalog] = useState<Record<string, SourceMeta>>(DEFAULT_SOURCES);
-  const [selectedSource, setSelectedSource] = useState<string>('binaryinferno');
-  const [selectedDataset, setSelectedDataset] = useState<string>('bgp_100');
+  const [selectedSource, setSelectedSource] = useState<string>('netplier');
+  const [selectedDataset, setSelectedDataset] = useState<string>('modbus');
   const [selectedMsgCount, setSelectedMsgCount] = useState<number>(100);
   const [sourceDropdownOpen, setSourceDropdownOpen] = useState<boolean>(false);
   const [benchmarkFilter, setBenchmarkFilter] = useState<string>('all');
